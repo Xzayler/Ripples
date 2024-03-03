@@ -8,13 +8,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        accent: "var(--color-accent)",
-        background: "var(--color-background)",
-        foreground: "var(--color-foreground)",
-        faint: "var(--color-faint)",
-        highlight: "var(--color-highlight)",
-        highlightextra: "var(--color-highlightextra)",
-        ui: "var(--color-divider)",
+        accent: "rgb(var(--color-accent) / <alpha-value>)",
+        background: "rgb(var(--color-background) / <alpha-value>)",
+        foreground: "rgb(var(--color-foreground) / <alpha-value>)",
+        faint: "rgb(var(--color-faint) / <alpha-value>)",
+        highlight: "rgb(var(--color-highlight) / <alpha-value>)",
+        highlightextra: "rgb(var(--color-highlightextra) / <alpha-value>)",
+        ui: "rgb(var(--color-divider) / <alpha-value>)",
       },
       fontSize: {
         md: "15px",

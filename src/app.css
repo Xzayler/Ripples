@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --color-accent: #ff7a01;
-  --color-foreground: #e7e9ea; /* #0F1419 */
-  --color-background: #000000; /* #FFFFFF */
-  --color-faint: #71767b; /* #536471 */
-  --color-divider: #2f3336; /* #EFF3F4 */
-  --color-highlight: #16181c; /* #F7F9F9 */
-  --color-highlightextra: #1d1f23;
+  --color-accent: 255 122 1;
+  --color-foreground: 231 233 234; /* #0F1419 */
+  --color-background: 0 0 0; /* #FFFFFF */
+  --color-faint: 113 118 123; /* #536471 */
+  --color-divider: 47 51 54; /* #EFF3F4 */
+  --color-highlight: 22 24 28; /* #F7F9F9 */
+  --color-highlightextra: 29 31 35;
 
   --font-family: "Helvetica Neue", Roboto, -apple-system, BlinkMacSystemFont;
 }
