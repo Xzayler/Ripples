@@ -4,6 +4,7 @@ import { getRequestEvent } from "solid-js/web";
 import { createUser, getAdapter, getUserByUsername } from "./database";
 import { setCookie } from "vinxi/http";
 import { Argon2id } from "oslo/password";
+import { User } from "lucia";
 
 export const lucia = new Lucia(getAdapter()!, {
   sessionCookie: {
@@ -133,7 +134,7 @@ export const logout = action(async (formData: FormData) => {
   return redirect("/login");
 });
 
-export const getCurrentUser = cache(async () => {
+export const getCurrentUser = cache(async (): Promise<User> => {
   "use server";
   const event = getRequestEvent();
   if (!event?.nativeEvent.context.session || !event?.nativeEvent.context.user) {
