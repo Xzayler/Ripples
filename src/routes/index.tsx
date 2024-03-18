@@ -1,5 +1,4 @@
 import { A } from "@solidjs/router";
-import Login from "~/components/login/Login";
 
 export default function MainPage() {
   return (

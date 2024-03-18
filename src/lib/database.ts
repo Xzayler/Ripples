@@ -21,18 +21,6 @@ export async function initDb() {
   }
 }
 
-// (async () => {
-//   // "use server";
-//   mongoose
-//     .connect(process.env.DB_CONN_STRING!, {
-//       dbName: process.env.DB_NAME,
-//     })
-//     .catch((e) => console.log(e))
-//     .then(() => {
-//       console.log("Connection established");
-//     });
-// })();
-
 export async function getPosts({
   page = 1,
   limit = 10,
@@ -158,11 +146,13 @@ export async function getComments() {
   }
 }
 
-export const getAdapter = () => {
-  if (mongoose.connection) {
-    return new MongodbAdapter(
-      mongoose.connection.collection("sessions"),
-      mongoose.connection.collection("users")
-    );
+export const getAdapter = async () => {
+  if (!mongoose.connection) {
+    await initDb();
   }
+  return new MongodbAdapter(
+    // @ts-ignore
+    mongoose.connection.collection("sessions"),
+    mongoose.connection.collection("users")
+  );
 };
