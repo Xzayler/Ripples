@@ -1,29 +1,67 @@
+// import { closePostModal } from "~/routes/(base)";
+import { createSignal } from "solid-js";
+import { JSX } from "solid-js";
+
+const [element, setElement] = createSignal<JSX.Element>(null);
+const closePostModal = () => {
+  setElement(null);
+};
+export const openPostModal = () => {
+  console.log("opening");
+  setElement(PostModalElement({ closeFn: closePostModal }));
+};
+
+const [postBody, setPostBody] = createSignal<string | null>("");
+
+const updatePlaceholder = (e: Event) => {
+  const el: HTMLElement = e.target as HTMLElement;
+  setPostBody(el.textContent);
+  if (el.textContent == "") {
+    el.removeChild(el.firstChild!);
+  }
+};
+
 export default function PostModal() {
+  return <>{element()}</>;
+}
+
+function PostModalElement(props: { closeFn: () => void }) {
   return (
-    <div class="fixed left-0 top-0 w-full h-full bg-foreground bg-opacity-80 ">
-      <div class="relative top-[5%] bg-background rounded-2xl min-w-[600px] max-h-[90dvh] max-w-[80dvw] p-2">
-        <div>
-          <button class="text-foreground">X</button>
+    <div class="fixed left-0 top-0 w-full h-full bg-faint/40 ">
+      <div class="relative top-[5%] mx-auto bg-background rounded-2xl w-[600px] max-h-[90dvh] px-4 pb-2">
+        <div class=" py-4">
+          <button
+            class="text-foreground hover:bg-highlightextra rounded-full aspect-square p-2"
+            onclick={closePostModal}
+          >
+            <div class="h-5 w-5 m-auto">x</div>
+          </button>
         </div>
-        <form method="post" action="" class=" p-4 ">
-          <div>
-            <div>
-              <div class="h-10 w-10 bg-gray rounded-full"></div>
+        <form method="post" action="" class=" ">
+          <div class=" border-b border-solid border-ui flex gap-2 ">
+            <div class="pt-3">
+              <div class="h-10 w-10 bg-gray-300 rounded-full"></div>
             </div>
-            <textarea
-              name="content"
+            <p
+              contentEditable
+              onInput={updatePlaceholder}
+              class=" [&:empty:not(:focus)]:after:content-['Write_Something'] after:text-faint grow text-xl min-h resize-none text-foreground outline-none bg-background focus-within:placeholder-background "
               id=""
-              cols="30"
-              rows="10"
-              placeholder="Write Something"
-            ></textarea>
+            ></p>
+            <textarea name="body" id="" class="hidden">
+              {postBody()}
+            </textarea>
           </div>
-          <div>
-            <div class="px-4 cursor-pointer bg-accent transition hover:opacity-90 rounded-full text-white font-bold">
-              <div class="flex items-center justify-center h-[50px]">
-                <span class="text-lg">Post</span>
+          <div class="flex justify-between">
+            <div></div>
+            <button
+              type="submit"
+              class="px-4 py-2 cursor-pointer bg-accent transition hover:bg-accent/90 rounded-full text-white font-bold mt-2"
+            >
+              <div class="flex items-center justify-center">
+                <span class="text-md">Post</span>
               </div>
-            </div>
+            </button>
           </div>
         </form>
       </div>
