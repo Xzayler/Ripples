@@ -1,27 +1,30 @@
 import { Lucia } from "lucia";
 import { redirect, action, cache } from "@solidjs/router";
-import { getRequestEvent } from "solid-js/web";
+import { getRequestEvent, isServer } from "solid-js/web";
 import { createUser, getAdapter, getUserByUsername } from "./database";
 import { setCookie } from "vinxi/http";
-import { Argon2id } from "oslo/password";
 import { User } from "lucia";
+import bcrypt from "bcryptjs";
 
-export const lucia = new Lucia(getAdapter()!, {
-  sessionCookie: {
-    expires: true,
-    attributes: {
-      // set to `true` when using HTTPS
-      // secure: process.env.NODE_ENV === "production",
-      secure: false,
+export const lucia = await (async () => {
+  // this runs on fucking client for some reason
+  return new Lucia((await getAdapter())!, {
+    sessionCookie: {
+      expires: true,
+      attributes: {
+        // set to `true` when using HTTPS
+        // secure: process.env.NODE_ENV === "production",
+        secure: false,
+      },
     },
-  },
-  getUserAttributes: (attributes) => {
-    return {
-      name: attributes.name,
-      handle: attributes.handle,
-    };
-  },
-});
+    getUserAttributes: (attributes) => {
+      return {
+        name: attributes.name,
+        handle: attributes.handle,
+      };
+    },
+  });
+})();
 
 declare module "lucia" {
   interface Register {
@@ -35,8 +38,7 @@ export interface DatabaseUserAttributes {
   handle: string;
 }
 
-export const register = action(async (formData: FormData) => {
-  "use server";
+export const register = async (formData: FormData) => {
   const username = formData.get("username");
   if (
     typeof username !== "string" ||
@@ -46,7 +48,6 @@ export const register = action(async (formData: FormData) => {
   ) {
     return new Error("Invalid username");
   }
-
   const name = formData.get("name");
   if (
     typeof name !== "string" ||
@@ -56,7 +57,6 @@ export const register = action(async (formData: FormData) => {
   ) {
     return new Error("Invalid name");
   }
-
   const password = formData.get("password");
   const confirmPassword = formData.get("confirm-password");
   if (
@@ -66,22 +66,20 @@ export const register = action(async (formData: FormData) => {
   ) {
     return new Error("Invalid password");
   }
-
   if (password !== confirmPassword) {
     return new Error("Passwords do not match");
   }
+  const hashedPass = await bcrypt.hash(password, 10);
 
-  const hashedPass = await new Argon2id().hash(password);
   try {
     await createUser({ name: name, handle: username, password: hashedPass });
   } catch (error) {
     return error as Error;
   }
   return redirect("/login");
-});
+};
 
-export const login = action(async (formData: FormData) => {
-  "use server";
+export const login = async (formData: FormData) => {
   const username = String(formData.get("username"));
   if (
     username.length < 3 ||
@@ -100,11 +98,7 @@ export const login = action(async (formData: FormData) => {
   if (!existingUser) {
     return new Error("That user doesn't exist");
   }
-
-  const validPassword = await new Argon2id().verify(
-    existingUser.password,
-    password
-  );
+  const validPassword = bcrypt.compare(password, existingUser.password);
   if (!validPassword) {
     return new Error("Incorrect username or password");
   }
@@ -114,31 +108,20 @@ export const login = action(async (formData: FormData) => {
 
   const sessCookieVal = lucia.createSessionCookie(session.id).serialize();
   setCookie(event.nativeEvent, lucia.sessionCookieName, sessCookieVal);
+  // event.request.headers.set(lucia.sessionCookieName, sessCookieVal); not working for some reason.
   return redirect("/home");
-});
+};
 
-export const logout = action(async (formData: FormData) => {
-  "use server";
+export const logout = async (formData: FormData) => {
   const event = getRequestEvent();
-  if (!event?.nativeEvent.context.session) {
+  if (!event?.locals.session) {
     return new Error("Unauthorized");
   }
-
-  await lucia.invalidateSession(event.nativeEvent.context.session.id);
-  setCookie(
-    event.nativeEvent,
+  await lucia.invalidateSession(event.locals.session.id);
+  event.response.headers.set(
     lucia.sessionCookieName,
     lucia.createBlankSessionCookie().serialize()
   );
 
   return redirect("/login");
-});
-
-export const getCurrentUser = cache(async (): Promise<User> => {
-  "use server";
-  const event = getRequestEvent();
-  if (!event?.nativeEvent.context.session || !event?.nativeEvent.context.user) {
-    throw redirect("/login");
-  }
-  return event.nativeEvent.context.user;
-}, "user");
+};

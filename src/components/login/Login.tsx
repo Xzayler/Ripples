@@ -1,5 +1,5 @@
 import { A, redirect, action, useAction } from "@solidjs/router";
-import { login } from "~/lib/auth";
+import { login } from "~/lib/actions";
 import { getRequestEvent } from "solid-js/web";
 
 const isLoggedIn = action(async () => {
@@ -19,7 +19,7 @@ export default function Login() {
       {/* TODO: Show an error if username or password is incorrect */}
       {/* useSubmission(login) */}
       <form
-        action={login}
+        action={action(login)}
         method="post"
         class="mt-5 w-full max-w-lg mx-auto flex flex-col"
       >

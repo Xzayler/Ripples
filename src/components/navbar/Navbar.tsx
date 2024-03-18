@@ -8,14 +8,7 @@ import BookmarkIcon from "~/components/shared/icons/BookmarkIcon";
 import ProfileIcon from "~/components/shared/icons/ProfileIcon";
 import WavesIcon from "~/components/shared/icons/WavesIcon";
 
-import { createResource } from "solid-js";
-import { getCurrentUser } from "~/lib/auth";
-
 export default function Navbar() {
-  const [user] = createResource(async () => {
-    return await getCurrentUser();
-  });
-  // width 275px large
   return (
     <header class="w-[275px] h-screen flex flex-col justify-between">
       <div class="pt-6 px-2">
@@ -44,7 +37,7 @@ export default function Navbar() {
         </div>
       </div>
       <div class="mt-3 mb-3">
-        <UserProfile user={user()}></UserProfile>
+        <UserProfile />
       </div>
     </header>
   );

@@ -1,10 +1,9 @@
 import { A, useSubmission } from "@solidjs/router";
 import { action } from "@solidjs/router";
-import { createSignal } from "solid-js";
-import { register } from "~/lib/auth";
+import { register } from "~/lib/actions";
 
 export default function Signup() {
-  const registerResponse = useSubmission(register);
+  const registerResponse = useSubmission(action(register));
 
   return (
     <div class="min-h-screen flex flex-col justify-center items-center">
@@ -12,7 +11,7 @@ export default function Signup() {
       <form
         class="mt-5 w-full max-w-lg mx-auto flex flex-col"
         method="post"
-        action={register}
+        action={action(register)}
       >
         <input
           class="p-3.5 rounded-t border-b border-gray-300 text-gray-900 outline-none"

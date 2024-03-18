@@ -5,7 +5,7 @@ import { lucia } from "./lib/auth";
 
 export default createMiddleware({
   onRequest: async (event) => {
-    if (event.nativeEvent.node.req.method !== "GET") {
+    if (event.request.method !== "GET") {
       const originHeader = getHeader(event.nativeEvent, "Origin") ?? null;
       const hostHeader = getHeader(event.nativeEvent, "Host") ?? null;
       if (
@@ -28,28 +28,26 @@ export default createMiddleware({
     }
     const { session, user } = await lucia.validateSession(sessionId);
     if (session && session.fresh) {
-      setCookie(
-        event.nativeEvent,
+      event.response.headers.set(
         lucia.sessionCookieName,
         lucia.createSessionCookie(session.id).serialize()
       );
     }
     if (!session) {
-      setCookie(
-        event.nativeEvent,
+      event.response.headers.set(
         lucia.sessionCookieName,
         lucia.createBlankSessionCookie().serialize()
       );
     }
 
-    event.nativeEvent.context.session = session;
-    event.nativeEvent.context.user = user;
+    event.locals.session = session;
+    event.locals.user = user;
   },
 });
 
-declare module "vinxi/server" {
-  interface H3EventContext {
-    user: User | null;
-    session: Session | null;
-  }
-}
+// declare module "vinxi/server" {
+//   interface H3EventContext {
+//     user: User | null;
+//     session: Session | null;
+//   }
+// }
