@@ -5,7 +5,7 @@ import { getRequestEvent } from "solid-js/web";
 const isLoggedIn = action(async () => {
   "use server";
   const event = getRequestEvent();
-  if (event?.nativeEvent.context.session) {
+  if (event?.locals.session) {
     throw redirect("/home");
   }
 }, "user");
