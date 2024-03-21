@@ -3,20 +3,10 @@ import MessageBox from "~/components/chat/MessageBox";
 import { JSX, createSignal } from "solid-js";
 import PostModal from "~/components/shared/PostModal";
 import { UserContext } from "~/lib/UserContext";
-import { cache, createAsync } from "@solidjs/router";
+import { createAsync } from "@solidjs/router";
 import type { User } from "lucia";
-import { getRequestEvent } from "solid-js/web";
-import { redirect } from "@solidjs/router";
 import { Suspense } from "solid-js";
-
-const getCurrentUser = cache(async (): Promise<User> => {
-  "use server";
-  const event = getRequestEvent();
-  if (!event || !event.locals.session || !event.locals.user) {
-    throw redirect("/login");
-  }
-  return event.locals.user;
-}, "curruser");
+import { getCurrentUser } from "~/lib/server";
 
 export default function BaseLayout(props: { children: JSX.Element }) {
   const [user, setUser] = createSignal<User>({

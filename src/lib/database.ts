@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { MongodbAdapter } from "@lucia-auth/adapter-mongodb";
 import UserModel, { InferredUser, type User } from "~/models/UserModel";
-import PostModel, { type Post, type InferredPost } from "~/models/PostModel";
+import PostModel, { type InferredPost } from "~/models/PostModel";
 import CommentModel, { type Comment } from "~/models/CommentModel";
 import LikeModel, { type Like } from "~/models/LikeModel";
 import FollowModel, { type Follow } from "~/models/FollowModel";
@@ -21,54 +21,54 @@ export async function initDb() {
   }
 }
 
-export async function getPosts({
-  page = 1,
-  limit = 10,
-  filter = {},
-  sort = { id: "asc" },
-}: {
-  page?: number;
-  limit?: number;
-  filter?: mongoose.FilterQuery<InferredPost>;
-  sort?: { [key: string]: mongoose.SortOrder };
-}): Promise<Post[] | null> {
-  try {
-    const skip = (page - 1) * limit;
-    const result: InferredPost[] = await PostModel.find(filter)
-      .sort(sort)
-      .skip(skip)
-      .limit(limit);
+// export async function getPosts({
+//   page = 1,
+//   limit = 10,
+//   filter = {},
+//   sort = { id: "asc" },
+// }: {
+//   page?: number;
+//   limit?: number;
+//   filter?: mongoose.FilterQuery<InferredPost>;
+//   sort?: { [key: string]: mongoose.SortOrder };
+// }): Promise<Post[] | null> {
+//   try {
+//     const skip = (page - 1) * limit;
+//     const result: InferredPost[] = await PostModel.find(filter)
+//       .sort(sort)
+//       .skip(skip)
+//       .limit(limit);
 
-    return result.map((res) => {
-      // return res.json();
-      return {
-        _id: res._id.toString(),
-        author_id: res.author_id.toString(),
-        createdAt: res.createdAt,
-        updatedAt: res.updatedAt,
-        content: res.content,
-      } as Post;
-    }) as Post[];
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-}
+//     return result.map((res) => {
+//       // return res.json();
+//       return {
+//         _id: res._id.toString(),
+//         author_id: res.author_id.toString(),
+//         createdAt: res.createdAt,
+//         updatedAt: res.updatedAt,
+//         content: res.content,
+//       } as Post;
+//     }) as Post[];
+//   } catch (error) {
+//     console.log(error);
+//     return null;
+//   }
+// }
 
-export async function addPost(post: Post) {
+export async function addPost(postData: { content: string; author: string }) {
+  const id = new mongoose.Types.ObjectId();
   try {
-    await PostModel.create(post);
+    await PostModel.create({ _id: id, ...postData });
   } catch (error) {
     console.log(error);
   }
 }
 
 export async function getUserById(id: string): Promise<User | null> {
-  const mongoId = new mongoose.Types.ObjectId(id);
-  const res: InferredUser | null = await UserModel.findById(mongoId);
+  const res: InferredUser | null = await UserModel.findById(id);
   if (!res) return null;
   return {
-    _id: res._id.toString(),
+    _id: res._id,
     name: res.name,
     handle: res.handle,
     password: res.password,
@@ -115,18 +115,65 @@ export async function createUser({
   return null;
 }
 
-// export const getUser = async (filter: mongoose.FilterQuery<InferredUser>) => {
-//   const res: InferredUser | null = await UserModel.findOne(filter);
-//   if (!res) return null;
-//   return {
-//     _id: res._id.toString(),
-//     name: res.name,
-//     handle: res.handle,
-//     password: res.password,
-//     pfp: res.pfp,
-//     bio: res.bio,
-//   };
-// };
+export async function getFeed() {
+  try {
+    const posts = await PostModel.aggregate([
+      { $match: {} },
+      {
+        $lookup: {
+          from: "users",
+          localField: "author",
+          foreignField: "_id",
+          as: "author",
+        },
+      },
+      // Get the author from the previous array
+      {
+        $unwind: "$author",
+      },
+      // Get the likes
+      {
+        $lookup: {
+          from: "likes",
+          localField: "_id",
+          foreignField: "post_id",
+          as: "likes",
+        },
+      },
+      // What fields return
+      {
+        $project: {
+          _id: true,
+          content: true,
+          author: "$author",
+          createdAt: true,
+          updatedAt: true,
+          likes: { $size: "$likes" },
+        },
+      },
+    ]);
+
+    return posts.map((post) => {
+      if (post.author == null || typeof post.author == "string") {
+        console.log("Author can't be found");
+      }
+      return {
+        authorName: post.author.name,
+        authorHandle: post.author.handle,
+        pfp: post.author.pfp,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        content: post.content,
+        likes: post.likes,
+        reposts: 0,
+        comments: 0,
+      } as Ripple;
+    });
+  } catch (error) {
+    console.log(error);
+    return error as Error;
+  }
+}
 
 export async function getLikes() {
   try {

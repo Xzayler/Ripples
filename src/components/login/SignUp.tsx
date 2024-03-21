@@ -1,6 +1,6 @@
 import { A, useSubmission } from "@solidjs/router";
 import { action } from "@solidjs/router";
-import { register } from "~/lib/actions";
+import { register } from "~/lib/server";
 
 export default function Signup() {
   const registerResponse = useSubmission(action(register));

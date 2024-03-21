@@ -1,6 +1,7 @@
-// import { closePostModal } from "~/routes/(base)";
+import { action } from "@solidjs/router";
 import { createSignal } from "solid-js";
 import { JSX } from "solid-js";
+import { submitPost } from "~/lib/server";
 
 const [element, setElement] = createSignal<JSX.Element>(null);
 const closePostModal = () => {
@@ -37,7 +38,14 @@ function PostModalElement(props: { closeFn: () => void }) {
             <div class="h-5 w-5 m-auto">x</div>
           </button>
         </div>
-        <form method="post" action="" class=" ">
+        <form
+          method="post"
+          action={action((formData: FormData) => {
+            closePostModal();
+            return submitPost(formData);
+          })}
+          class=" "
+        >
           <div class=" border-b border-solid border-ui flex gap-2 ">
             <div class="pt-3">
               <div class="h-10 w-10 bg-gray-300 rounded-full"></div>

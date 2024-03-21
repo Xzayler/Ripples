@@ -1,5 +1,5 @@
 import { A, redirect, action, useAction } from "@solidjs/router";
-import { login } from "~/lib/actions";
+import { login } from "~/lib/server";
 import { getRequestEvent } from "solid-js/web";
 
 const isLoggedIn = action(async () => {

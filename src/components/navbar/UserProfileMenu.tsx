@@ -1,4 +1,4 @@
-import { logout } from "~/lib/actions";
+import { logout } from "~/lib/server";
 import { action } from "@solidjs/router";
 
 export default function UserProfileMenu(props: { handle: string }) {

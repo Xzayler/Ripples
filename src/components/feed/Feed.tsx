@@ -1,14 +1,11 @@
 import Ripple from "./Ripple";
 
 import { createResource, For } from "solid-js";
-import { getPosts } from "~/lib/database";
-import type { Post } from "~/models/PostModel";
-import { createAsync } from "@solidjs/router";
+import { getFeed } from "~/lib/server";
 
 export default function Feed() {
   const [posts] = createResource(async () => {
-    "use server";
-    return (await getPosts({})) as Post[];
+    return (await getFeed()) as Ripple[];
   });
 
   return (

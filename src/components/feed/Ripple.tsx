@@ -1,30 +1,26 @@
-import { type Post } from "~/models/PostModel";
-
-function PostReactions() {
+function PostReactions(props: {
+  likes: number;
+  comments: number;
+  reposts: number;
+}) {
   return (
     <div class="mt-6 flex flex-row">
       <div class="flex items-center grow">
         <div class="h-[18px] w-[18px] rounded-sm bg-faint"></div>
         <div class="px-2">
-          <span class="text-faint text-sm">12</span>
+          <span class="text-sm">{props.comments}</span>
         </div>
       </div>
       <div class="flex items-center grow">
         <div class="h-[18px] w-[18px] rounded-sm bg-faint"></div>
         <div class="px-2">
-          <span class="text-faint text-sm">12</span>
+          <span class=" text-sm">{props.likes}</span>
         </div>
       </div>
       <div class="flex items-center grow">
         <div class="h-[18px] w-[18px] rounded-sm bg-faint"></div>
         <div class="px-2">
-          <span class="text-faint text-sm">12</span>
-        </div>
-      </div>
-      <div class="flex items-center grow">
-        <div class="h-[18px] w-[18px] rounded-sm bg-faint"></div>
-        <div class="px-2">
-          <span class="text-faint text-sm">12</span>
+          <span class="text-faint text-sm">{props.reposts}</span>
         </div>
       </div>
       <div class="flex items-center mr-3 ">
@@ -37,8 +33,18 @@ function PostReactions() {
   );
 }
 
-export default function Ripple({ post }: { post: Post }) {
-  const { content } = post;
+export default function Ripple({ post }: { post: Ripple }) {
+  const {
+    authorName,
+    authorHandle,
+    pfp,
+    createdAt,
+    updatedAt,
+    content,
+    likes,
+    reposts,
+    comments,
+  } = post;
   return (
     <div class="w-full cursor-pointer border-ui border-b">
       <article class="px-4 flex flex-col w-full">
@@ -64,18 +70,18 @@ export default function Ripple({ post }: { post: Post }) {
             {/* Post Meta */}
             <div class="flex flex-row">
               <div class="mr-1">
-                <span class="font-bold text-foreground">Username</span>
+                <span class="font-bold text-foreground">{authorName}</span>
               </div>
               <div class="flex text-faint">
                 <div>
-                  <span>@UserHandle</span>
+                  <span>{`@${authorHandle}`}</span>
                 </div>
                 <div class="px-1">
                   <span>⋅</span>
                 </div>
                 <div>
                   {/* <span>{`${date.getMonth()} ${date.getDate()}`}</span> */}
-                  <span>Nov 14</span>
+                  <span>{createdAt.toUTCString()}</span>
                 </div>
               </div>
             </div>
@@ -83,7 +89,11 @@ export default function Ripple({ post }: { post: Post }) {
             <div>{content}</div>
             {/* Post Reactions */}
             <div class="mb-3 w-full">
-              <PostReactions />
+              <PostReactions
+                likes={likes}
+                comments={comments}
+                reposts={reposts}
+              />
             </div>
           </div>
         </div>
