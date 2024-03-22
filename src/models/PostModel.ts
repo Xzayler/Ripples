@@ -12,6 +12,9 @@ const postSchema = new Schema(
       ref: "users",
     },
     content: { type: String, required: true },
+    likes: { type: Number },
+    comments: { type: Number },
+    reposts: { type: Number },
   },
   { timestamps: true }
 );

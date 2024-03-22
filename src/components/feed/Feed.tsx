@@ -1,11 +1,12 @@
 import Ripple from "./Ripple";
+import { type Ripple as RippleType } from "~/types";
 
 import { createResource, For } from "solid-js";
 import { getFeed } from "~/lib/server";
 
 export default function Feed() {
   const [posts] = createResource(async () => {
-    return (await getFeed()) as Ripple[];
+    return (await getFeed()) as RippleType[];
   });
 
   return (

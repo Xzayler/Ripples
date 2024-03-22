@@ -1,5 +1,6 @@
-type Ripple = {
+export type Ripple = {
   // retweetedBy: string | null; once retweets are implemented
+  id: string;
   authorName: string;
   authorHandle: string;
   pfp: string;
@@ -7,6 +8,7 @@ type Ripple = {
   updatedAt: Date;
   content: string;
   likes: number;
+  hasLiked: boolean;
   reposts: number;
   comments: number;
 };

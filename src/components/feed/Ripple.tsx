@@ -1,8 +1,20 @@
+import { likePost, unlikePost } from "~/lib/server";
+import { action, useAction } from "@solidjs/router";
+import { type Ripple } from "~/types";
+import { createSignal } from "solid-js";
+
 function PostReactions(props: {
+  id: string;
   likes: number;
   comments: number;
   reposts: number;
+  hasLiked: boolean;
 }) {
+  const like = useAction(action(likePost));
+  const unlike = useAction(action(unlikePost));
+  const [likesCount, setLikesCount] = createSignal<number>(props.likes);
+  const [hasLiked, setHasLiked] = createSignal<boolean>(props.hasLiked);
+
   return (
     <div class="mt-6 flex flex-row">
       <div class="flex items-center grow">
@@ -11,10 +23,29 @@ function PostReactions(props: {
           <span class="text-sm">{props.comments}</span>
         </div>
       </div>
-      <div class="flex items-center grow">
-        <div class="h-[18px] w-[18px] rounded-sm bg-faint"></div>
+      <div
+        class={
+          "flex items-center grow " +
+          (hasLiked() ? " text-like " : " text-faint ") +
+          " hover:text-like"
+        }
+        onClick={() => {
+          if (!hasLiked()) {
+            console.log("liking");
+            setHasLiked(true);
+            setLikesCount(likesCount() + 1);
+            like(props.id);
+          } else {
+            console.log("unlike");
+            setHasLiked(false);
+            setLikesCount(likesCount() - 1);
+            unlike(props.id);
+          }
+        }}
+      >
+        <div class="h-[18px] w-[18px] rounded-sm bg-faint "></div>
         <div class="px-2">
-          <span class=" text-sm">{props.likes}</span>
+          <span class=" text-sm">{likesCount()}</span>
         </div>
       </div>
       <div class="flex items-center grow">
@@ -35,6 +66,7 @@ function PostReactions(props: {
 
 export default function Ripple({ post }: { post: Ripple }) {
   const {
+    id,
     authorName,
     authorHandle,
     pfp,
@@ -42,6 +74,7 @@ export default function Ripple({ post }: { post: Ripple }) {
     updatedAt,
     content,
     likes,
+    hasLiked,
     reposts,
     comments,
   } = post;
@@ -90,9 +123,11 @@ export default function Ripple({ post }: { post: Ripple }) {
             {/* Post Reactions */}
             <div class="mb-3 w-full">
               <PostReactions
+                id={id}
                 likes={likes}
                 comments={comments}
                 reposts={reposts}
+                hasLiked={hasLiked}
               />
             </div>
           </div>

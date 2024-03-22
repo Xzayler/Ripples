@@ -3,10 +3,11 @@ import { MongodbAdapter } from "@lucia-auth/adapter-mongodb";
 import UserModel, { InferredUser, type User } from "~/models/UserModel";
 import PostModel, { type InferredPost } from "~/models/PostModel";
 import CommentModel, { type Comment } from "~/models/CommentModel";
-import LikeModel, { type Like } from "~/models/LikeModel";
+import LikeModel, { type InferredLike } from "~/models/LikeModel";
 import FollowModel, { type Follow } from "~/models/FollowModel";
 import SessionModel, { type Session } from "~/models/SessionModel";
 import { isServer } from "solid-js/web";
+import { type Ripple } from "~/types";
 
 export async function initDb() {
   if (
@@ -58,7 +59,13 @@ export async function initDb() {
 export async function addPost(postData: { content: string; author: string }) {
   const id = new mongoose.Types.ObjectId();
   try {
-    await PostModel.create({ _id: id, ...postData });
+    await PostModel.create({
+      _id: id,
+      ...postData,
+      likes: 0,
+      comments: 0,
+      reposts: 0,
+    });
   } catch (error) {
     console.log(error);
   }
@@ -115,10 +122,24 @@ export async function createUser({
   return null;
 }
 
-export async function getFeed() {
+export async function getFeed(userId: string) {
   try {
     const posts = await PostModel.aggregate([
-      { $match: {} },
+      // { $match: {} },
+      {
+        $lookup: {
+          from: "likes",
+          localField: "_id",
+          foreignField: "post",
+          pipeline: [
+            {
+              $match: { user: userId },
+            },
+            { $limit: 1 },
+          ],
+          as: "likedocs",
+        },
+      },
       {
         $lookup: {
           from: "users",
@@ -127,20 +148,9 @@ export async function getFeed() {
           as: "author",
         },
       },
-      // Get the author from the previous array
       {
         $unwind: "$author",
       },
-      // Get the likes
-      {
-        $lookup: {
-          from: "likes",
-          localField: "_id",
-          foreignField: "post_id",
-          as: "likes",
-        },
-      },
-      // What fields return
       {
         $project: {
           _id: true,
@@ -148,41 +158,90 @@ export async function getFeed() {
           author: "$author",
           createdAt: true,
           updatedAt: true,
-          likes: { $size: "$likes" },
+          hasLiked: {
+            $cond: {
+              if: { $eq: [{ $size: "$likedocs" }, 0] },
+              then: false,
+              else: true,
+            },
+          },
+          likes: true,
+          comments: true,
+          reposts: true,
         },
       },
     ]);
 
     return posts.map((post) => {
       if (post.author == null || typeof post.author == "string") {
-        console.log("Author can't be found");
       }
       return {
+        id: post._id.toString(),
         authorName: post.author.name,
         authorHandle: post.author.handle,
         pfp: post.author.pfp,
         createdAt: post.createdAt,
         updatedAt: post.updatedAt,
         content: post.content,
-        likes: post.likes,
-        reposts: 0,
-        comments: 0,
+        likes: post.likes ?? 0,
+        hasLiked: post.hasLiked,
+        reposts: post.reposts ?? 0,
+        comments: post.comments ?? 0,
       } as Ripple;
     });
   } catch (error) {
-    console.log(error);
     return error as Error;
   }
 }
 
-export async function getLikes() {
+export async function likePost(
+  postId: mongoose.Types.ObjectId,
+  userId: string
+) {
   try {
-    const result: Like[] = await LikeModel.find();
-    return result;
+    await LikeModel.create({
+      _id: new mongoose.Types.ObjectId(),
+      user: userId,
+      post: postId,
+    });
+    await PostModel.updateOne({ _id: postId }, { $inc: { likes: 1 } });
+  } catch (error) {
+    console.log("error liking");
+  }
+}
+
+export async function unlikePost(
+  postId: mongoose.Types.ObjectId,
+  userId: string
+) {
+  try {
+    await LikeModel.deleteOne({ user: userId, post: postId });
+    await PostModel.updateOne({ _id: postId }, { $inc: { likes: -1 } });
+  } catch (error) {
+    console.log("error liking");
+  }
+}
+
+export async function getLike(postId: mongoose.Types.ObjectId, userId: string) {
+  try {
+    const like: InferredLike | null = await LikeModel.findOne({
+      post: postId,
+      user: userId,
+    });
+    return like;
   } catch (error) {
     return error;
   }
 }
+
+// export async function getLikes() {
+//   try {
+//     const result: Like[] = await LikeModel.find();
+//     return result;
+//   } catch (error) {
+//     return error;
+//   }
+// }
 
 export async function getComments() {
   try {
