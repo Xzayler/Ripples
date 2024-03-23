@@ -2,10 +2,9 @@ import mongoose from "mongoose";
 import { MongodbAdapter } from "@lucia-auth/adapter-mongodb";
 import UserModel, { InferredUser, type User } from "~/models/UserModel";
 import PostModel, { type InferredPost } from "~/models/PostModel";
-import CommentModel, { type Comment } from "~/models/CommentModel";
+import CommentModel, { type InferredComment } from "~/models/CommentModel";
 import LikeModel, { type InferredLike } from "~/models/LikeModel";
 import FollowModel, { type Follow } from "~/models/FollowModel";
-import SessionModel, { type Session } from "~/models/SessionModel";
 import { isServer } from "solid-js/web";
 import { type Ripple } from "~/types";
 
@@ -66,6 +65,29 @@ export async function addPost(postData: { content: string; author: string }) {
       comments: 0,
       reposts: 0,
     });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function addComment(postData: {
+  content: string;
+  author: string;
+  parent: mongoose.Types.ObjectId;
+}) {
+  const id = new mongoose.Types.ObjectId();
+  try {
+    await CommentModel.create({
+      _id: id,
+      ...postData,
+      likes: 0,
+      comments: 0,
+      reposts: 0,
+    });
+    await PostModel.updateOne(
+      { _id: postData.parent },
+      { $inc: { comments: 1 } }
+    );
   } catch (error) {
     console.log(error);
   }

@@ -20,10 +20,5 @@ const postSchema = new Schema(
 );
 
 export type InferredPost = InferSchemaType<typeof postSchema>;
-// export type Post = Omit<InferredPost, "_id" | "author_id"> & {
-//   _id: string;
-//   author_id: string;
-// };
-
 export default mongoose.models?.PostModel ||
   mongoose.model<InferredPost>("PostModel", postSchema, "posts");

@@ -6,6 +6,7 @@ import { redirect } from "@solidjs/router";
 import { User } from "lucia";
 import {
   submitPost as sp,
+  submitComment as sc,
   like as lp,
   unlike as ulp,
   getFeed as gf,
@@ -26,6 +27,7 @@ export const getCurrentUser = cache((): User => {
 
 // Interactions
 export const submitPost = sp;
+export const submitComment = sc;
 export const getFeed = gf;
 export const likePost = lp;
 export const unlikePost = ulp;

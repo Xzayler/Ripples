@@ -1,6 +1,7 @@
 import { getCurrentUser } from "./server";
 import {
   addPost,
+  addComment,
   likePost,
   getLike,
   unlikePost,
@@ -14,6 +15,15 @@ export const submitPost = async (formData: FormData) => {
   await addPost({
     content: body ?? "",
     author: id,
+  });
+};
+export const submitComment = async (formData: FormData, postId: string) => {
+  const id = (await getCurrentUser()).id;
+  const body = formData.get("body")?.toString();
+  await addComment({
+    content: body ?? "",
+    author: id,
+    parent: new mongoose.Types.ObjectId(postId),
   });
 };
 

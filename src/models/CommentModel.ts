@@ -1,26 +1,26 @@
 import mongoose from "mongoose";
 import { Schema, InferSchemaType } from "mongoose";
 
-const commentSchema = new Schema({
-  _id: { type: mongoose.Schema.Types.ObjectId },
-  author_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: "users",
+const commentSchema = new Schema(
+  {
+    _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+    // _id: { type: String, required: true },
+    author: {
+      // type: mongoose.Schema.Types.ObjectId,
+      type: String,
+      required: true,
+      ref: "users",
+    },
+    content: { type: String, required: true },
+    likes: { type: Number },
+    comments: { type: Number },
+    reposts: { type: Number },
+    parent: { type: mongoose.Schema.Types.ObjectId, ref: "posts" },
   },
-  post_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: "posts",
-  },
-  parent_comment: { type: mongoose.Schema.Types.ObjectId, ref: "comments" },
-  content: { type: String, required: true },
-  date: { type: Date, required: true },
-});
+  { timestamps: true }
+);
 
-type Comment = InferSchemaType<typeof commentSchema>;
-
-export type { Comment };
+export type InferredComment = InferSchemaType<typeof commentSchema>;
 
 export default mongoose.models?.CommentModel ||
   mongoose.model<Comment>("CommentModel", commentSchema, "comments");
