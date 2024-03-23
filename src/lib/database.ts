@@ -21,39 +21,12 @@ export async function initDb() {
   }
 }
 
-// export async function getPosts({
-//   page = 1,
-//   limit = 10,
-//   filter = {},
-//   sort = { id: "asc" },
-// }: {
-//   page?: number;
-//   limit?: number;
-//   filter?: mongoose.FilterQuery<InferredPost>;
-//   sort?: { [key: string]: mongoose.SortOrder };
-// }): Promise<Post[] | null> {
-//   try {
-//     const skip = (page - 1) * limit;
-//     const result: InferredPost[] = await PostModel.find(filter)
-//       .sort(sort)
-//       .skip(skip)
-//       .limit(limit);
-
-//     return result.map((res) => {
-//       // return res.json();
-//       return {
-//         _id: res._id.toString(),
-//         author_id: res.author_id.toString(),
-//         createdAt: res.createdAt,
-//         updatedAt: res.updatedAt,
-//         content: res.content,
-//       } as Post;
-//     }) as Post[];
-//   } catch (error) {
-//     console.log(error);
-//     return null;
-//   }
-// }
+export async function getPost(postId: mongoose.Types.ObjectId) {
+  try {
+  } catch (error) {
+    return error as Error;
+  }
+}
 
 export async function addPost(postData: { content: string; author: string }) {
   const id = new mongoose.Types.ObjectId();
@@ -119,15 +92,11 @@ export async function getUserByUsername(un: string): Promise<User | null> {
   } as User;
 }
 
-export async function createUser({
-  name,
-  handle,
-  password,
-}: {
-  name: string;
-  password: string;
-  handle: string;
-}) {
+export async function createUser(
+  name: string,
+  handle: string,
+  password: string
+) {
   const newUser: InferredUser = {
     _id: new mongoose.Types.ObjectId().toString(),
     name: name,
@@ -255,15 +224,6 @@ export async function getLike(postId: mongoose.Types.ObjectId, userId: string) {
     return error;
   }
 }
-
-// export async function getLikes() {
-//   try {
-//     const result: Like[] = await LikeModel.find();
-//     return result;
-//   } catch (error) {
-//     return error;
-//   }
-// }
 
 export async function getComments() {
   try {

@@ -72,7 +72,7 @@ export const register = async (formData: FormData) => {
   const hashedPass = await bcrypt.hash(password, 10);
 
   try {
-    await createUser({ name: name, handle: username, password: hashedPass });
+    await createUser(name, username, hashedPass);
   } catch (error) {
     return error as Error;
   }
