@@ -6,13 +6,19 @@ import { Ripple } from "~/types";
 
 const [element, setElement] = createSignal<JSX.Element>(null);
 const closePostModal = () => {
+  const html = document.getElementsByTagName("html")[0] as HTMLElement;
+  html.classList.remove("overflow-hidden");
   setElement(null);
 };
 export const openPostModal = () => {
+  const html = document.getElementsByTagName("html")[0] as HTMLElement;
+  html.classList.add("overflow-hidden");
   setElement(PostModalElement({}));
 };
 
 export const openCommentModal = (ripple: Ripple) => {
+  const html = document.getElementsByTagName("html")[0] as HTMLElement;
+  html.classList.add("overflow-hidden");
   setElement(PostModalElement({ parent: ripple }));
 };
 
