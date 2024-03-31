@@ -1,6 +1,6 @@
 import Navbar from "~/components/navbar/Navbar";
 import MessageBox from "~/components/chat/MessageBox";
-import { JSX, createSignal } from "solid-js";
+import { JSX, createSignal, createResource } from "solid-js";
 import PostModal from "~/components/shared/PostModal";
 import { UserContext } from "~/lib/UserContext";
 import { createAsync } from "@solidjs/router";
@@ -9,16 +9,13 @@ import { Suspense } from "solid-js";
 import { getCurrentUser } from "~/lib/server";
 
 export default function BaseLayout(props: { children: JSX.Element }) {
-  const [user, setUser] = createSignal<User>({
-    id: "123456",
-    name: "Loading",
-    handle: "loading",
-  } as User);
-  const currUser = createAsync(async () => setUser(await getCurrentUser()));
-  currUser();
+  const [user] = createResource(async () => {
+    return (await getCurrentUser()) as User;
+  });
+
   return (
     <div class="relative w-full min-h-screen bg-background text-foreground flex justify-center items-center">
-      <div class="flex flex-row relative items-start">
+      <div class="flex flex-row relative items-start justify-center">
         <Suspense>
           <UserContext.Provider value={user}>
             <div class="sticky top-0 max-h-screen flex justify-end ">
