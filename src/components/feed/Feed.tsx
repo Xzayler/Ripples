@@ -1,6 +1,6 @@
 import Ripple from "./Ripple";
 import { type Ripple as RippleType } from "~/types";
-
+import { A } from "@solidjs/router";
 import { createResource, For } from "solid-js";
 import { getFeed } from "~/lib/server";
 
@@ -13,7 +13,11 @@ export default function Feed() {
     <div class="">
       <For each={posts()}>
         {(item) => {
-          return <Ripple post={item} />;
+          return (
+            <A href={`/post/${item.id}`} class="w-full cursor-pointer">
+              <Ripple post={item} />
+            </A>
+          );
         }}
       </For>
     </div>
