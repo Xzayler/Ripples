@@ -103,7 +103,7 @@ function PostModalElement(props: { parent?: Ripple }) {
                 <p
                   contentEditable
                   onInput={updatePlaceholder}
-                  class="mb-4 mt-5 [&:empty:not(:focus)]:after:content-['Write_Something'] after:text-faint grow text-xl leading-6 min-h-14 resize-none text-foreground outline-none bg-background focus-within:placeholder-background "
+                  class="mb-4 mt-5 overflow-hidden text-pretty [&:empty:not(:focus)]:after:content-['Write_Something'] after:text-faint grow text-xl leading-6 min-h-14 resize-none text-foreground outline-none bg-background focus-within:placeholder-background "
                   id=""
                 ></p>
                 <textarea name="body" id="" class="hidden">
