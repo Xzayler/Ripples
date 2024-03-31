@@ -4,6 +4,7 @@ import UserModel, { InferredUser, type User } from "~/models/UserModel";
 import PostModel, { type InferredPost } from "~/models/PostModel";
 import CommentModel, { type InferredComment } from "~/models/CommentModel";
 import LikeModel, { type InferredLike } from "~/models/LikeModel";
+import BookmarksModel, { type InferredBookmark } from "~/models/BookmarksModel";
 import FollowModel, { type Follow } from "~/models/FollowModel";
 import { isServer } from "solid-js/web";
 import { type Ripple } from "~/types";
@@ -90,16 +91,22 @@ export async function createUser(
   handle: string,
   password: string
 ) {
+  const id = new mongoose.Types.ObjectId();
   const newUser: InferredUser = {
-    _id: new mongoose.Types.ObjectId().toString(),
+    _id: id.toString(),
     name: name,
     handle: handle,
     password: password,
     pfp: undefined,
     bio: undefined,
   };
+  const newBookmarks: InferredBookmark = {
+    _id: id,
+    posts: [],
+  };
   try {
     await UserModel.create(newUser);
+    await BookmarksModel.create(newBookmarks);
   } catch (error) {
     return error as Error;
   }
@@ -107,6 +114,7 @@ export async function createUser(
 }
 
 export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
+  const bmId = new mongoose.Types.ObjectId(userId);
   try {
     const post = (
       await PostModel.aggregate([
@@ -133,12 +141,30 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
             as: "likedocs",
           },
         },
+        // Check if the post is bookmarked by the User
+        {
+          $lookup: {
+            from: "bookmarks",
+            let: { postId: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: [bmId, "$_id"] },
+                },
+              },
+              { $limit: 1 },
+            ],
+            as: "bookmarkdocs",
+          },
+        },
+        { $unwind: "$bookmarkdocs" },
         // Get all comments whose parent is the post
         {
           $lookup: {
             from: "posts",
             localField: "_id",
             foreignField: "parent",
+            let: { posts: "$bookmarkdocs.posts" },
             pipeline: [
               {
                 // Get if user liked the child
@@ -192,6 +218,13 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
                       },
                       then: false,
                       else: true,
+                    },
+                  },
+                  hasBookmarked: {
+                    $cond: {
+                      if: { $in: ["$_id", "$$posts"] },
+                      then: true,
+                      else: false,
                     },
                   },
                   likes: true,
@@ -300,6 +333,15 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
                 },
               },
             },
+            hasBookmarked: {
+              $push: {
+                $cond: {
+                  if: { $in: ["$_id", "$bookmarkdocs.posts"] },
+                  then: true,
+                  else: false,
+                },
+              },
+            },
             likes: {
               $first: "$likes",
             },
@@ -350,6 +392,15 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
                       },
                     },
                   },
+                  {
+                    hasBookmarked: {
+                      $cond: {
+                        if: { $in: ["$ancestors._id", "$bookmarkdocs.posts"] },
+                        then: true,
+                        else: false,
+                      },
+                    },
+                  },
                 ],
               },
             },
@@ -368,6 +419,7 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
       content: post.content,
       likes: post.likes ?? 0,
       hasLiked: post.hasLiked,
+      hasBookmarked: post.hasBookmarked,
       reposts: post.reposts ?? 0,
       comments: post.comments ?? 0,
       // @ts-ignore
@@ -382,6 +434,7 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
           content: child.content,
           likes: child.likes,
           hasLiked: child.hasLiked,
+          hasBookmarked: child.hasBookmarked,
           reposts: child.reposts,
           comments: child.comments,
         } as Ripple;
@@ -402,6 +455,7 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
                 content: ancestor.content,
                 likes: ancestor.likes,
                 hasLiked: ancestor.hasLiked,
+                hasBookmarked: ancestor.hasBookmarked,
                 reposts: ancestor.reposts,
                 comments: ancestor.comments,
               } as Ripple;
@@ -416,6 +470,7 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
 }
 
 export async function getFeed(userId: string) {
+  const bmId = new mongoose.Types.ObjectId(userId);
   try {
     const posts = await PostModel.aggregate([
       { $match: { parent: null } },
@@ -433,6 +488,23 @@ export async function getFeed(userId: string) {
           as: "likedocs",
         },
       },
+      // Check if the post is bookmarked by the User
+      {
+        $lookup: {
+          from: "bookmarks",
+          let: { postId: "_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: [bmId, "$_id"] },
+              },
+            },
+            { $limit: 1 },
+          ],
+          as: "bookmarkdocs",
+        },
+      },
+      { $unwind: "$bookmarkdocs" },
       {
         $lookup: {
           from: "users",
@@ -458,13 +530,20 @@ export async function getFeed(userId: string) {
               else: true,
             },
           },
+          hasBookmarked: {
+            $cond: {
+              if: { $in: ["$_id", "$bookmarkdocs.posts"] },
+              then: true,
+              else: false,
+            },
+          },
           likes: true,
           comments: true,
           reposts: true,
         },
       },
     ]);
-
+    console.log(posts);
     return posts.map((post) => {
       if (post.author == null || typeof post.author == "string") {
       }
@@ -478,12 +557,142 @@ export async function getFeed(userId: string) {
         content: post.content,
         likes: post.likes ?? 0,
         hasLiked: post.hasLiked,
+        hasBookmarked: post.hasBookmarked,
         reposts: post.reposts ?? 0,
         comments: post.comments ?? 0,
       } as Ripple;
     });
   } catch (error) {
     return error as Error;
+  }
+}
+
+export async function addBookmark(
+  bmId: mongoose.Types.ObjectId,
+  postId: mongoose.Types.ObjectId
+) {
+  try {
+    await BookmarksModel.updateOne({ _id: bmId }, { $push: { posts: postId } });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function removeBookmark(
+  bmId: mongoose.Types.ObjectId,
+  postId: mongoose.Types.ObjectId
+) {
+  try {
+    await BookmarksModel.updateOne({ _id: bmId }, { $pull: { posts: postId } });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getBookmarks(bmId: mongoose.Types.ObjectId) {
+  const userId = bmId.toString();
+  try {
+    const bookmarks = await BookmarksModel.aggregate([
+      { $match: { _id: bmId } },
+      {
+        $unwind: "$posts",
+      },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "posts",
+          foreignField: "_id",
+          pipeline: [
+            {
+              // Get if user liked the child
+              $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "post",
+                pipeline: [
+                  {
+                    $match: {
+                      user: userId,
+                    },
+                  },
+                  {
+                    $limit: 1,
+                  },
+                ],
+                as: "childlikedocs",
+              },
+            },
+            {
+              // Get child author
+              $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "childauthor",
+              },
+            },
+            {
+              $unwind: "$childauthor",
+            },
+            {
+              $project: {
+                _id: true,
+                content: true,
+                authorName: "$childauthor.name",
+                authorHandle: "$childauthor.handle",
+                authorPfp: "$childauthor.pfp",
+                createdAt: true,
+                updatedAt: true,
+                hasLiked: {
+                  $cond: {
+                    if: {
+                      $eq: [
+                        {
+                          $size: "$childlikedocs",
+                        },
+                        0,
+                      ],
+                    },
+                    then: false,
+                    else: true,
+                  },
+                },
+                likes: true,
+                comments: true,
+                reposts: true,
+              },
+            },
+          ],
+          as: "bookmarkedPost",
+        },
+      },
+      {
+        $project: {
+          _id: false,
+          bookmarkedPost: true,
+        },
+      },
+    ]);
+    console.log(bookmarks);
+    // @ts-ignore
+    return bookmarks.map((bookmark) => {
+      const bm = bookmark.bookmarkedPost[0];
+      return {
+        id: bm._id.toString(),
+        content: bm.content,
+        likes: bm.likes,
+        comments: bm.comments,
+        reposts: bm.reposts,
+        createdAt: bm.createdAt,
+        updatedAt: bm.updatedAt,
+        authorName: bm.authorName,
+        authorHandle: bm.authorHandle,
+        hasLiked: bm.hasLiked,
+        hasBookmarked: true,
+      } as Ripple;
+    });
+  } catch (error) {
+    console.log(error);
   }
 }
 

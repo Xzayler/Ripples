@@ -1,9 +1,13 @@
 import { useAction, action } from "@solidjs/router";
 import { createEffect, createSignal, useContext } from "solid-js";
 import type { Ripple } from "~/types";
-import { likePost, unlikePost } from "~/lib/server";
+import {
+  addBookmark,
+  removeBookmark,
+  likePost,
+  unlikePost,
+} from "~/lib/server";
 import { openCommentModal } from "../shared/PostModal";
-import { UserContext } from "~/lib/UserContext";
 
 const defaultPost = {
   id: "idasd",
@@ -15,6 +19,7 @@ const defaultPost = {
   content: "Default",
   likes: 0,
   hasLiked: false,
+  hasBookmarked: false,
   reposts: 0,
   comments: 0,
 };
@@ -22,27 +27,43 @@ const defaultPost = {
 export default function Reactions(props: { post: Ripple | null | undefined }) {
   const like = useAction(action(likePost));
   const unlike = useAction(action(unlikePost));
+  const bookmark = useAction(action(addBookmark));
+  const unBookmark = useAction(action(removeBookmark));
   const [likesCount, setLikesCount] = createSignal<number>(
     props.post ? props.post.likes : 0
   );
   const [hasLiked, setHasLiked] = createSignal<boolean>(
     props.post ? props.post.hasLiked : false
   );
+  const [hasBookmarked, setHasBookmarked] = createSignal<boolean>(
+    props.post ? props.post.hasBookmarked : false
+  );
 
   createEffect(() => {
     setLikesCount((() => (props.post ? props.post.likes : 0))());
     setHasLiked((() => (props.post ? props.post.hasLiked : false))());
+    setHasBookmarked((() => (props.post ? props.post.hasBookmarked : false))());
   });
 
   const pressLike = () => {
     if (!hasLiked()) {
       setHasLiked(true);
       setLikesCount(likesCount() + 1);
-      like(props.post ? props.post.id : "");
+      if (props.post) like(props.post.id);
     } else {
       setHasLiked(false);
       setLikesCount(likesCount() - 1);
-      unlike(props.post ? props.post.id : "");
+      if (props.post) unlike(props.post.id);
+    }
+  };
+
+  const pressBookmark = () => {
+    if (!hasBookmarked()) {
+      setHasBookmarked(true);
+      if (props.post) bookmark(props.post.id);
+    } else {
+      setHasBookmarked(false);
+      if (props.post) unBookmark(props.post.id);
     }
   };
 
@@ -84,7 +105,16 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
       </div>
       <div class="flex">
         <div class="flex items-center mr-3 ">
-          <div class="h-[18px] w-[18px] rounded-sm bg-faint"></div>
+          <div
+            onclick={(e) => {
+              e.preventDefault();
+              pressBookmark();
+            }}
+            class={
+              "h-[18px] w-[18px] rounded-sm " +
+              (hasBookmarked() ? "bg-comment" : "bg-faint")
+            }
+          ></div>
         </div>
         <div class="flex items-center">
           <div class="h-[18px] w-[18px] rounded-sm bg-faint"></div>

@@ -11,6 +11,9 @@ import {
   unlike as ulp,
   getFeed as gf,
   getPost as gp,
+  getBookmarks as gb,
+  addBookmark as ab,
+  removeBookmark as rb,
 } from "./interactions";
 
 // session / auth
@@ -35,3 +38,6 @@ export const unlikePost = ulp;
 
 // Data
 export const getPost = gp;
+export const addBookmark = ab;
+export const getBookmarks = gb;
+export const removeBookmark = rb;
