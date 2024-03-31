@@ -11,5 +11,6 @@ export type Ripple = {
   hasLiked: boolean;
   reposts: number;
   comments: number;
-  parent?: Ripple;
+  ancestors?: Ripple[];
+  children?: Ripple[];
 };

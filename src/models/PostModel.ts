@@ -15,6 +15,7 @@ const postSchema = new Schema(
     likes: { type: Number },
     comments: { type: Number },
     reposts: { type: Number },
+    parent: { type: mongoose.Schema.ObjectId, ref: "posts" },
   },
   { timestamps: true }
 );

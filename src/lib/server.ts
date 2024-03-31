@@ -10,6 +10,7 @@ import {
   like as lp,
   unlike as ulp,
   getFeed as gf,
+  getPost as gp,
 } from "./interactions";
 
 // session / auth
@@ -31,3 +32,6 @@ export const submitComment = sc;
 export const getFeed = gf;
 export const likePost = lp;
 export const unlikePost = ulp;
+
+// Data
+export const getPost = gp;

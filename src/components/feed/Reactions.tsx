@@ -19,10 +19,7 @@ const defaultPost = {
   comments: 0,
 };
 
-export default function Reactions(props: {
-  post: Ripple | null | undefined;
-  likes?: number;
-}) {
+export default function Reactions(props: { post: Ripple | null | undefined }) {
   const like = useAction(action(likePost));
   const unlike = useAction(action(unlikePost));
   const [likesCount, setLikesCount] = createSignal<number>(
@@ -39,12 +36,10 @@ export default function Reactions(props: {
 
   const pressLike = () => {
     if (!hasLiked()) {
-      console.log("liking");
       setHasLiked(true);
       setLikesCount(likesCount() + 1);
       like(props.post ? props.post.id : "");
     } else {
-      console.log("unlike");
       setHasLiked(false);
       setLikesCount(likesCount() - 1);
       unlike(props.post ? props.post.id : "");

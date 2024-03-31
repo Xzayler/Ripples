@@ -6,6 +6,7 @@ import {
   getLike,
   unlikePost,
   getFeed as getPosts,
+  getPost as getOnePost,
 } from "./database";
 import mongoose from "mongoose";
 
@@ -48,4 +49,10 @@ export const unlike = async (post: string) => {
 export const getFeed = async () => {
   const id = (await getCurrentUser()).id;
   return await getPosts(id);
+};
+
+export const getPost = async (post: string) => {
+  const id = (await getCurrentUser()).id;
+  const postId = new mongoose.Types.ObjectId(post);
+  return await getOnePost(id, postId);
 };
