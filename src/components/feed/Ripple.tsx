@@ -1,5 +1,6 @@
 import { type Ripple } from "~/types";
 import Reactions from "./Reactions";
+import { calcDate } from "~/lib/date";
 
 export default function Ripple(props: { post: Ripple }) {
   const post = props.post;
@@ -54,7 +55,7 @@ export default function Ripple(props: { post: Ripple }) {
                 <span>⋅</span>
               </div>
               <div>
-                <span>{createdAt.toUTCString()}</span>
+                <span>{calcDate(createdAt)}</span>
               </div>
             </div>
           </div>

@@ -2,6 +2,7 @@ import { For } from "solid-js";
 import { Ripple } from "~/types";
 import { A } from "@solidjs/router";
 import Reactions from "./Reactions";
+import { calcDate } from "~/lib/date";
 
 function Parent(props: { parent: Ripple }) {
   return (
@@ -26,7 +27,7 @@ function Parent(props: { parent: Ripple }) {
               <span>⋅</span>
             </div>
             <div>
-              <span>{props.parent.createdAt.toUTCString()}</span>
+              <span>{calcDate(props.parent.createdAt)}</span>
             </div>
           </div>
         </div>
