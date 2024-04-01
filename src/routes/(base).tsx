@@ -1,16 +1,15 @@
 import Navbar from "~/components/navbar/Navbar";
 import MessageBox from "~/components/chat/MessageBox";
-import { JSX, createSignal, createResource } from "solid-js";
+import { JSX, createResource } from "solid-js";
 import PostModal from "~/components/shared/PostModal";
 import { UserContext } from "~/lib/UserContext";
-import { createAsync } from "@solidjs/router";
-import type { User } from "lucia";
+import type { User as LuciaUser } from "lucia";
 import { Suspense } from "solid-js";
 import { getCurrentUser } from "~/lib/server";
 
 export default function BaseLayout(props: { children: JSX.Element }) {
   const [user] = createResource(async () => {
-    return (await getCurrentUser()) as User;
+    return (await getCurrentUser()) as LuciaUser;
   });
 
   return (

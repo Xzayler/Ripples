@@ -1,5 +1,5 @@
 import { useAction, action } from "@solidjs/router";
-import { createEffect, createSignal, useContext } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import type { Ripple } from "~/types";
 import {
   addBookmark,

@@ -1,25 +1,10 @@
 import { useParams, A } from "@solidjs/router";
 import Sidebar from "~/components/sidebar/Sidebar";
 import { getPost } from "~/lib/server";
-import { createMemo, createResource, createSignal, For, Show } from "solid-js";
+import { createResource, For } from "solid-js";
 import Ripple from "~/components/feed/Ripple";
 import MainRipple from "~/components/feed/MainRipple";
 import { Suspense } from "solid-js";
-import { createEffect } from "solid-js";
-
-const defaultPost = {
-  id: "idasd",
-  pfp: "",
-  authorName: "default",
-  authorHandle: "def",
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  content: "Default",
-  likes: 0,
-  hasLiked: false,
-  reposts: 0,
-  comments: 0,
-};
 
 export default function Post() {
   const params = useParams();
