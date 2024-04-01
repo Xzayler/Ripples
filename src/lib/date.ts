@@ -1,5 +1,4 @@
 export function calcDate(date: Date) {
-  "use server";
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   if (diff < 1000 * 60 * 60) {
