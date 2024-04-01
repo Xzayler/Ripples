@@ -22,8 +22,8 @@ export default createMiddleware({
       getCookie(event.nativeEvent, lucia.sessionCookieName) ?? null;
     const sessionId = cookie ? lucia.readSessionCookie(cookie) : null;
     if (!sessionId) {
-      event.nativeEvent.context.session = null;
-      event.nativeEvent.context.user = null;
+      event.locals.session = null;
+      event.locals.user = null;
       return;
     }
     const { session, user } = await lucia.validateSession(sessionId);
