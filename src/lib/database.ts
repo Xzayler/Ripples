@@ -340,7 +340,7 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
               },
             },
             hasBookmarked: {
-              $push: {
+              $first: {
                 $cond: {
                   if: { $in: ["$_id", "$bookmarkdocs.posts"] },
                   then: true,
@@ -678,7 +678,6 @@ export async function getBookmarks(bmId: mongoose.Types.ObjectId) {
         },
       },
     ]);
-    console.log(bookmarks);
     // @ts-ignore
     return bookmarks.map((bookmark) => {
       const bm = bookmark.bookmarkedPost[0];
@@ -754,7 +753,6 @@ export async function getUserSummary(userHandle: string) {
   // const objId = new mongoose.Types.ObjectId(userId);
   try {
     const user = await UserModel.findOne({ handle: userHandle });
-    // console.log(user);
     return {
       id: user._id.toString(),
       name: user.name,
