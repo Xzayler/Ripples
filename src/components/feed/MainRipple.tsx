@@ -3,6 +3,7 @@ import { Show } from "solid-js";
 import Reactions from "./Reactions";
 import ParentChain from "./ParentChain";
 import WriteComment from "./WriteComment";
+import UserWrapper from "../user/UserWrapper";
 
 export default function MainRipple(props: { post: Ripple | undefined | null }) {
   return (
@@ -21,12 +22,16 @@ export default function MainRipple(props: { post: Ripple | undefined | null }) {
             </div>
             <div class="flex flex-col">
               <div class="mr-1">
-                <span class="font-bold text-foreground">
-                  {props.post ? props.post.authorName : ""}
-                </span>
+                <UserWrapper handle={props.post ? props.post.authorHandle : ""}>
+                  <span class="font-bold text-foreground">
+                    {props.post ? props.post.authorName : ""}
+                  </span>
+                </UserWrapper>
               </div>
               <div class="flex text-faint">
-                <span>{`@${props.post ? props.post.authorHandle : ""}`}</span>
+                <UserWrapper handle={props.post ? props.post.authorHandle : ""}>
+                  <span>{`@${props.post ? props.post.authorHandle : ""}`}</span>
+                </UserWrapper>
               </div>
             </div>
           </div>

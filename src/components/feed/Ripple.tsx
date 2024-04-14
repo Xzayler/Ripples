@@ -1,6 +1,7 @@
 import { type Ripple } from "~/types";
 import Reactions from "./Reactions";
 import { calcDate } from "~/lib/date";
+import UserWrapper from "../user/UserWrapper";
 
 export default function Ripple(props: { post: Ripple }) {
   const post = props.post;
@@ -45,11 +46,15 @@ export default function Ripple(props: { post: Ripple }) {
           {/* Post Meta */}
           <div class="flex flex-row">
             <div class="mr-1">
-              <span class="font-bold text-foreground">{authorName}</span>
+              <UserWrapper handle={authorHandle}>
+                <span class="font-bold text-foreground">{authorName}</span>
+              </UserWrapper>
             </div>
             <div class="flex text-faint">
               <div>
-                <span>{`@${authorHandle}`}</span>
+                <UserWrapper handle={authorHandle}>
+                  <span class="hover:underline">{`@${authorHandle}`}</span>
+                </UserWrapper>
               </div>
               <div class="px-1">
                 <span>⋅</span>

@@ -1,13 +1,15 @@
 import mongoose from "mongoose";
 import { MongodbAdapter } from "@lucia-auth/adapter-mongodb";
-import UserModel, { InferredUser, type User } from "~/models/UserModel";
+import UserModel, { InferredUser } from "~/models/UserModel";
 import PostModel, { type InferredPost } from "~/models/PostModel";
 import CommentModel, { type InferredComment } from "~/models/CommentModel";
 import LikeModel, { type InferredLike } from "~/models/LikeModel";
 import BookmarksModel, { type InferredBookmark } from "~/models/BookmarksModel";
-import FollowModel, { type Follow } from "~/models/FollowModel";
 import { isServer } from "solid-js/web";
 import { type Ripple } from "~/types";
+import FollowerModel, { InferredFollower } from "~/models/FollowerModel";
+import FollowingModel, { InferredFollowing } from "~/models/FollowingModel";
+import type { User } from "~/types";
 
 export async function initDb() {
   if (
@@ -60,30 +62,22 @@ export async function addComment(postData: {
   }
 }
 
-export async function getUserById(id: string): Promise<User | null> {
+export async function getUserById(id: string) {
   const res: InferredUser | null = await UserModel.findById(id);
   if (!res) return null;
   return {
     _id: res._id,
-    name: res.name,
-    handle: res.handle,
     password: res.password,
-    pfp: res.pfp,
-    bio: res.bio,
-  } as User;
+  };
 }
 
-export async function getUserByUsername(un: string): Promise<User | null> {
+export async function getUserByUsername(un: string) {
   const res: InferredUser | null = await UserModel.findOne({ handle: un });
   if (!res) return null;
   return {
     _id: res._id.toString(),
-    name: res.name,
-    handle: res.handle,
     password: res.password,
-    pfp: res.pfp,
-    bio: res.bio,
-  } as User;
+  };
 }
 
 export async function createUser(
@@ -99,14 +93,26 @@ export async function createUser(
     password: password,
     pfp: undefined,
     bio: undefined,
+    followers: 0,
+    following: 0,
   };
   const newBookmarks: InferredBookmark = {
     _id: id,
     posts: [],
   };
+  const newFollowings: InferredFollowing = {
+    _id: id,
+    users: [],
+  };
+  const newFollowers: InferredFollower = {
+    _id: id,
+    users: [],
+  };
   try {
     await UserModel.create(newUser);
     await BookmarksModel.create(newBookmarks);
+    await FollowerModel.create(newFollowers);
+    await FollowingModel.create(newFollowings);
   } catch (error) {
     return error as Error;
   }
@@ -543,7 +549,6 @@ export async function getFeed(userId: string) {
         },
       },
     ]);
-    console.log(posts);
     return posts.map((post) => {
       if (post.author == null || typeof post.author == "string") {
       }
@@ -742,6 +747,25 @@ export async function getComments() {
     return result;
   } catch (error) {
     return error;
+  }
+}
+
+export async function getUserSummary(userHandle: string) {
+  // const objId = new mongoose.Types.ObjectId(userId);
+  try {
+    const user = await UserModel.findOne({ handle: userHandle });
+    // console.log(user);
+    return {
+      id: user._id.toString(),
+      name: user.name,
+      handle: user.handle,
+      pfp: user.pfp,
+      bio: user.bio ?? "",
+      followers: user.followers,
+      following: user.following,
+    } as User;
+  } catch (error) {
+    console.log(error);
   }
 }
 

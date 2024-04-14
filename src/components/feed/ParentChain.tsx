@@ -3,6 +3,7 @@ import { Ripple } from "~/types";
 import { A } from "@solidjs/router";
 import Reactions from "./Reactions";
 import { calcDate } from "~/lib/date";
+import UserWrapper from "../user/UserWrapper";
 
 function Parent(props: { parent: Ripple }) {
   return (
@@ -15,14 +16,18 @@ function Parent(props: { parent: Ripple }) {
         {/* Post Meta */}
         <div class="flex flex-row">
           <div class="mr-1">
-            <span class="font-bold text-foreground">
-              {props.parent.authorName}
-            </span>
+            <UserWrapper handle={props.parent ? props.parent.authorHandle : ""}>
+              <span class="font-bold text-foreground">
+                {props.parent.authorName}
+              </span>
+            </UserWrapper>
           </div>
           <div class="flex text-faint">
-            <div>
-              <span>{`@${props.parent.authorHandle}`}</span>
-            </div>
+            <UserWrapper handle={props.parent ? props.parent.authorHandle : ""}>
+              <div>
+                <span>{`@${props.parent.authorHandle}`}</span>
+              </div>
+            </UserWrapper>
             <div class="px-1">
               <span>⋅</span>
             </div>

@@ -4,6 +4,7 @@ import { register as rg, login as li, logout as lo } from "./auth";
 import { getRequestEvent } from "solid-js/web";
 import { redirect } from "@solidjs/router";
 import { User } from "lucia";
+import { getUserSummary as gus } from "./database";
 import {
   submitPost as sp,
   submitComment as sc,
@@ -32,12 +33,13 @@ export const getCurrentUser = cache((): User => {
 // Interactions
 export const submitPost = sp;
 export const submitComment = sc;
-export const getFeed = gf;
 export const likePost = lp;
 export const unlikePost = ulp;
+export const addBookmark = ab;
+export const removeBookmark = rb;
 
 // Data
+export const getFeed = gf;
 export const getPost = gp;
-export const addBookmark = ab;
 export const getBookmarks = gb;
-export const removeBookmark = rb;
+export const getUserSummary = gus;

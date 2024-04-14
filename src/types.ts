@@ -9,8 +9,19 @@ export type Ripple = {
   content: string;
   likes: number;
   hasLiked: boolean;
+  hasBookmarked: boolean;
   reposts: number;
   comments: number;
   ancestors?: Ripple[];
   children?: Ripple[];
+};
+
+export type User = {
+  id: string;
+  name: string;
+  handle: string;
+  pfp?: string;
+  bio: string;
+  followers: number;
+  following: number;
 };

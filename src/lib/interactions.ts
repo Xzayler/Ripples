@@ -10,6 +10,7 @@ import {
   getBookmarks as getBm,
   addBookmark as addBm,
   removeBookmark as remBm,
+  getUserSummary as getUS,
 } from "./database";
 import mongoose from "mongoose";
 

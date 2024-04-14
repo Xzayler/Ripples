@@ -8,12 +8,11 @@ const userSchema = new Schema({
   password: { type: String, required: true },
   pfp: { type: String, required: false },
   bio: { type: String, required: false },
+  followers: { type: Number, required: true },
+  following: { type: Number, required: true },
 });
 
 export type InferredUser = InferSchemaType<typeof userSchema>;
-export type User = Omit<InferredUser, "_id"> & {
-  _id: string;
-};
 
 export default mongoose.models?.UserModel ||
   mongoose.model<InferredUser>("UserModel", userSchema, "users");
