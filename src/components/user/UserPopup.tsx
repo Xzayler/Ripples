@@ -2,10 +2,10 @@ import { createResource, Show } from "solid-js";
 //@ts-ignore
 import defaultPfp from "./defaultPfp.png";
 import { getUserSummary } from "~/lib/server";
-import FollowButton from "./FollowButton";
+import FollowButton, { FollowButtonDisabled } from "./FollowButton";
 
 export default function UserPopup(props: { userHandle: string }) {
-  const [user] = createResource(() => {
+  const [user, {}] = createResource(() => {
     return getUserSummary(props.userHandle);
   });
 
@@ -31,9 +31,18 @@ export default function UserPopup(props: { userHandle: string }) {
               />
             )}
           </Show>
-          <div>
-            <FollowButton />
-          </div>
+          <Show
+            when={user()}
+            fallback={
+              <div>
+                <FollowButtonDisabled />
+              </div>
+            }
+          >
+            <div>
+              <FollowButton uId={user()!.id} isFollowed={user()!.isFollowed} />
+            </div>
+          </Show>
         </div>
         <Show
           when={user()}

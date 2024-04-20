@@ -594,6 +594,46 @@ export async function removeBookmark(
   }
 }
 
+export async function addFollow(
+  followerId: mongoose.Types.ObjectId,
+  followeeId: mongoose.Types.ObjectId
+) {
+  try {
+    await FollowerModel.updateOne(
+      { _id: followeeId },
+      { $push: { users: followerId } }
+    );
+    await FollowingModel.updateOne(
+      { _id: followerId },
+      { $push: { users: followeeId } }
+    );
+    await UserModel.updateOne({ _id: followerId }, { $inc: { following: 1 } });
+    await UserModel.updateOne({ _id: followeeId }, { $inc: { followers: 1 } });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function removeFollow(
+  followerId: mongoose.Types.ObjectId,
+  followeeId: mongoose.Types.ObjectId
+) {
+  try {
+    await FollowerModel.updateOne(
+      { _id: followeeId },
+      { $pull: { users: followerId } }
+    );
+    await FollowingModel.updateOne(
+      { _id: followerId },
+      { $pull: { users: followeeId } }
+    );
+    await UserModel.updateOne({ _id: followerId }, { $inc: { following: -1 } });
+    await UserModel.updateOne({ _id: followeeId }, { $inc: { followers: -1 } });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function getBookmarks(bmId: mongoose.Types.ObjectId) {
   const userId = bmId.toString();
   try {
@@ -740,19 +780,68 @@ export async function getLike(postId: mongoose.Types.ObjectId, userId: string) {
   }
 }
 
-export async function getComments() {
-  try {
-    const result: Comment[] = await CommentModel.find();
-    return result;
-  } catch (error) {
-    return error;
-  }
-}
+// export async function getComments() {
+//   try {
+//     const result: Comment[] = await CommentModel.find();
+//     return result;
+//   } catch (error) {
+//     return error;
+//   }
+// }
 
-export async function getUserSummary(userHandle: string) {
-  // const objId = new mongoose.Types.ObjectId(userId);
+export async function getUserSummary(
+  uHandle: string,
+  currUserId: mongoose.Types.ObjectId
+) {
   try {
-    const user = await UserModel.findOne({ handle: userHandle });
+    const user = (
+      await UserModel.aggregate([
+        { $match: { handle: uHandle } },
+        {
+          $addFields: {
+            convertedId: { $toObjectId: "$_id" },
+          },
+        },
+        {
+          $lookup: {
+            from: "followings",
+            localField: "convertedId",
+            foreignField: "_id",
+            pipeline: [
+              {
+                $project: {
+                  _id: false,
+                  found: {
+                    $cond: {
+                      if: {
+                        $in: [currUserId, "$users"],
+                      },
+                      then: true,
+                      else: false,
+                    },
+                  },
+                },
+              },
+            ],
+            as: "isFollowed",
+          },
+        },
+        { $unwind: "$isFollowed" },
+        {
+          $project: {
+            id: true,
+            name: true,
+            handle: true,
+            pfp: true,
+            bio: true,
+            followers: true,
+            following: true,
+            isFollowed: "$isFollowed.found",
+            convertedId: true,
+          },
+        },
+      ])
+    )[0];
     return {
       id: user._id.toString(),
       name: user.name,
@@ -761,6 +850,7 @@ export async function getUserSummary(userHandle: string) {
       bio: user.bio ?? "",
       followers: user.followers,
       following: user.following,
+      isFollowed: user.isFollowed,
     } as User;
   } catch (error) {
     console.log(error);

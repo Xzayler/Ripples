@@ -3,6 +3,7 @@ import { Schema, InferSchemaType } from "mongoose";
 
 const followerSchema = new Schema({
   _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+  // User who are the followers of the user above
   users: {
     type: [mongoose.Schema.Types.ObjectId],
     required: true,

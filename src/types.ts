@@ -24,4 +24,5 @@ export type User = {
   bio: string;
   followers: number;
   following: number;
+  isFollowed: boolean;
 };

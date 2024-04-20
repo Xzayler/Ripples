@@ -11,6 +11,8 @@ import {
   addBookmark as addBm,
   removeBookmark as remBm,
   getUserSummary as getUS,
+  addFollow as addFl,
+  removeFollow as remFl,
 } from "./database";
 import mongoose from "mongoose";
 
@@ -77,4 +79,21 @@ export const getBookmarks = async () => {
   const id = (await getCurrentUser()).id;
   const bmId = new mongoose.Types.ObjectId(id);
   return await getBm(bmId);
+};
+
+export const addFollow = async (uId: string) => {
+  const followerId = new mongoose.Types.ObjectId((await getCurrentUser()).id);
+  const followeeId = new mongoose.Types.ObjectId(uId);
+  return await addFl(followerId, followeeId);
+};
+
+export const removeFollow = async (uId: string) => {
+  const followerId = new mongoose.Types.ObjectId((await getCurrentUser()).id);
+  const followeeId = new mongoose.Types.ObjectId(uId);
+  return await remFl(followerId, followeeId);
+};
+
+export const getUserSummary = async (uHandle: string) => {
+  const currUId = new mongoose.Types.ObjectId((await getCurrentUser()).id);
+  return await getUS(uHandle, currUId);
 };

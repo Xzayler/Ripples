@@ -21,7 +21,7 @@ module.exports = {
         comment: "rgb(var(--color-comment) / <alpha-value>)",
       },
       fontSize: {
-        md: "15px",
+        md: ["0.9375/* 15px */", "1.175/* 22px */"],
       },
     },
     fontFamily: {

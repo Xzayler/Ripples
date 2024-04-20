@@ -4,7 +4,6 @@ import { register as rg, login as li, logout as lo } from "./auth";
 import { getRequestEvent } from "solid-js/web";
 import { redirect } from "@solidjs/router";
 import { User } from "lucia";
-import { getUserSummary as gus } from "./database";
 import {
   submitPost as sp,
   submitComment as sc,
@@ -15,6 +14,9 @@ import {
   getBookmarks as gb,
   addBookmark as ab,
   removeBookmark as rb,
+  getUserSummary as gus,
+  addFollow as af,
+  removeFollow as rf,
 } from "./interactions";
 
 // session / auth
@@ -37,6 +39,8 @@ export const likePost = lp;
 export const unlikePost = ulp;
 export const addBookmark = ab;
 export const removeBookmark = rb;
+export const addFollow = af;
+export const removeFollow = rf;
 
 // Data
 export const getFeed = gf;
