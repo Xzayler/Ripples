@@ -33,11 +33,7 @@ export default function Post() {
           <MainRipple post={post()} />
           <For each={post() ? post()!.children : []}>
             {(item) => {
-              return (
-                <A href={`/post/${item.id}`}>
-                  <Ripple post={item} />
-                </A>
-              );
+              return <Ripple post={item} />;
             }}
           </For>
         </Suspense>
