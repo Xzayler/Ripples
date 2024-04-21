@@ -799,14 +799,15 @@ export async function getUserSummary(
         { $match: { handle: uHandle } },
         {
           $addFields: {
-            convertedId: { $toObjectId: "$_id" },
+            currentUser: currUserId,
           },
         },
         {
           $lookup: {
             from: "followings",
-            localField: "convertedId",
+            localField: "currentUser",
             foreignField: "_id",
+            let: { toFind: { $toObjectId: "$_id" } },
             pipeline: [
               {
                 $project: {
@@ -814,7 +815,7 @@ export async function getUserSummary(
                   found: {
                     $cond: {
                       if: {
-                        $in: [currUserId, "$users"],
+                        $in: ["$$toFind", "$users"],
                       },
                       then: true,
                       else: false,
