@@ -6,6 +6,7 @@ import {
   getLike,
   unlikePost,
   getFeed as getPosts,
+  getSubFeed as getSubPosts,
   getPost as getOnePost,
   getBookmarks as getBm,
   addBookmark as addBm,
@@ -55,6 +56,11 @@ export const unlike = async (post: string) => {
 export const getFeed = async () => {
   const id = (await getCurrentUser()).id;
   return await getPosts(id);
+};
+
+export const getSubFeed = async () => {
+  const id = (await getCurrentUser()).id;
+  return await getSubPosts(id);
 };
 
 export const getPost = async (post: string) => {

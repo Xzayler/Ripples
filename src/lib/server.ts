@@ -10,6 +10,7 @@ import {
   like as lp,
   unlike as ulp,
   getFeed as gf,
+  getSubFeed as gsf,
   getPost as gp,
   getBookmarks as gb,
   addBookmark as ab,
@@ -44,6 +45,7 @@ export const removeFollow = rf;
 
 // Data
 export const getFeed = gf;
+export const getSubFeed = gsf;
 export const getPost = gp;
 export const getBookmarks = gb;
 export const getUserSummary = gus;

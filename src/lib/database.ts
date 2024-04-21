@@ -114,7 +114,7 @@ export async function createUser(
     await FollowerModel.create(newFollowers);
     await FollowingModel.create(newFollowings);
   } catch (error) {
-    return error as Error;
+    console.log(error);
   }
   return null;
 }
@@ -498,7 +498,6 @@ export async function getFeed(userId: string) {
       {
         $lookup: {
           from: "bookmarks",
-          let: { postId: "_id" },
           pipeline: [
             {
               $match: {
@@ -568,7 +567,153 @@ export async function getFeed(userId: string) {
       } as Ripple;
     });
   } catch (error) {
-    return error as Error;
+    console.log(error);
+  }
+}
+
+export async function getSubFeed(userId: string) {
+  const uObjId = new mongoose.Types.ObjectId(userId);
+  try {
+    const posts = await FollowingModel.aggregate([
+      {
+        $match: { _id: uObjId },
+      },
+      {
+        $lookup: {
+          from: "posts",
+          let: { users: "$users" },
+          pipeline: [
+            {
+              $match: {
+                $and: [
+                  {
+                    parent: null,
+                  },
+                  {
+                    $expr: {
+                      $cond: {
+                        if: {
+                          $in: [{ $toObjectId: "$author" }, "$$users"],
+                        },
+                        then: true,
+                        else: false,
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "post",
+                pipeline: [
+                  {
+                    $match: { user: userId },
+                  },
+                  { $limit: 1 },
+                ],
+                as: "likedocs",
+              },
+            },
+            // Check if the post is bookmarked by the User
+            {
+              $lookup: {
+                from: "bookmarks",
+                pipeline: [
+                  {
+                    $match: {
+                      $expr: { $eq: [uObjId, "$_id"] },
+                    },
+                  },
+                  { $limit: 1 },
+                ],
+                as: "bookmarkdocs",
+              },
+            },
+            { $unwind: "$bookmarkdocs" },
+            {
+              $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "author",
+              },
+            },
+            {
+              $unwind: "$author",
+            },
+            {
+              $project: {
+                _id: true,
+                content: true,
+                author: "$author",
+                createdAt: true,
+                updatedAt: true,
+                hasLiked: {
+                  $cond: {
+                    if: { $eq: [{ $size: "$likedocs" }, 0] },
+                    then: false,
+                    else: true,
+                  },
+                },
+                hasBookmarked: {
+                  $cond: {
+                    if: { $in: ["$_id", "$bookmarkdocs.posts"] },
+                    then: true,
+                    else: false,
+                  },
+                },
+                likes: true,
+                comments: true,
+                reposts: true,
+              },
+            },
+          ],
+          as: "followedPosts",
+        },
+      },
+      {
+        $project: {
+          _id: false,
+          users: false,
+        },
+      },
+      { $unwind: "$followedPosts" },
+      {
+        $project: {
+          _id: "$followedPosts._id",
+          author: "$followedPosts.author",
+          createdAt: "$followedPosts.createdAt",
+          updatedAt: "$followedPosts.updatedAt",
+          content: "$followedPosts.content",
+          likes: "$followedPosts.likes",
+          hasLiked: "$followedPosts.hasLiked",
+          hasBookmarked: "$followedPosts.hasBookmarked",
+          reposts: "$followedPosts.reposts",
+          comments: "$followedPosts.comments",
+        },
+      },
+    ]);
+    return posts.map((post) => {
+      return {
+        id: post._id.toString(),
+        authorName: post.author.name,
+        authorHandle: post.author.handle,
+        pfp: post.author.pfp,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        content: post.content,
+        likes: post.likes ?? 0,
+        hasLiked: post.hasLiked,
+        hasBookmarked: post.hasBookmarked,
+        reposts: post.reposts ?? 0,
+        comments: post.comments ?? 0,
+      } as Ripple;
+    });
+  } catch (error) {
+    console.log(error);
   }
 }
 
@@ -779,15 +924,6 @@ export async function getLike(postId: mongoose.Types.ObjectId, userId: string) {
     return error;
   }
 }
-
-// export async function getComments() {
-//   try {
-//     const result: Comment[] = await CommentModel.find();
-//     return result;
-//   } catch (error) {
-//     return error;
-//   }
-// }
 
 export async function getUserSummary(
   uHandle: string,
