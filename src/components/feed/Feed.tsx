@@ -13,11 +13,7 @@ export default function Feed() {
     <div class="">
       <For each={posts()}>
         {(item) => {
-          return (
-            <A href={`/post/${item.id}`} class="w-full cursor-pointer">
-              <Ripple post={item} />
-            </A>
-          );
+          return <Ripple post={item} />;
         }}
       </For>
     </div>

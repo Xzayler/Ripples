@@ -2,6 +2,7 @@ import { type Ripple } from "~/types";
 import Reactions from "./Reactions";
 import { calcDate } from "~/lib/date";
 import UserWrapper from "../user/UserWrapper";
+import { redirect, useNavigate } from "@solidjs/router";
 
 export default function Ripple(props: { post: Ripple }) {
   const post = props.post;
@@ -21,9 +22,15 @@ export default function Ripple(props: { post: Ripple }) {
     reposts,
     comments,
   } = post;
+  const navigate = useNavigate();
 
   return (
-    <article class="px-4 flex flex-col w-full border-solid border-b border-ui">
+    <article
+      onClick={() => {
+        navigate(`/post/${id}`);
+      }}
+      class="px-4 flex flex-col w-full cursor-pointer border-solid border-b border-ui"
+    >
       {/* retweeted by.. */}
       <div class="pt-3 pb-2">
         {/* <div class="flex gap-3 align-center">
@@ -47,7 +54,9 @@ export default function Ripple(props: { post: Ripple }) {
           <div class="flex flex-row">
             <div class="mr-1">
               <UserWrapper handle={authorHandle}>
-                <span class="font-bold text-foreground">{authorName}</span>
+                <span class="hover:underline font-bold text-foreground">
+                  {authorName}
+                </span>
               </UserWrapper>
             </div>
             <div class="flex text-faint">
@@ -60,7 +69,9 @@ export default function Ripple(props: { post: Ripple }) {
                 <span>⋅</span>
               </div>
               <div>
-                <span>{calcDate(createdAt)}</span>
+                <time dateTime={createdAt.toISOString()}>
+                  {calcDate(createdAt)}
+                </time>
               </div>
             </div>
           </div>
