@@ -1,7 +1,7 @@
 export function calcDate(date: Date) {
   const now = new Date();
   const diff = Math.round((now.getTime() - date.getTime()) / 1000);
-  if (diff <= 60 * 60 * 24) {
+  if (diff < 60 * 60) {
     return `${Math.round(diff / 60)}m`;
   } else if (diff < 60 * 60 * 24) {
     return `${Math.round(diff / (60 * 60))}h`;
