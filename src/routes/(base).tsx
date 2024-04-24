@@ -6,6 +6,7 @@ import { UserContext } from "~/lib/UserContext";
 import type { User as LuciaUser } from "lucia";
 import { Suspense } from "solid-js";
 import { getCurrentUser } from "~/lib/server";
+import WavesIcon from "~/components/shared/icons/WavesIcon";
 
 export default function BaseLayout(props: { children: JSX.Element }) {
   const [user] = createResource(async () => {
@@ -15,12 +16,26 @@ export default function BaseLayout(props: { children: JSX.Element }) {
   return (
     <div class="relative w-full min-h-screen bg-background text-foreground flex justify-center items-center">
       <div class="flex flex-row relative items-start justify-center">
-        <Suspense>
+        <Suspense
+          fallback={
+            <div class="w-full h-dvh bg-background flex items-center justify-center  ">
+              <WavesIcon />
+            </div>
+          }
+        >
           <UserContext.Provider value={user}>
             <div class="sticky top-0 max-h-screen flex justify-end ">
               <Navbar />
             </div>
-            {props.children}
+            <Suspense
+              fallback={
+                <div class="w-full h-dvh bg-background flex items-center justify-center  ">
+                  <WavesIcon />
+                </div>
+              }
+            >
+              {props.children}
+            </Suspense>
           </UserContext.Provider>
         </Suspense>
         {/* <div class="absolute bottom-0 right-4">

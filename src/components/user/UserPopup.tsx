@@ -1,6 +1,6 @@
 import { createResource, Show } from "solid-js";
 //@ts-ignore
-import defaultPfp from "./defaultPfp.png";
+import defaultPfp from "../../assets/pfps/defaultPfp.png";
 import { getUserSummary } from "~/lib/server";
 import FollowButton, { FollowButtonDisabled } from "./FollowButton";
 
@@ -16,11 +16,13 @@ export default function UserPopup(props: { userHandle: string }) {
           <Show
             when={user()?.pfp}
             fallback={
-              <img
-                src={defaultPfp}
-                alt="default profile picture"
-                class="w-16 h-16 object-cover"
-              />
+              <div class="bg-gray-300 rounded-full">
+                <img
+                  src={defaultPfp}
+                  alt="default profile picture"
+                  class="w-16 h-16 object-cover"
+                />
+              </div>
             }
           >
             {(pfp) => (

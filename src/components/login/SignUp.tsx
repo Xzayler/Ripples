@@ -5,6 +5,22 @@ import { register } from "~/lib/server";
 export default function Signup() {
   const registerResponse = useSubmission(action(register));
 
+  let pwInput: HTMLInputElement | ((el: HTMLInputElement) => void) | undefined;
+  let confPwInput:
+    | HTMLInputElement
+    | ((el: HTMLInputElement) => void)
+    | undefined;
+
+  function passCheck() {
+    const confPass = confPwInput as HTMLInputElement;
+
+    if (confPass.value != (pwInput as HTMLInputElement).value) {
+      confPass.setCustomValidity("The passwords don't match!");
+    } else {
+      confPass.setCustomValidity("");
+    }
+  }
+
   return (
     <div class="min-h-screen flex flex-col justify-center items-center">
       <p>{registerResponse.result?.message}</p>
@@ -32,6 +48,7 @@ export default function Signup() {
           maxLength={16}
         />
         <input
+          ref={pwInput}
           class="p-3.5 border-b border-gray-300 text-gray-900 outline-none"
           name="password"
           type="password"
@@ -41,6 +58,8 @@ export default function Signup() {
           maxLength={32}
         />
         <input
+          ref={confPwInput}
+          onInput={passCheck}
           class="p-3.5 rounded-b border-gray-300 text-gray-900 outline-none"
           name="confirm-password"
           type="password"

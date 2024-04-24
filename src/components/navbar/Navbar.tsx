@@ -10,7 +10,7 @@ import WavesIcon from "~/components/shared/icons/WavesIcon";
 
 export default function Navbar() {
   return (
-    <header class="w-[275px] h-screen flex flex-col justify-between">
+    <header class="w-[275px] h-screen flex flex-col justify-between border-solid border-r border-ui">
       <div class="pt-6 px-2">
         <div class="ml-3 h-8 w-8">
           <WavesIcon />
@@ -24,8 +24,8 @@ export default function Navbar() {
           </MenuItem>
           <MenuItem href={"/bookmarks"} text="Bookmarks">
             <BookmarkIcon
-              fill="var(--color-background)"
-              stroke={"var(--color-foreground)"}
+              fill={`rgb(var(--color-${"background"}))`}
+              stroke="rgb(var(--color-foreground))"
             />
           </MenuItem>
           <MenuItem href={"/profile"} text="Profile">

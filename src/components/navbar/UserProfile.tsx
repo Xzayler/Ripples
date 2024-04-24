@@ -8,7 +8,7 @@ export default function UserProfile() {
     <div class="group">
       <div class="relative w-full">
         <div class=" absolute bottom-0 w-full">
-          <UserProfileMenu handle={user!() ? user!().handle : "loading"} />
+          <UserProfileMenu handle={user!() ? user!()!.handle : "loading"} />
         </div>
       </div>
       <div class="cursor-pointer rounded-full w-full p-3 flex items-center hover:bg-highlight">
@@ -18,10 +18,10 @@ export default function UserProfile() {
         </div>
         <div class="flex flex-col mx-3 text-foreground">
           <span class="text-md font-bold ">
-            {user!() ? user!().name : "Loading"}
+            {user!() ? user!()!.name : "Loading"}
           </span>
           <span class="text-md text-faint">{`@${
-            user!() ? user!().handle : "loading"
+            user!() ? user!()!.handle : "loading"
           }`}</span>
         </div>
         <div class="grow flex justify-end">

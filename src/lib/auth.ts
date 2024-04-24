@@ -43,11 +43,14 @@ export const register = async (formData: FormData) => {
   if (
     typeof username !== "string" ||
     username.length < 3 ||
-    username.length > 31 ||
-    !/^[a-z0-9_-]+$/.test(username)
+    username.length > 31
   ) {
     return new Error("Invalid username");
   }
+  if (!/^[a-z0-9_-]+$/.test(username))
+    return new Error(
+      "Username must only contain 0-9, a-z, '_' and '-' characters"
+    );
   const name = formData.get("name");
   if (
     typeof name !== "string" ||
