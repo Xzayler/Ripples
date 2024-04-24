@@ -74,6 +74,7 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
         onClick={(e) => {
           e.preventDefault();
           openCommentModal(props.post ?? defaultPost);
+          e.stopPropagation();
         }}
       >
         <div class="h-[18px] w-[18px] rounded-sm bg-faint"></div>
@@ -90,6 +91,7 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
         onclick={(e) => {
           e.preventDefault();
           pressLike();
+          e.stopPropagation();
         }}
       >
         <div class="h-[18px] w-[18px] rounded-sm bg-faint "></div>
@@ -109,6 +111,7 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
             onclick={(e) => {
               e.preventDefault();
               pressBookmark();
+              e.stopPropagation();
             }}
             class={
               "h-[18px] w-[18px] rounded-sm " +
