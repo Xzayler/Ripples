@@ -1,41 +1,26 @@
-import { useContext, Suspense, createResource, For } from "solid-js";
-import Sidebar from "~/components/sidebar/Sidebar";
-import { UserContext } from "~/lib/UserContext";
-import type { Ripple as RippleType } from "~/types";
-import Ripple from "~/components/feed/Ripple";
+import Feed from "~/components/feed/Feed";
 import { getBookmarks } from "~/lib/server";
 import { A } from "@solidjs/router";
-
-function BookmarkedPosts() {
-  const [bookmarks] = createResource(async () => {
-    return (await getBookmarks()) as RippleType[];
-  });
-  return (
-    <For each={bookmarks() ? bookmarks() : []}>
-      {(item) => {
-        return (
-          <A href={`/post/${item.id}`}>
-            <Ripple post={item} />
-          </A>
-        );
-      }}
-    </For>
-  );
-}
+import { Suspense } from "solid-js";
+import Sidebar from "~/components/sidebar/Sidebar";
 
 export default function Bookmarks() {
-  const user = useContext(UserContext);
   return (
     <main class="w-[990px] flex justify-between h-full relative items-end ">
       <div class="shrink w-[600px] relative flex flex-col self-stretch ">
-        <div class="flex flex-col justify-center items-start w-full sticky top-0 h-[53px] px-4">
-          <h1 class="text-xl font-bold">Bookmarks</h1>
-          <p class="text-sm leading-4 text-faint ">{`@${
-            user!() ? user!()!.handle : "loading"
-          }`}</p>
-        </div>
+        <nav class="flex w-full sticky top-0 border-b border-ui z-50">
+          <div class="px-4 w-1/2 bg-background gap-3 h-[53px] font-semibold grow flex items-center ">
+            <A
+              href="/home"
+              class=" w-8 aspect-square p-1 rounded-full hover:bg-ui "
+            >
+              {"<-"}
+            </A>
+            <h1 class="flex items-center h-[52px] ">My Bookmarks</h1>
+          </div>
+        </nav>
         <Suspense>
-          <BookmarkedPosts />
+          <Feed fetcher={getBookmarks} />
         </Suspense>
       </div>
       {/* Sidebar */}
