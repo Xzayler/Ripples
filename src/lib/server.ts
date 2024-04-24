@@ -11,11 +11,13 @@ import {
   unlike as ulp,
   getFeed as gf,
   getSubFeed as gsf,
+  getUserPosts as gup,
   getPost as gp,
   getBookmarks as gb,
   addBookmark as ab,
   removeBookmark as rb,
   getUserSummary as gus,
+  getUserData as gud,
   addFollow as af,
   removeFollow as rf,
 } from "./interactions";
@@ -46,6 +48,8 @@ export const removeFollow = rf;
 // Data
 export const getFeed = gf;
 export const getSubFeed = gsf;
+export const getUserPosts = gup;
 export const getPost = gp;
 export const getBookmarks = gb;
 export const getUserSummary = gus;
+export const getUserData = gud;

@@ -6,10 +6,9 @@ import CommentModel, { type InferredComment } from "~/models/CommentModel";
 import LikeModel, { type InferredLike } from "~/models/LikeModel";
 import BookmarksModel, { type InferredBookmark } from "~/models/BookmarksModel";
 import { isServer } from "solid-js/web";
-import { type Ripple } from "~/types";
 import FollowerModel, { InferredFollower } from "~/models/FollowerModel";
 import FollowingModel, { InferredFollowing } from "~/models/FollowingModel";
-import type { User } from "~/types";
+import type { User, Ripple } from "~/types";
 
 export async function initDb() {
   if (
@@ -571,6 +570,106 @@ export async function getFeed(userId: string) {
   }
 }
 
+export async function getUserPosts(
+  userId: string,
+  currUserId: mongoose.Types.ObjectId
+) {
+  const currUserIdString = currUserId.toString();
+  try {
+    const posts = await PostModel.aggregate([
+      { $match: { $and: [{ author: userId }, { parent: null }] } },
+      {
+        $lookup: {
+          from: "likes",
+          localField: "_id",
+          foreignField: "post",
+          pipeline: [
+            {
+              $match: { user: currUserIdString },
+            },
+            { $limit: 1 },
+          ],
+          as: "likedocs",
+        },
+      },
+      // Check if the post is bookmarked by the User
+      {
+        $lookup: {
+          from: "bookmarks",
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: [currUserId, "$_id"] },
+              },
+            },
+            { $limit: 1 },
+          ],
+          as: "bookmarkdocs",
+        },
+      },
+      { $unwind: "$bookmarkdocs" },
+      // User is looked up every time even though we know the author is always the same.
+      {
+        $lookup: {
+          from: "users",
+          localField: "author",
+          foreignField: "_id",
+          as: "author",
+        },
+      },
+      {
+        $unwind: "$author",
+      },
+      {
+        $project: {
+          _id: true,
+          content: true,
+          author: "$author",
+          createdAt: true,
+          updatedAt: true,
+          hasLiked: {
+            $cond: {
+              if: { $eq: [{ $size: "$likedocs" }, 0] },
+              then: false,
+              else: true,
+            },
+          },
+          hasBookmarked: {
+            $cond: {
+              if: { $in: ["$_id", "$bookmarkdocs.posts"] },
+              then: true,
+              else: false,
+            },
+          },
+          likes: true,
+          comments: true,
+          reposts: true,
+        },
+      },
+    ]);
+    return posts.map((post) => {
+      if (post.author == null || typeof post.author == "string") {
+      }
+      return {
+        id: post._id.toString(),
+        authorName: post.author.name,
+        authorHandle: post.author.handle,
+        pfp: post.author.pfp,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        content: post.content,
+        likes: post.likes ?? 0,
+        hasLiked: post.hasLiked,
+        hasBookmarked: post.hasBookmarked,
+        reposts: post.reposts ?? 0,
+        comments: post.comments ?? 0,
+      } as Ripple;
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function getSubFeed(userId: string) {
   const uObjId = new mongoose.Types.ObjectId(userId);
   try {
@@ -739,46 +838,6 @@ export async function removeBookmark(
   }
 }
 
-export async function addFollow(
-  followerId: mongoose.Types.ObjectId,
-  followeeId: mongoose.Types.ObjectId
-) {
-  try {
-    await FollowerModel.updateOne(
-      { _id: followeeId },
-      { $push: { users: followerId } }
-    );
-    await FollowingModel.updateOne(
-      { _id: followerId },
-      { $push: { users: followeeId } }
-    );
-    await UserModel.updateOne({ _id: followerId }, { $inc: { following: 1 } });
-    await UserModel.updateOne({ _id: followeeId }, { $inc: { followers: 1 } });
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-export async function removeFollow(
-  followerId: mongoose.Types.ObjectId,
-  followeeId: mongoose.Types.ObjectId
-) {
-  try {
-    await FollowerModel.updateOne(
-      { _id: followeeId },
-      { $pull: { users: followerId } }
-    );
-    await FollowingModel.updateOne(
-      { _id: followerId },
-      { $pull: { users: followeeId } }
-    );
-    await UserModel.updateOne({ _id: followerId }, { $inc: { following: -1 } });
-    await UserModel.updateOne({ _id: followeeId }, { $inc: { followers: -1 } });
-  } catch (error) {
-    console.log(error);
-  }
-}
-
 export async function getBookmarks(bmId: mongoose.Types.ObjectId) {
   const userId = bmId.toString();
   try {
@@ -880,6 +939,46 @@ export async function getBookmarks(bmId: mongoose.Types.ObjectId) {
         hasBookmarked: true,
       } as Ripple;
     });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function addFollow(
+  followerId: mongoose.Types.ObjectId,
+  followeeId: mongoose.Types.ObjectId
+) {
+  try {
+    await FollowerModel.updateOne(
+      { _id: followeeId },
+      { $push: { users: followerId } }
+    );
+    await FollowingModel.updateOne(
+      { _id: followerId },
+      { $push: { users: followeeId } }
+    );
+    await UserModel.updateOne({ _id: followerId }, { $inc: { following: 1 } });
+    await UserModel.updateOne({ _id: followeeId }, { $inc: { followers: 1 } });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function removeFollow(
+  followerId: mongoose.Types.ObjectId,
+  followeeId: mongoose.Types.ObjectId
+) {
+  try {
+    await FollowerModel.updateOne(
+      { _id: followeeId },
+      { $pull: { users: followerId } }
+    );
+    await FollowingModel.updateOne(
+      { _id: followerId },
+      { $pull: { users: followeeId } }
+    );
+    await UserModel.updateOne({ _id: followerId }, { $inc: { following: -1 } });
+    await UserModel.updateOne({ _id: followeeId }, { $inc: { followers: -1 } });
   } catch (error) {
     console.log(error);
   }
@@ -989,6 +1088,109 @@ export async function getUserSummary(
       following: user.following,
       isFollowed: user.isFollowed,
     } as User;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getUserData(
+  uHandle: string,
+  currUserId: mongoose.Types.ObjectId
+) {
+  try {
+    const user = (
+      await UserModel.aggregate([
+        { $match: { handle: uHandle } },
+        {
+          $addFields: {
+            currentUser: currUserId,
+            objectId: { $toObjectId: "$_id" },
+          },
+        },
+        {
+          $lookup: {
+            from: "followings",
+            localField: "currentUser",
+            foreignField: "_id",
+            let: { toFind: "$objectId" },
+            pipeline: [
+              {
+                $project: {
+                  _id: false,
+                  found: {
+                    $cond: {
+                      if: {
+                        $in: ["$$toFind", "$users"],
+                      },
+                      then: true,
+                      else: false,
+                    },
+                  },
+                },
+              },
+            ],
+            as: "isFollowed",
+          },
+        },
+        {
+          $lookup: {
+            from: "followers",
+            localField: "currentUser",
+            foreignField: "_id",
+            let: {
+              toFind: "$objectIf",
+            },
+            pipeline: [
+              {
+                $project: {
+                  _id: false,
+                  found: {
+                    $cond: {
+                      if: {
+                        $in: ["$$toFind", "$users"],
+                      },
+                      then: true,
+                      else: false,
+                    },
+                  },
+                },
+              },
+            ],
+            as: "isFollowing",
+          },
+        },
+        {
+          $unwind: "$isFollowed",
+        },
+        {
+          $unwind: "$isFollowing",
+        },
+        {
+          $project: {
+            id: true,
+            name: true,
+            handle: true,
+            pfp: true,
+            bio: true,
+            followers: true,
+            following: true,
+            isFollowed: "$isFollowed.found",
+            isFollowing: "$isFollowing.found",
+          },
+        },
+      ])
+    )[0];
+    return {
+      id: user._id.toString(),
+      name: user.name,
+      handle: user.handle,
+      pfp: user.pfp,
+      bio: user.bio ?? "",
+      followers: user.followers,
+      following: user.following,
+      isFollowed: user.isFollowed,
+      isFollowing: user.isFollowing,
+    } as User & { isFollowing: boolean };
   } catch (error) {
     console.log(error);
   }

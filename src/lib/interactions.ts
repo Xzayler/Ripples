@@ -7,11 +7,13 @@ import {
   unlikePost,
   getFeed as getPosts,
   getSubFeed as getSubPosts,
+  getUserPosts as getUPosts,
   getPost as getOnePost,
   getBookmarks as getBm,
   addBookmark as addBm,
   removeBookmark as remBm,
   getUserSummary as getUS,
+  getUserData as getUD,
   addFollow as addFl,
   removeFollow as remFl,
 } from "./database";
@@ -63,6 +65,11 @@ export const getSubFeed = async () => {
   return await getSubPosts(id);
 };
 
+export const getUserPosts = async (uId: string) => {
+  const currUId = new mongoose.Types.ObjectId((await getCurrentUser()).id);
+  return await getUPosts(uId, currUId);
+};
+
 export const getPost = async (post: string) => {
   const id = (await getCurrentUser()).id;
   const postId = new mongoose.Types.ObjectId(post);
@@ -102,4 +109,9 @@ export const removeFollow = async (uId: string) => {
 export const getUserSummary = async (uHandle: string) => {
   const currUId = new mongoose.Types.ObjectId((await getCurrentUser()).id);
   return await getUS(uHandle, currUId);
+};
+
+export const getUserData = async (uHandle: string) => {
+  const currUId = new mongoose.Types.ObjectId((await getCurrentUser()).id);
+  return await getUD(uHandle, currUId);
 };
