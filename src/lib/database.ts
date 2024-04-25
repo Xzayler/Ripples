@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 import { MongodbAdapter } from "@lucia-auth/adapter-mongodb";
 import UserModel, { InferredUser } from "~/models/UserModel";
 import PostModel, { type InferredPost } from "~/models/PostModel";
-import CommentModel, { type InferredComment } from "~/models/CommentModel";
 import LikeModel, { type InferredLike } from "~/models/LikeModel";
+import LikerModel, { type InferredLiker } from "~/models/LikerModel";
 import BookmarksModel, { type InferredBookmark } from "~/models/BookmarksModel";
 import { isServer } from "solid-js/web";
 import FollowerModel, { InferredFollower } from "~/models/FollowerModel";
@@ -26,15 +26,24 @@ export async function initDb() {
 export async function addPost(postData: { content: string; author: string }) {
   const id = new mongoose.Types.ObjectId();
   try {
-    await PostModel.create({
-      _id: id,
-      ...postData,
-      likes: 0,
-      comments: 0,
-      reposts: 0,
-    });
-  } catch (error) {
-    console.log(error);
+    await Promise.all([
+      PostModel.create({
+        _id: id,
+        ...postData,
+        likes: 0,
+        comments: 0,
+        reposts: 0,
+      }).catch((err) => {
+        console.log("Creating post failed");
+        console.log(err);
+      }),
+      LikerModel.create({ _id: id, users: [] }).catch((err) => {
+        console.log("Creating Liker document failed");
+        console.log(err);
+      }),
+    ]);
+  } catch (e) {
+    console.log(e);
   }
 }
 
@@ -107,19 +116,40 @@ export async function createUser(
     _id: id,
     users: [],
   };
+  const newLikes: InferredLike = {
+    _id: id,
+    posts: [],
+  };
   try {
-    await UserModel.create(newUser);
-    await BookmarksModel.create(newBookmarks);
-    await FollowerModel.create(newFollowers);
-    await FollowingModel.create(newFollowings);
+    await Promise.allSettled([
+      UserModel.create(newUser).catch((err) => {
+        console.log("Creating User failed");
+        console.log(err);
+      }),
+      BookmarksModel.create(newBookmarks).catch((err) => {
+        console.log("Creating Bookmarks failed");
+        console.log(err);
+      }),
+      FollowerModel.create(newFollowers).catch((err) => {
+        console.log("Creating Follower failed");
+        console.log(err);
+      }),
+      FollowingModel.create(newFollowings).catch((err) => {
+        console.log("Creating Following failed");
+        console.log(err);
+      }),
+      LikeModel.create(newLikes).catch((err) => {
+        console.log("Creating Likes failed");
+        console.log(err);
+      }),
+    ]);
   } catch (error) {
     console.log(error);
   }
-  return null;
 }
 
 export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
-  const bmId = new mongoose.Types.ObjectId(userId);
+  const uObjId = new mongoose.Types.ObjectId(userId);
   try {
     const post = (
       await PostModel.aggregate([
@@ -131,65 +161,66 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
         {
           $lookup: {
             from: "likes",
-            localField: "_id",
-            foreignField: "post",
             pipeline: [
               {
                 $match: {
-                  user: userId,
+                  _id: uObjId,
                 },
               },
-              {
-                $limit: 1,
-              },
             ],
-            as: "likedocs",
+            as: "likedPosts",
+          },
+        },
+        {
+          $unwind: {
+            path: "$likedPosts",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $addFields: {
+            likedPosts: "$likedPosts.posts",
           },
         },
         // Check if the post is bookmarked by the User
         {
           $lookup: {
             from: "bookmarks",
-            let: { postId: "$_id" },
+            let: {
+              postId: "$_id",
+            },
             pipeline: [
               {
                 $match: {
-                  $expr: { $eq: [bmId, "$_id"] },
+                  _id: uObjId,
                 },
               },
-              { $limit: 1 },
             ],
-            as: "bookmarkdocs",
+            as: "bookmarkedPosts",
           },
         },
-        { $unwind: "$bookmarkdocs" },
+        {
+          $unwind: {
+            path: "$bookmarkedPosts",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $addFields: {
+            bookmarkedPosts: "$bookmarkedPosts.posts",
+          },
+        },
         // Get all comments whose parent is the post
         {
           $lookup: {
             from: "posts",
             localField: "_id",
             foreignField: "parent",
-            let: { posts: "$bookmarkdocs.posts" },
+            let: {
+              bookmarkedPosts: "$bookmarkedPosts",
+              likedPosts: "$likedPosts",
+            },
             pipeline: [
-              {
-                // Get if user liked the child
-                $lookup: {
-                  from: "likes",
-                  localField: "_id",
-                  foreignField: "post",
-                  pipeline: [
-                    {
-                      $match: {
-                        user: userId,
-                      },
-                    },
-                    {
-                      $limit: 1,
-                    },
-                  ],
-                  as: "childlikedocs",
-                },
-              },
               {
                 // Get child author
                 $lookup: {
@@ -213,21 +244,14 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
                   updatedAt: true,
                   hasLiked: {
                     $cond: {
-                      if: {
-                        $eq: [
-                          {
-                            $size: "$childlikedocs",
-                          },
-                          0,
-                        ],
-                      },
-                      then: false,
-                      else: true,
+                      if: { $in: ["$_id", "$$likedPosts"] },
+                      then: true,
+                      else: false,
                     },
                   },
                   hasBookmarked: {
                     $cond: {
-                      if: { $in: ["$_id", "$$posts"] },
+                      if: { $in: ["$_id", "$$bookmarkedPosts"] },
                       then: true,
                       else: false,
                     },
@@ -281,25 +305,6 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
             as: "ancestorauthor",
           },
         },
-        // Get if user liked the parent
-        {
-          $lookup: {
-            from: "likes",
-            localField: "ancestors._id",
-            foreignField: "post",
-            pipeline: [
-              {
-                $match: {
-                  user: userId,
-                },
-              },
-              {
-                $limit: 1,
-              },
-            ],
-            as: "ancestorlikedocs",
-          },
-        },
         // Build the output document
         {
           $group: {
@@ -325,23 +330,16 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
             hasLiked: {
               $first: {
                 $cond: {
-                  if: {
-                    $eq: [
-                      {
-                        $size: "$likedocs",
-                      },
-                      0,
-                    ],
-                  },
-                  then: false,
-                  else: true,
+                  if: { $in: ["$_id", "$likedPosts"] },
+                  then: true,
+                  else: false,
                 },
               },
             },
             hasBookmarked: {
               $first: {
                 $cond: {
-                  if: { $in: ["$_id", "$bookmarkdocs.posts"] },
+                  if: { $in: ["$_id", "$bookmarkedPosts"] },
                   then: true,
                   else: false,
                 },
@@ -384,23 +382,16 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
                   {
                     hasLiked: {
                       $cond: {
-                        if: {
-                          $eq: [
-                            {
-                              $size: "$ancestorlikedocs",
-                            },
-                            0,
-                          ],
-                        },
-                        then: false,
-                        else: true,
+                        if: { $in: ["$ancestors._id", "$likedPosts"] },
+                        then: true,
+                        else: false,
                       },
                     },
                   },
                   {
                     hasBookmarked: {
                       $cond: {
-                        if: { $in: ["$ancestors._id", "$bookmarkdocs.posts"] },
+                        if: { $in: ["$ancestors._id", "$bookmarkedPosts"] },
                         then: true,
                         else: false,
                       },
@@ -475,40 +466,66 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
 }
 
 export async function getFeed(userId: string) {
-  const bmId = new mongoose.Types.ObjectId(userId);
+  const uObjId = new mongoose.Types.ObjectId(userId);
   try {
     const posts = await PostModel.aggregate([
-      { $match: { parent: null } },
+      {
+        $match: {
+          parent: null,
+        },
+      },
       {
         $lookup: {
           from: "likes",
-          localField: "_id",
-          foreignField: "post",
           pipeline: [
             {
-              $match: { user: userId },
+              $match: {
+                _id: uObjId,
+              },
             },
-            { $limit: 1 },
           ],
-          as: "likedocs",
+          as: "likedPosts",
+        },
+      },
+      {
+        $unwind: {
+          path: "$likedPosts",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          likedPosts: "$likedPosts.posts",
         },
       },
       // Check if the post is bookmarked by the User
       {
         $lookup: {
           from: "bookmarks",
+          let: {
+            postId: "$_id",
+          },
           pipeline: [
             {
               $match: {
-                $expr: { $eq: [bmId, "$_id"] },
+                _id: uObjId,
               },
             },
-            { $limit: 1 },
           ],
-          as: "bookmarkdocs",
+          as: "bookmarkedPosts",
         },
       },
-      { $unwind: "$bookmarkdocs" },
+      {
+        $unwind: {
+          path: "$bookmarkedPosts",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          bookmarkedPosts: "$bookmarkedPosts.posts",
+        },
+      },
       {
         $lookup: {
           from: "users",
@@ -529,14 +546,18 @@ export async function getFeed(userId: string) {
           updatedAt: true,
           hasLiked: {
             $cond: {
-              if: { $eq: [{ $size: "$likedocs" }, 0] },
-              then: false,
-              else: true,
+              if: {
+                $in: ["$_id", "$likedPosts"],
+              },
+              then: true,
+              else: false,
             },
           },
           hasBookmarked: {
             $cond: {
-              if: { $in: ["$_id", "$bookmarkdocs.posts"] },
+              if: {
+                $in: ["$_id", "$bookmarkedPosts"],
+              },
               then: true,
               else: false,
             },
@@ -548,8 +569,6 @@ export async function getFeed(userId: string) {
       },
     ]);
     return posts.map((post) => {
-      if (post.author == null || typeof post.author == "string") {
-      }
       return {
         id: post._id.toString(),
         authorName: post.author.name,
@@ -572,42 +591,60 @@ export async function getFeed(userId: string) {
 
 export async function getUserPosts(
   userId: string,
-  currUserId: mongoose.Types.ObjectId
+  uObjId: mongoose.Types.ObjectId
 ) {
-  const currUserIdString = currUserId.toString();
+  const currUserIdString = uObjId.toString();
   try {
     const posts = await PostModel.aggregate([
       { $match: { $and: [{ author: userId }, { parent: null }] } },
       {
         $lookup: {
           from: "likes",
-          localField: "_id",
-          foreignField: "post",
           pipeline: [
             {
-              $match: { user: currUserIdString },
+              $match: {
+                _id: uObjId,
+              },
             },
-            { $limit: 1 },
           ],
-          as: "likedocs",
+          as: "likedPosts",
+        },
+      },
+      {
+        $unwind: {
+          path: "$likedPosts",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          likedPosts: "$likedPosts.posts",
         },
       },
       // Check if the post is bookmarked by the User
       {
         $lookup: {
           from: "bookmarks",
+          let: { postId: "$_id" },
           pipeline: [
             {
-              $match: {
-                $expr: { $eq: [currUserId, "$_id"] },
-              },
+              $match: { _id: uObjId },
             },
-            { $limit: 1 },
           ],
-          as: "bookmarkdocs",
+          as: "bookmarkedPosts",
         },
       },
-      { $unwind: "$bookmarkdocs" },
+      {
+        $unwind: {
+          path: "$bookmarkedPosts",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          bookmarkedPosts: "$bookmarkedPosts.posts",
+        },
+      },
       // User is looked up every time even though we know the author is always the same.
       {
         $lookup: {
@@ -629,14 +666,14 @@ export async function getUserPosts(
           updatedAt: true,
           hasLiked: {
             $cond: {
-              if: { $eq: [{ $size: "$likedocs" }, 0] },
-              then: false,
-              else: true,
+              if: { $in: ["$_id", "$likedPosts"] },
+              then: true,
+              else: false,
             },
           },
           hasBookmarked: {
             $cond: {
-              if: { $in: ["$_id", "$bookmarkdocs.posts"] },
+              if: { $in: ["$_id", "$bookmarkedPosts"] },
               then: true,
               else: false,
             },
@@ -648,8 +685,6 @@ export async function getUserPosts(
       },
     ]);
     return posts.map((post) => {
-      if (post.author == null || typeof post.author == "string") {
-      }
       return {
         id: post._id.toString(),
         authorName: post.author.name,
@@ -679,8 +714,56 @@ export async function getSubFeed(userId: string) {
       },
       {
         $lookup: {
+          from: "likes",
+          pipeline: [
+            {
+              $match: {
+                _id: uObjId,
+              },
+            },
+          ],
+          as: "likedPosts",
+        },
+      },
+      {
+        $unwind: {
+          path: "$likedPosts",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          likedPosts: "$likedPosts.posts",
+        },
+      },
+      // Check if the post is bookmarked by the User
+      {
+        $lookup: {
+          from: "bookmarks",
+          pipeline: [
+            {
+              $match: { _id: uObjId },
+            },
+          ],
+          as: "bookmarkedPosts",
+        },
+      },
+      {
+        $unwind: { path: "$bookmarkedPosts", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $addFields: {
+          bookmarkedPosts: "$bookmarkedPosts.posts",
+        },
+      },
+      {
+        $lookup: {
           from: "posts",
-          let: { users: "$users" },
+          let: {
+            users: "$users",
+            likedPosts: "$likedPosts",
+            bookmarkedPosts: "$bookmarkedPosts",
+          },
           pipeline: [
             {
               $match: {
@@ -704,36 +787,6 @@ export async function getSubFeed(userId: string) {
             },
             {
               $lookup: {
-                from: "likes",
-                localField: "_id",
-                foreignField: "post",
-                pipeline: [
-                  {
-                    $match: { user: userId },
-                  },
-                  { $limit: 1 },
-                ],
-                as: "likedocs",
-              },
-            },
-            // Check if the post is bookmarked by the User
-            {
-              $lookup: {
-                from: "bookmarks",
-                pipeline: [
-                  {
-                    $match: {
-                      $expr: { $eq: [uObjId, "$_id"] },
-                    },
-                  },
-                  { $limit: 1 },
-                ],
-                as: "bookmarkdocs",
-              },
-            },
-            { $unwind: "$bookmarkdocs" },
-            {
-              $lookup: {
                 from: "users",
                 localField: "author",
                 foreignField: "_id",
@@ -752,14 +805,14 @@ export async function getSubFeed(userId: string) {
                 updatedAt: true,
                 hasLiked: {
                   $cond: {
-                    if: { $eq: [{ $size: "$likedocs" }, 0] },
-                    then: false,
-                    else: true,
+                    if: { $in: ["$_id", "$$likedPosts"] },
+                    then: true,
+                    else: false,
                   },
                 },
                 hasBookmarked: {
                   $cond: {
-                    if: { $in: ["$_id", "$bookmarkdocs.posts"] },
+                    if: { $in: ["$_id", "$$bookmarkedPosts"] },
                     then: true,
                     else: false,
                   },
@@ -838,11 +891,36 @@ export async function removeBookmark(
   }
 }
 
-export async function getBookmarks(bmId: mongoose.Types.ObjectId) {
-  const userId = bmId.toString();
+export async function getBookmarks(uObjId: mongoose.Types.ObjectId) {
+  const userId = uObjId.toString();
   try {
     const bookmarks = await BookmarksModel.aggregate([
-      { $match: { _id: bmId } },
+      { $match: { _id: uObjId } },
+      {
+        $lookup: {
+          from: "likes",
+          pipeline: [
+            {
+              $match: {
+                _id: uObjId,
+              },
+            },
+          ],
+          as: "likedPosts",
+        },
+      },
+      {
+        $unwind: {
+          path: "$likedPosts",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          likedPosts: "$likedPosts.posts",
+        },
+      },
+      // { $unwind: "$likedPosts" },
       {
         $unwind: "$posts",
       },
@@ -851,59 +929,35 @@ export async function getBookmarks(bmId: mongoose.Types.ObjectId) {
           from: "posts",
           localField: "posts",
           foreignField: "_id",
+          let: { likedPosts: "$likedPosts" },
           pipeline: [
+            // Check if the post is bookmarked by the User
             {
-              // Get if user liked the child
-              $lookup: {
-                from: "likes",
-                localField: "_id",
-                foreignField: "post",
-                pipeline: [
-                  {
-                    $match: {
-                      user: userId,
-                    },
-                  },
-                  {
-                    $limit: 1,
-                  },
-                ],
-                as: "childlikedocs",
-              },
-            },
-            {
-              // Get child author
+              // Get author
               $lookup: {
                 from: "users",
                 localField: "author",
                 foreignField: "_id",
-                as: "childauthor",
+                as: "author",
               },
             },
             {
-              $unwind: "$childauthor",
+              $unwind: "$author",
             },
             {
               $project: {
                 _id: true,
                 content: true,
-                authorName: "$childauthor.name",
-                authorHandle: "$childauthor.handle",
-                authorPfp: "$childauthor.pfp",
+                authorName: "$author.name",
+                authorHandle: "$author.handle",
+                authorPfp: "$author.pfp",
                 createdAt: true,
                 updatedAt: true,
                 hasLiked: {
                   $cond: {
-                    if: {
-                      $eq: [
-                        {
-                          $size: "$childlikedocs",
-                        },
-                        0,
-                      ],
-                    },
-                    then: false,
-                    else: true,
+                    if: { $in: ["$_id", "$$likedPosts"] },
+                    then: true,
+                    else: false,
                   },
                 },
                 likes: true,
@@ -988,15 +1042,30 @@ export async function likePost(
   postId: mongoose.Types.ObjectId,
   userId: string
 ) {
+  const uObjId = new mongoose.Types.ObjectId(userId);
   try {
-    await LikeModel.create({
-      _id: new mongoose.Types.ObjectId(),
-      user: userId,
-      post: postId,
-    });
-    await PostModel.updateOne({ _id: postId }, { $inc: { likes: 1 } });
-  } catch (error) {
-    console.log("error liking");
+    await Promise.all([
+      LikerModel.updateOne({ _id: postId }, { $push: { users: uObjId } }).catch(
+        (err) => {
+          console.log("Liker update failed");
+          console.log(err);
+        }
+      ),
+      LikeModel.updateOne({ _id: uObjId }, { $push: { posts: postId } }).catch(
+        (err) => {
+          console.log("Like update failed");
+          console.log(err);
+        }
+      ),
+      PostModel.updateOne({ _id: postId }, { $inc: { likes: 1 } }).catch(
+        (err) => {
+          console.log("Post like incrementing failed");
+          console.log(err);
+        }
+      ),
+    ]);
+  } catch (e) {
+    console.log(e);
   }
 }
 
@@ -1004,23 +1073,30 @@ export async function unlikePost(
   postId: mongoose.Types.ObjectId,
   userId: string
 ) {
+  const uObjId = new mongoose.Types.ObjectId(userId);
   try {
-    await LikeModel.deleteOne({ user: userId, post: postId });
-    await PostModel.updateOne({ _id: postId }, { $inc: { likes: -1 } });
-  } catch (error) {
-    console.log("error liking");
-  }
-}
-
-export async function getLike(postId: mongoose.Types.ObjectId, userId: string) {
-  try {
-    const like: InferredLike | null = await LikeModel.findOne({
-      post: postId,
-      user: userId,
-    });
-    return like;
-  } catch (error) {
-    return error;
+    await Promise.all([
+      LikerModel.updateOne({ _id: postId }, { $pull: { users: uObjId } }).catch(
+        (err) => {
+          console.log("Liker update failed");
+          console.log(err);
+        }
+      ),
+      LikeModel.updateOne({ _id: uObjId }, { $pull: { posts: postId } }).catch(
+        (err) => {
+          console.log("Like update failed");
+          console.log(err);
+        }
+      ),
+      PostModel.updateOne({ _id: postId }, { $inc: { likes: -1 } }).catch(
+        (err) => {
+          console.log("Post like incrementing failed");
+          console.log(err);
+        }
+      ),
+    ]);
+  } catch (e) {
+    console.log(e);
   }
 }
 
