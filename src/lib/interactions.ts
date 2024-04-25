@@ -3,7 +3,6 @@ import {
   addPost,
   addComment,
   likePost,
-  getLike,
   unlikePost,
   getFeed as getPosts,
   getSubFeed as getSubPosts,
@@ -40,19 +39,13 @@ export const submitComment = async (formData: FormData, postId: string) => {
 export const like = async (post: string) => {
   const id = (await getCurrentUser()).id;
   const postId = new mongoose.Types.ObjectId(post);
-  const alreadyLiked = await getLike(postId, id);
-  if (!alreadyLiked) {
-    await likePost(postId, id);
-  }
+  await likePost(postId, id);
 };
 
 export const unlike = async (post: string) => {
   const id = (await getCurrentUser()).id;
   const postId = new mongoose.Types.ObjectId(post);
-  const alreadyLiked = await getLike(postId, id);
-  if (alreadyLiked) {
-    await unlikePost(postId, id);
-  }
+  await unlikePost(postId, id);
 };
 
 export const getFeed = async () => {
@@ -95,7 +88,9 @@ export const getBookmarks = async () => {
 };
 
 export const addFollow = async (uId: string) => {
-  const followerId = new mongoose.Types.ObjectId((await getCurrentUser()).id);
+  const follower = (await getCurrentUser()).id;
+  if (follower == uId) return;
+  const followerId = new mongoose.Types.ObjectId(follower);
   const followeeId = new mongoose.Types.ObjectId(uId);
   return await addFl(followerId, followeeId);
 };
