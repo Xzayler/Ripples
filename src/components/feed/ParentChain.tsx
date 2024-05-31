@@ -1,13 +1,19 @@
 import { For } from "solid-js";
 import { Ripple } from "~/types";
-import { A } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 import Reactions from "./Reactions";
 import { calcDate } from "~/lib/date";
 import UserWrapper from "../user/UserWrapper";
 
 function Parent(props: { parent: Ripple }) {
+  const navigate = useNavigate();
   return (
-    <div class="flex gap-3 w-full pb-1">
+    <div
+      onClick={() => {
+        navigate(`/post/${props.parent.id}`);
+      }}
+      class="flex gap-3 w-full pb-1 cursor-pointer"
+    >
       <div class="flex gap-1 flex-col items-center basis-10">
         <div class="h-10 w-10 bg-gray-300 rounded-full"></div>
         <div class="grow border-x border-ui border-solid"></div>
@@ -50,11 +56,7 @@ export default function ParentChain(props: { ancestors: Ripple[] }) {
   return (
     <For each={props.ancestors}>
       {(item) => {
-        return (
-          <A href={`/post/${item.id}`}>
-            <Parent parent={item} />
-          </A>
-        );
+        return <Parent parent={item} />;
       }}
     </For>
   );
