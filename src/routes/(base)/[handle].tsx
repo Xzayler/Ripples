@@ -1,30 +1,42 @@
-import { useParams, A } from "@solidjs/router";
-import { Show, createResource, Suspense } from "solid-js";
-import { getUserData, getUserPosts } from "~/lib/server";
+import { useParams } from "@solidjs/router";
+import {
+  Switch,
+  Match,
+  Show,
+  For,
+  createResource,
+  Suspense,
+  useContext,
+  createSignal,
+} from "solid-js";
+import { getCurrentUser, getUserData, getUserPosts } from "~/lib/server";
 import Sidebar from "~/components/sidebar/Sidebar";
+import BackButton from "~/components/shared/BackButton";
 import FollowButton, {
   FollowButtonDisabled,
 } from "~/components/user/FollowButton";
 import Feed from "~/components/feed/Feed";
 //@ts-ignore
 import defaultPfp from "~/assets/pfps/defaultPfp.png";
+import { UserContext } from "~/lib/UserContext";
+import EditProfileModal, {
+  openModal,
+} from "~/components/user/EditProfileModal";
+import UserPfp from "~/components/user/UserPfp";
 
 export default function UserPage() {
   const params = useParams();
   const [user] = createResource(() => {
     return getUserData(params.handle);
   });
+  const currUser = useContext(UserContext);
+  const [editActive, setEditActive] = createSignal<boolean>(false);
   return (
     <main class="w-[990px] flex justify-between h-full relative items-end ">
       <div class="shrink w-[600px] relative flex flex-col self-stretch ">
         <nav class="flex w-full sticky top-0 border-b border-ui z-50">
           <div class="px-4 w-1/2 bg-background gap-3 h-[53px] font-semibold grow flex items-center ">
-            <A
-              href="/home"
-              class=" w-8 aspect-square p-1 rounded-full hover:bg-ui "
-            >
-              {"<-"}
-            </A>
+            <BackButton />
             <h1 class="flex items-center h-[52px] ">{user()?.name}</h1>
           </div>
         </nav>
@@ -33,24 +45,11 @@ export default function UserPage() {
           <Show when={user()}>
             <div class="flex gap-4 justify-between w-full">
               <div class="flex flex-col gap-2 items-start">
-                <Show
-                  when={user()?.pfp}
-                  fallback={
-                    <div class="bg-gray-300 rounded-full  ">
-                      <img
-                        src={defaultPfp}
-                        alt="default profile picture"
-                        class="w-24 h-24 object-cover"
-                      />
-                    </div>
-                  }
-                >
-                  <img
-                    src={user()!.pfp}
-                    alt="user profile picture"
-                    class="w-16 h-16 object-cover "
-                  />
-                </Show>
+                <div class="w-24 h-24">
+                  <Show when={user()?.pfp} fallback={<UserPfp />}>
+                    <UserPfp pfp={user()!.pfp} />
+                  </Show>
+                </div>
                 <div>
                   <div class="text-foreground font-bold text-3xl ">
                     {user()!.name}
@@ -59,14 +58,53 @@ export default function UserPage() {
                 </div>
               </div>
               <div>
-                <FollowButton
-                  isFollowed={user()!.isFollowed}
-                  uId={user()!.id}
-                />
+                <Switch
+                  fallback={
+                    <FollowButton
+                      isFollowed={user()!.isFollowed}
+                      uId={user()!.id}
+                    />
+                  }
+                >
+                  <Match
+                    when={
+                      currUser != undefined &&
+                      user()?.handle == currUser()?.handle
+                    }
+                  >
+                    <button
+                      type="button"
+                      onclick={(e) => {
+                        openModal(() => setEditActive(true));
+                      }}
+                      class={
+                        "px-4 group cursor-pointer transition rounded-full border text-foreground border-foreground border-solid bg-background hover:text-background hover:bg-foreground "
+                      }
+                    >
+                      <div class="flex items-center justify-center py-2">
+                        <span class="text-sm font-bold ">Edit Profile</span>
+                      </div>
+                    </button>
+                    <Show when={editActive()}>
+                      <EditProfileModal
+                        closeFn={() => {
+                          setEditActive(false);
+                        }}
+                      />
+                    </Show>
+                  </Match>
+                </Switch>
               </div>
             </div>
             <Show when={user()?.bio != ""}>
-              <div>{user()!.bio}</div>
+              <div>
+                {/* {user()!.bio} */}
+                <For each={user()!.bio.split("\n")}>
+                  {(line) => {
+                    return <p>{line}</p>;
+                  }}
+                </For>
+              </div>
             </Show>
             <div class="flex gap-3 text-md">
               <div class="flex gap-1">

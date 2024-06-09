@@ -38,7 +38,7 @@ export default function PostModal() {
 
 function PostModalElement(props: { parent?: Ripple }) {
   return (
-    <div class="fixed left-0 top-0 w-full h-full bg-faint/40 ">
+    <div class="fixed left-0 top-0 w-full h-full bg-faint/40 z-50">
       <div class="relative top-[5%] mx-auto bg-background rounded-2xl w-[600px] overflow-hidden ">
         <div class="max-h-[90dvh] overflow-x-auto">
           <div class="py-4 sticky top-0 bg-black bg-opacity-65 backdrop-blur-md">

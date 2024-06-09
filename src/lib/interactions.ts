@@ -15,6 +15,7 @@ import {
   getUserData as getUD,
   addFollow as addFl,
   removeFollow as remFl,
+  updateUserData as uud,
 } from "./database";
 import mongoose from "mongoose";
 
@@ -109,4 +110,19 @@ export const getUserSummary = async (uHandle: string) => {
 export const getUserData = async (uHandle: string) => {
   const currUId = new mongoose.Types.ObjectId((await getCurrentUser()).id);
   return await getUD(uHandle, currUId);
+};
+
+export const updateUserData = async (
+  pfp: File | null,
+  name: string | null,
+  bio: string | null
+) => {
+  const currUser = await getCurrentUser();
+  let newImg: File | null = null;
+  if (pfp) {
+    newImg = new File([pfp], currUser.handle, {
+      type: pfp.type,
+    });
+  }
+  return await uud(currUser.id, newImg, name, bio);
 };

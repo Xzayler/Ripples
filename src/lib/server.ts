@@ -20,6 +20,7 @@ import {
   getUserData as gud,
   addFollow as af,
   removeFollow as rf,
+  updateUserData as uud,
 } from "./interactions";
 
 // session / auth
@@ -44,6 +45,7 @@ export const addBookmark = ab;
 export const removeBookmark = rb;
 export const addFollow = af;
 export const removeFollow = rf;
+export const updateUserData = uud;
 
 // Data
 export const getFeed = gf;
