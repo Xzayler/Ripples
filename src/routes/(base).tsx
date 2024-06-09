@@ -36,6 +36,7 @@ export default function BaseLayout(props: { children: JSX.Element }) {
             >
               {props.children}
             </Suspense>
+            <div id="modal-root" class="h-0 w-0"></div>
           </UserContext.Provider>
         </Suspense>
         {/* <div class="absolute bottom-0 right-4">

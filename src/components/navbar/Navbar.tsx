@@ -28,9 +28,6 @@ export default function Navbar() {
               stroke="rgb(var(--color-foreground))"
             />
           </MenuItem>
-          <MenuItem href={"/profile"} text="Profile">
-            <ProfileIcon />
-          </MenuItem>
         </nav>
         <div class="my-1 w-[90%] ">
           <PostButton></PostButton>

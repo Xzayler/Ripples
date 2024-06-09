@@ -9,6 +9,7 @@ import { isServer } from "solid-js/web";
 import FollowerModel, { InferredFollower } from "~/models/FollowerModel";
 import FollowingModel, { InferredFollowing } from "~/models/FollowingModel";
 import type { User, Ripple } from "~/types";
+import { uploadPfp } from "./cloudinary";
 
 export async function initDb() {
   if (
@@ -1270,6 +1271,34 @@ export async function getUserData(
   } catch (error) {
     console.log(error);
   }
+}
+
+export async function updateUserData(
+  currUserId: string,
+  pfp: File | null,
+  name: string | null,
+  bio: string | null
+) {
+  try {
+    let toChange: { pfp?: string; bio?: string; name?: string } = {};
+    if (pfp) {
+      const response = await uploadPfp(pfp);
+      if (!response) throw new Error("no response");
+      toChange.pfp = response.url;
+    }
+    if (name) {
+      toChange.name = name;
+    }
+    if (bio) {
+      toChange.bio = bio;
+    }
+    console.log(toChange);
+    await UserModel.updateOne({ _id: currUserId }, toChange);
+  } catch (error) {
+    console.log(error);
+    return "failed";
+  }
+  return "ok";
 }
 
 export const getAdapter = async () => {
