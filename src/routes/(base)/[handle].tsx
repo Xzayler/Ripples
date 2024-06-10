@@ -9,7 +9,12 @@ import {
   useContext,
   createSignal,
 } from "solid-js";
-import { getCurrentUser, getUserData, getUserPosts } from "~/lib/server";
+import {
+  getCurrentUser,
+  getUserData,
+  getUserLikedPosts,
+  getUserPosts,
+} from "~/lib/server";
 import Sidebar from "~/components/sidebar/Sidebar";
 import BackButton from "~/components/shared/BackButton";
 import FollowButton, {
@@ -31,6 +36,9 @@ export default function UserPage() {
   });
   const currUser = useContext(UserContext);
   const [editActive, setEditActive] = createSignal<boolean>(false);
+
+  const [toShow, setToShow] = createSignal<"posts" | "likes">("posts");
+
   return (
     <main class="w-[990px] flex justify-between h-full relative items-end ">
       <div class="shrink w-[600px] relative flex flex-col self-stretch ">
@@ -120,18 +128,47 @@ export default function UserPage() {
           </Show>
         </div>
         <div class="mt-4 flex border-b border-ui">
-          <div class="flex w-1/2 grow items-stretch justify-center cursor-pointer py-2 hover:bg-highlight">
+          <div
+            class={`flex w-1/2 grow items-stretch justify-center cursor-pointer py-2 hover:bg-highlight ${
+              toShow() == "posts"
+                ? " underline decoration-accent decoration-8 underline-offset-8"
+                : ""
+            }`}
+            onclick={() => {
+              setToShow("posts");
+            }}
+          >
             Posts
           </div>
-          <div class="flex w-1/2 grow items-stretch justify-center cursor-pointer py-2 hover:bg-highlight">
+          <div
+            class={`flex w-1/2 grow items-stretch justify-center cursor-pointer py-2 hover:bg-highlight ${
+              toShow() == "likes"
+                ? " underline decoration-accent decoration-8 underline-offset-8"
+                : ""
+            }`}
+            onclick={() => {
+              setToShow("likes");
+            }}
+          >
             Likes
           </div>
         </div>
-        <Show when={user()}>
-          <Suspense>
-            <Feed fetcher={() => getUserPosts(user()!.id)} />
-          </Suspense>
-        </Show>
+        <Suspense>
+          <Switch
+            fallback={
+              <div class="w-full h-full flex items-center justify-center">
+                Loading...
+              </div>
+            }
+          >
+            <Match when={user() && toShow() == "posts"}>
+              <Feed fetcher={() => getUserPosts(user()!.id)} />
+            </Match>
+            <Match when={user() && toShow() == "likes"}>
+              <Feed fetcher={() => getUserLikedPosts(user()!.id)} />
+            </Match>
+          </Switch>
+        </Suspense>
       </div>
       <div class="shrink w-[350px] mr-[10px] border-l border-ui p">
         <Sidebar />
