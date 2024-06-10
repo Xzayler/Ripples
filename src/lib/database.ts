@@ -706,6 +706,167 @@ export async function getUserPosts(
   }
 }
 
+export async function getUserLikedPosts(
+  userId: string,
+  currUObjId: mongoose.Types.ObjectId
+) {
+  const uObjId = new mongoose.Types.ObjectId(userId);
+  try {
+    const posts = await LikeModel.aggregate([
+      {
+        $match: {
+          _id: uObjId,
+        },
+      },
+      {
+        $lookup: {
+          from: "likes",
+          pipeline: [
+            {
+              $match: {
+                _id: currUObjId,
+              },
+            },
+          ],
+          as: "likedPosts",
+        },
+      },
+      {
+        $unwind: {
+          path: "$likedPosts",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          likedPosts: "$likedPosts.posts",
+        },
+      },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "posts",
+          foreignField: "_id",
+          as: "post",
+        },
+      },
+      {
+        $lookup: {
+          from: "bookmarks",
+          let: {
+            postId: "$_id",
+          },
+          pipeline: [
+            {
+              $match: {
+                _id: currUObjId,
+              },
+            },
+          ],
+          as: "bookmarkedPosts",
+        },
+      },
+      {
+        $unwind: {
+          path: "$bookmarkedPosts",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          bookmarkedPosts: "$bookmarkedPosts.posts",
+        },
+      },
+      {
+        $project: {
+          _id: false,
+          posts: false,
+        },
+      },
+      {
+        $unwind: {
+          path: "$post",
+        },
+      },
+      {
+        $project: {
+          _id: "$post._id",
+          author: "$post.author",
+          content: "$post.content",
+          reposts: "$post.reposts",
+          updataedAt: "$post.updatedAt",
+          createdAt: "$post.createdAt",
+          likes: "$post.likes",
+          comments: "$post.comments",
+          hasLiked: {
+            $cond: {
+              if: {
+                $in: ["$post._id", "$likedPosts"],
+              },
+              then: true,
+              else: false,
+            },
+          },
+          hasBookmarked: {
+            $cond: {
+              if: {
+                $in: ["$post._id", "$bookmarkedPosts"],
+              },
+              then: true,
+              else: false,
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "author",
+          foreignField: "_id",
+          as: "author",
+        },
+      },
+      {
+        $unwind: {
+          path: "$author",
+        },
+      },
+      {
+        $project: {
+          _id: true,
+          content: true,
+          author: "$author",
+          createdAt: true,
+          updatedAt: true,
+          likes: true,
+          comments: true,
+          reposts: true,
+          hasLiked: true,
+          hasBookmarked: true,
+        },
+      },
+    ]);
+    return posts.map((post) => {
+      return {
+        id: post._id.toString(),
+        authorName: post.author.name,
+        authorHandle: post.author.handle,
+        pfp: post.author.pfp,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        content: post.content,
+        likes: post.likes ?? 0,
+        hasLiked: post.hasLiked,
+        hasBookmarked: post.hasBookmarked,
+        reposts: post.reposts ?? 0,
+        comments: post.comments ?? 0,
+      } as Ripple;
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function getSubFeed(userId: string) {
   const uObjId = new mongoose.Types.ObjectId(userId);
   try {

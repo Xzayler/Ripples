@@ -12,6 +12,7 @@ import {
   getFeed as gf,
   getSubFeed as gsf,
   getUserPosts as gup,
+  getUserLikedPosts as gulp,
   getPost as gp,
   getBookmarks as gb,
   addBookmark as ab,
@@ -51,6 +52,7 @@ export const updateUserData = uud;
 export const getFeed = gf;
 export const getSubFeed = gsf;
 export const getUserPosts = gup;
+export const getUserLikedPosts = gulp;
 export const getPost = gp;
 export const getBookmarks = gb;
 export const getUserSummary = gus;

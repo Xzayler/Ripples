@@ -7,6 +7,7 @@ import {
   getFeed as getPosts,
   getSubFeed as getSubPosts,
   getUserPosts as getUPosts,
+  getUserLikedPosts as getULPosts,
   getPost as getOnePost,
   getBookmarks as getBm,
   addBookmark as addBm,
@@ -63,6 +64,11 @@ export const getUserPosts = async (uId: string) => {
   const currUId = new mongoose.Types.ObjectId((await getCurrentUser()).id);
   return await getUPosts(uId, currUId);
 };
+
+export const getUserLikedPosts = async (uId: string) => {
+  const currUId = new mongoose.Types.ObjectId((await getCurrentUser()).id);
+  return await getULPosts(uId, currUId);
+}
 
 export const getPost = async (post: string) => {
   const id = (await getCurrentUser()).id;
