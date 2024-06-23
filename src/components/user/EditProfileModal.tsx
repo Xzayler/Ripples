@@ -75,7 +75,7 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
               </p>
               <div class=" flex justify-center grow items-center ">
                 <div class="w-48 h-48 max-w-48 max-h-48 relative">
-                  <Switch fallback={<UserPfp pfp={defaultPfp} />}>
+                  <Switch fallback={<UserPfp />}>
                     <Match when={pfp() != null}>
                       <UserPfp pfp={URL.createObjectURL(pfp()!)} />
                     </Match>
