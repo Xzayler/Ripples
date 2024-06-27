@@ -1,6 +1,5 @@
 import { createResource, Show } from "solid-js";
-//@ts-ignore
-import defaultPfp from "../../assets/pfps/defaultPfp.png";
+import UserPfp from "./UserPfp";
 import { getUserSummary } from "~/lib/server";
 import FollowButton, { FollowButtonDisabled } from "./FollowButton";
 
@@ -13,7 +12,8 @@ export default function UserPopup(props: { userHandle: string }) {
     <div class="absolute cursor-default w-[256px] bottom-full left-1/2 -translate-x-[50%]">
       <div class="flex flex-col p-4 gap-2 mb-2 rounded-2xl bg-background shadow-[0px_0px_4px_rgba(255,255,255,0.3)] overflow-hidden">
         <div class="flex justify-between w-full">
-          <Show
+          <UserPfp pfp={user()?.pfp} />
+          {/* <Show
             when={user()?.pfp}
             fallback={
               <div class="bg-gray-300 rounded-full">
@@ -32,7 +32,7 @@ export default function UserPopup(props: { userHandle: string }) {
                 class="w-16 h-16 object-cover "
               />
             )}
-          </Show>
+          </Show> */}
           <Show
             when={user()}
             fallback={

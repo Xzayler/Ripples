@@ -17,6 +17,7 @@ import {
   addFollow as addFl,
   removeFollow as remFl,
   updateUserData as uud,
+  getSuggestedUsers as gsu,
 } from "./database";
 import mongoose from "mongoose";
 
@@ -68,7 +69,7 @@ export const getUserPosts = async (uId: string) => {
 export const getUserLikedPosts = async (uId: string) => {
   const currUId = new mongoose.Types.ObjectId((await getCurrentUser()).id);
   return await getULPosts(uId, currUId);
-}
+};
 
 export const getPost = async (post: string) => {
   const id = (await getCurrentUser()).id;
@@ -131,4 +132,9 @@ export const updateUserData = async (
     });
   }
   return await uud(currUser.id, newImg, name, bio);
+};
+
+export const getSuggestedUsers = async () => {
+  const currUserId = (await getCurrentUser()).id;
+  return gsu(currUserId);
 };

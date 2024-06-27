@@ -1462,6 +1462,108 @@ export async function updateUserData(
   return "ok";
 }
 
+export async function getSuggestedUsers(currUserId: string) {
+  const currUObjId = new mongoose.Types.ObjectId(currUserId);
+  try {
+    const users = await FollowerModel.aggregate([
+      {
+        $match: {
+          _id: currUObjId,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          let: {
+            followers: "$users",
+          },
+          pipeline: [
+            {
+              $addFields: {
+                stringIds: {
+                  $map: {
+                    input: "$$followers",
+                    as: "id",
+                    in: {
+                      $toString: "$$id",
+                    },
+                  },
+                },
+              },
+            },
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $not: {
+                        $in: ["$_id", "$stringIds"],
+                      },
+                    },
+                    {
+                      $ne: [currUserId, "$_id"],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "users",
+        },
+      },
+      {
+        $unwind: {
+          path: "$users",
+          preserveNullAndEmptyArrays: false,
+        },
+      },
+      {
+        $project: {
+          _id: "$users._id",
+          name: "$users.name",
+          handle: "$users.handle",
+          pfp: "$users.pfp",
+          bio: "$users.bio",
+          followers: "$users.followers",
+          followings: "$users.followings",
+        },
+      },
+      {
+        $sort: {
+          followers: -1,
+        },
+      },
+      {
+        $limit: 5,
+      },
+      {
+        $project: {
+          _id: true,
+          name: true,
+          handle: true,
+          pfp: true,
+          bio: true,
+          followers: true,
+          following: true,
+        },
+      },
+    ]);
+    return users.map((u) => {
+      return {
+        id: u._id.toString(),
+        name: u.name,
+        handle: u.handle,
+        pfp: u.pfp ?? undefined,
+        bio: u.bio,
+        isFollowed: false,
+      } as User;
+    });
+  } catch (e) {
+    console.log(e);
+    return [] as User[];
+  }
+}
+
 export const getAdapter = async () => {
   if (!mongoose.connection) {
     await initDb();
