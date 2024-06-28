@@ -1,10 +1,10 @@
 import { UploadApiResponse, v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
-  cloud_name: "djdafssz0",
+  cloud_name: process.env.CLOUDINARY_NAME,
   secure: true,
-  api_secret: "9v1iLyf9L0wFK1h0fcbRVd5tM7E",
-  api_key: "345192242583419",
+  api_secret: process.env.CLOUDINARY_SECRET,
+  api_key: process.env.CLOUDINARY_KEY,
 });
 
 export async function uploadPfp(img: File) {
