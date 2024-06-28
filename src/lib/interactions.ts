@@ -1,4 +1,4 @@
-import { getCurrentUser } from "./server";
+import { getCurrentUser } from "./gcu";
 import {
   addPost,
   addComment,
