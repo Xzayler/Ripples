@@ -6,22 +6,7 @@ import { redirect, useNavigate } from "@solidjs/router";
 
 export default function Ripple(props: { post: Ripple }) {
   const post = props.post;
-  // if (!post) {
-  //   return <div></div>;
-  // }
-  const {
-    id,
-    authorName,
-    authorHandle,
-    pfp,
-    createdAt,
-    updatedAt,
-    content,
-    likes,
-    hasLiked,
-    reposts,
-    comments,
-  } = post;
+  const { id, authorName, authorHandle, createdAt, content } = post;
   const navigate = useNavigate();
 
   return (

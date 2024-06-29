@@ -13,8 +13,6 @@ import {
   createResource,
   Suspense,
 } from "solid-js";
-//@ts-ignore
-import defaultPfp from "~/assets/pfps/defaultPfp.png";
 import { UserContext } from "~/lib/UserContext";
 import { getUserData, updateUserData } from "~/lib/server";
 import UserPfp from "./UserPfp";
@@ -42,17 +40,12 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
   const updateBio = (e: Event) => {
     const el: HTMLTextAreaElement = e.target as HTMLTextAreaElement;
     setBio(el.value ?? "");
-    console.log(bio());
-    // if (el.innerText == "" && el.firstChild) {
-    //   el.removeChild(el.firstChild!);
-    // }
   };
 
   const [name, setName] = createSignal<string | null>(null);
   const updateName = (e: Event) => {
     const el: HTMLInputElement = e.target as HTMLInputElement;
     setName(el.value);
-    console.log(name());
   };
 
   const submitAction = action(async () => {

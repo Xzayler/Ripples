@@ -73,7 +73,6 @@ function PostModalElement(props: { parent?: Ripple }) {
                         <span>⋅</span>
                       </div>
                       <div>
-                        {/* <span>{`${date.getMonth()} ${date.getDate()}`}</span> */}
                         <span>{props.parent.createdAt.toUTCString()}</span>
                       </div>
                     </div>

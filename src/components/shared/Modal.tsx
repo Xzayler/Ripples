@@ -1,38 +1,11 @@
 import { JSX, Suspense } from "solid-js";
 import { Portal } from "solid-js/web";
 
-// const [element, setElement] = createSignal<JSX.Element>(null);
-// const closePostModal = () => {
-//   const html = document.getElementsByTagName("html")[0] as HTMLElement;
-//   html.classList.remove("overflow-hidden");
-//   setElement(null);
-// };
-
 export const openModal = (openFn: () => void) => {
   const html = document.getElementsByTagName("html")[0] as HTMLElement;
   html.classList.add("overflow-hidden");
   openFn();
 };
-
-// export const openCommentModal = (ripple: Ripple) => {
-//   const html = document.getElementsByTagName("html")[0] as HTMLElement;
-//   html.classList.add("overflow-hidden");
-//   setElement(PostModalElement({ parent: ripple }));
-// };
-
-// const [postBody, setPostBody] = createSignal<string | null>("");
-
-// const updatePlaceholder = (e: Event) => {
-//   const el: HTMLElement = e.target as HTMLElement;
-//   setPostBody(el.textContent);
-//   if (el.textContent == "") {
-//     el.removeChild(el.firstChild!);
-//   }
-// };
-
-// export default function PostModal() {
-//   return <>{element()}</>;
-// }
 
 export const closeModal = (fn: () => void) => {
   (document.getElementsByTagName("html")[0] as HTMLElement).classList.remove(

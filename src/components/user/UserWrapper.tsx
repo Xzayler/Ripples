@@ -1,5 +1,5 @@
 import { createSignal, type JSX, Show, Suspense } from "solid-js";
-import { A, useResolvedPath } from "@solidjs/router";
+import { A } from "@solidjs/router";
 import UserPopup from "./UserPopup";
 
 export default function UserWrapper(props: {
@@ -47,7 +47,6 @@ export default function UserWrapper(props: {
       >
         {props.children}
       </A>
-      {/* <div>{props.children}</div> */}
     </div>
   );
 }

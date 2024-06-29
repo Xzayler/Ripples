@@ -9,20 +9,11 @@ import {
   useContext,
   createSignal,
 } from "solid-js";
-import {
-  getCurrentUser,
-  getUserData,
-  getUserLikedPosts,
-  getUserPosts,
-} from "~/lib/server";
+import { getUserData, getUserLikedPosts, getUserPosts } from "~/lib/server";
 import Sidebar from "~/components/sidebar/Sidebar";
 import BackButton from "~/components/shared/BackButton";
-import FollowButton, {
-  FollowButtonDisabled,
-} from "~/components/user/FollowButton";
+import FollowButton from "~/components/user/FollowButton";
 import Feed from "~/components/feed/Feed";
-//@ts-ignore
-import defaultPfp from "~/assets/pfps/defaultPfp.png";
 import { UserContext } from "~/lib/UserContext";
 import EditProfileModal, {
   openModal,
@@ -105,14 +96,18 @@ export default function UserPage() {
               </div>
             </div>
             <Show when={user()?.bio != ""}>
-              <div>
-                {/* {user()!.bio} */}
+              <p>
                 <For each={user()!.bio.split("\n")}>
                   {(line) => {
-                    return <p>{line}</p>;
+                    return (
+                      <>
+                        {line}
+                        <br />
+                      </>
+                    );
                   }}
                 </For>
-              </div>
+              </p>
             </Show>
             <div class="flex gap-3 text-md">
               <div class="flex gap-1">
@@ -124,7 +119,6 @@ export default function UserPage() {
                 <span class="text-faint ">Followers</span>
               </div>
             </div>
-            {/* Followed by others  */}
           </Show>
         </div>
         <div class="mt-4 flex border-b border-ui">

@@ -1,5 +1,4 @@
 import { Ripple } from "~/types";
-import { Show } from "solid-js";
 import Reactions from "./Reactions";
 import ParentChain from "./ParentChain";
 import WriteComment from "./WriteComment";

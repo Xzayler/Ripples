@@ -54,27 +54,11 @@ export default function FollowButton(props: {
   );
 }
 
-/* <button
-        type="button"
-        onClick={(e) => {
-          e.preventDefault();
-          pressFollow();
-        }}
-        class="px-4 group cursor-pointer transition rounded-full border border-foreground border-solid bg-background text-foreground hover:text-red-600 hover:border-red-600 "
-      >
-        <div class="flex items-center justify-center py-2">
-          <span class="text-sm font-bold after:content-['Following'] group-hover:after:content-['Unfollow']"></span>
-        </div>
-      </button> */
-
 export function FollowButtonDisabled() {
   return (
     <button
       type="button"
       disabled={true}
-      // onclick={(e) => {
-      //   pressFollow();
-      // }}
       class="px-4 cursor-default rounded-full border border-gray-800 border-solid bg-gray-500 text-gray-800"
     >
       <div class="flex items-center justify-center py-2">

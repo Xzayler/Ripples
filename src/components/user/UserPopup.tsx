@@ -4,7 +4,7 @@ import { getUserSummary } from "~/lib/server";
 import FollowButton, { FollowButtonDisabled } from "./FollowButton";
 
 export default function UserPopup(props: { userHandle: string }) {
-  const [user, {}] = createResource(() => {
+  const [user] = createResource(() => {
     return getUserSummary(props.userHandle);
   });
 
@@ -13,26 +13,6 @@ export default function UserPopup(props: { userHandle: string }) {
       <div class="flex flex-col p-4 gap-2 mb-2 rounded-2xl bg-background shadow-[0px_0px_4px_rgba(255,255,255,0.3)] overflow-hidden">
         <div class="flex justify-between w-full">
           <UserPfp pfp={user()?.pfp} />
-          {/* <Show
-            when={user()?.pfp}
-            fallback={
-              <div class="bg-gray-300 rounded-full">
-                <img
-                  src={defaultPfp}
-                  alt="default profile picture"
-                  class="w-16 h-16 object-cover"
-                />
-              </div>
-            }
-          >
-            {(pfp) => (
-              <img
-                src={pfp()}
-                alt="user profile picture"
-                class="w-16 h-16 object-cover "
-              />
-            )}
-          </Show> */}
           <Show
             when={user()}
             fallback={

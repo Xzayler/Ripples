@@ -5,7 +5,6 @@ import UserProfile from "./UserProfile";
 import HomeIcon from "~/components/shared/icons/HomeIcon";
 import MessageIcon from "~/components/shared/icons/MessageIcon";
 import BookmarkIcon from "~/components/shared/icons/BookmarkIcon";
-import ProfileIcon from "~/components/shared/icons/ProfileIcon";
 import WavesIcon from "~/components/shared/icons/WavesIcon";
 
 export default function Navbar() {

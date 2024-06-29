@@ -1,5 +1,5 @@
-import { action, redirect, reload } from "@solidjs/router";
-import { submitComment, submitPost } from "~/lib/server";
+import { action } from "@solidjs/router";
+import { submitComment } from "~/lib/server";
 import { createSignal } from "solid-js";
 
 const [postBody, setPostBody] = createSignal<string | null>("");
