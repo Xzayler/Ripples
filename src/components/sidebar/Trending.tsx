@@ -30,7 +30,7 @@ export default function Trending() {
       </h2>
       <For each={tags()}>
         {(tag, i) => {
-          return <TrendEntry tag={tag} index={i()} />;
+          return <TrendEntry tag={tag} index={i() + 1} />;
         }}
       </For>
     </div>
