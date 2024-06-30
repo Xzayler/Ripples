@@ -1566,17 +1566,17 @@ export async function getSuggestedUsers(currUserId: string) {
 
 export async function addHashtags(
   postId: mongoose.Types.ObjectId,
-  hashtags: string[]
+  hashtags: Set<string>
 ) {
   try {
-    for (const hashtag of hashtags) {
+    hashtags.forEach(async (hashtag) => {
       console.log(`inserting ${hashtag}`);
       await HashtagsModel.findOneAndUpdate(
         { _id: hashtag },
         { $inc: { count: 1 }, $push: { posts: postId } },
         { upsert: true }
       );
-    }
+    });
   } catch (e) {
     console.log(e);
   }
