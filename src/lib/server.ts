@@ -23,6 +23,7 @@ import {
   removeFollow as rf,
   updateUserData as uud,
   getSuggestedUsers as gsu,
+  getTrending as gt,
 } from "./interactions";
 
 // session / auth
@@ -59,3 +60,4 @@ export const getBookmarks = gb;
 export const getUserSummary = gus;
 export const getUserData = gud;
 export const getSuggestedUsers = gsu;
+export const getTrending = gt;

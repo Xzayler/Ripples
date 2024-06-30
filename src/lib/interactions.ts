@@ -18,6 +18,7 @@ import {
   removeFollow as remFl,
   updateUserData as uud,
   getSuggestedUsers as gsu,
+  getTrending as gt,
 } from "./database";
 import mongoose from "mongoose";
 
@@ -138,3 +139,5 @@ export const getSuggestedUsers = async () => {
   const currUserId = (await getCurrentUser()).id;
   return gsu(currUserId);
 };
+
+export const getTrending = gt;

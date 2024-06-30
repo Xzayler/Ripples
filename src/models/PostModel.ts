@@ -16,6 +16,7 @@ const postSchema = new Schema(
     comments: { type: Number },
     reposts: { type: Number },
     parent: { type: mongoose.Schema.ObjectId, ref: "posts" },
+    tags: { type: [String], required: false },
   },
   { timestamps: true }
 );

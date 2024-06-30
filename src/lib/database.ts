@@ -8,8 +8,10 @@ import BookmarksModel, { type InferredBookmark } from "~/models/BookmarksModel";
 import { isServer } from "solid-js/web";
 import FollowerModel, { InferredFollower } from "~/models/FollowerModel";
 import FollowingModel, { InferredFollowing } from "~/models/FollowingModel";
+import HashtagsModel, { InferredHashtag } from "~/models/HashtagsModel";
 import type { User, Ripple } from "~/types";
 import { uploadPfp } from "./cloudinary";
+import { processPost } from "./postParsing";
 
 export async function initDb() {
   if (
@@ -26,6 +28,7 @@ export async function initDb() {
 
 export async function addPost(postData: { content: string; author: string }) {
   const id = new mongoose.Types.ObjectId();
+  const { hashtags } = processPost(postData.content);
   try {
     await Promise.all([
       PostModel.create({
@@ -34,14 +37,9 @@ export async function addPost(postData: { content: string; author: string }) {
         likes: 0,
         comments: 0,
         reposts: 0,
-      }).catch((err) => {
-        console.log("Creating post failed");
-        console.log(err);
       }),
-      LikerModel.create({ _id: id, users: [] }).catch((err) => {
-        console.log("Creating Liker document failed");
-        console.log(err);
-      }),
+      LikerModel.create({ _id: id, users: [] }),
+      addHashtags(id, hashtags),
     ]);
   } catch (e) {
     console.log(e);
@@ -54,6 +52,7 @@ export async function addComment(postData: {
   parent: mongoose.Types.ObjectId;
 }) {
   const id = new mongoose.Types.ObjectId();
+  const { hashtags } = processPost(postData.content);
   try {
     await PostModel.create({
       _id: id,
@@ -66,6 +65,7 @@ export async function addComment(postData: {
       { _id: postData.parent },
       { $inc: { comments: 1 } }
     );
+    await addHashtags(id, hashtags);
   } catch (error) {
     console.log(error);
   }
@@ -1561,6 +1561,48 @@ export async function getSuggestedUsers(currUserId: string) {
   } catch (e) {
     console.log(e);
     return [] as User[];
+  }
+}
+
+export async function addHashtags(
+  postId: mongoose.Types.ObjectId,
+  hashtags: string[]
+) {
+  try {
+    for (const hashtag of hashtags) {
+      console.log(`inserting ${hashtag}`);
+      await HashtagsModel.findOneAndUpdate(
+        { _id: hashtag },
+        { $inc: { count: 1 }, $push: { posts: postId } },
+        { upsert: true }
+      );
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function getTrending() {
+  try {
+    const topTrending: InferredHashtag[] = await HashtagsModel.aggregate([
+      {
+        $sort: { count: -1 },
+      },
+      {
+        $limit: 5,
+      },
+      {
+        $match: { count: { $ne: 0 } },
+      },
+    ]);
+    return topTrending.map((t) => {
+      return {
+        name: t._id,
+        count: t.count,
+      };
+    });
+  } catch (e) {
+    console.log(e);
   }
 }
 
