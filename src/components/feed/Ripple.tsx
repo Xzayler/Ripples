@@ -4,6 +4,8 @@ import { calcDate } from "~/lib/date";
 import UserWrapper from "../user/UserWrapper";
 import { redirect, useNavigate } from "@solidjs/router";
 
+import PostContent from "./PostContent";
+
 export default function Ripple(props: { post: Ripple }) {
   const post = props.post;
   // if (!post) {
@@ -76,7 +78,9 @@ export default function Ripple(props: { post: Ripple }) {
             </div>
           </div>
           {/* Post Content */}
-          <div>{content}</div>
+          <p>
+            <PostContent content={content} />
+          </p>
           {/* Post Reactions */}
           <div class="mb-3 w-full my-3">
             <Reactions post={post} />
