@@ -4,8 +4,6 @@ import { Schema, InferSchemaType } from "mongoose";
 const hashtagsSchema = new Schema({
   _id: {
     type: String,
-    required: true,
-    unique: true,
   },
   count: {
     type: Number,
