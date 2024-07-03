@@ -126,5 +126,5 @@ export const logout = async (formData: FormData) => {
     lucia.createBlankSessionCookie().serialize()
   );
 
-  return redirect("/login");
+  throw redirect("/login");
 };
