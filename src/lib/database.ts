@@ -1453,7 +1453,6 @@ export async function updateUserData(
     if (bio) {
       toChange.bio = bio;
     }
-    console.log(toChange);
     await UserModel.updateOne({ _id: currUserId }, toChange);
   } catch (error) {
     console.log(error);
@@ -1570,7 +1569,6 @@ export async function addHashtags(
 ) {
   try {
     hashtags.forEach(async (hashtag) => {
-      console.log(`inserting ${hashtag}`);
       await HashtagsModel.findOneAndUpdate(
         { _id: hashtag },
         { $inc: { count: 1 }, $push: { posts: postId } },
@@ -1579,6 +1577,155 @@ export async function addHashtags(
     });
   } catch (e) {
     console.log(e);
+  }
+}
+
+export async function getHashtags(
+  uObjId: mongoose.Types.ObjectId,
+  hashtag: string
+) {
+  try {
+    const res = await HashtagsModel.aggregate([
+      {
+        $match: {
+          _id: hashtag,
+        },
+      },
+      {
+        $project: {
+          posts: true,
+          _id: false,
+        },
+      },
+      {
+        $lookup: {
+          from: "likes",
+          pipeline: [
+            {
+              $match: {
+                _id: uObjId,
+              },
+            },
+          ],
+          as: "likedPosts",
+        },
+      },
+      {
+        $unwind: {
+          path: "$likedPosts",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          likedPosts: "$likedPosts.posts",
+        },
+      },
+      // Check if the post is bookmarked by the User
+      {
+        $lookup: {
+          from: "bookmarks",
+          let: {
+            postId: "$_id",
+          },
+          pipeline: [
+            {
+              $match: {
+                _id: uObjId,
+              },
+            },
+          ],
+          as: "bookmarkedPosts",
+        },
+      },
+      {
+        $unwind: {
+          path: "$bookmarkedPosts",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          bookmarkedPosts: "$bookmarkedPosts.posts",
+        },
+      },
+      {
+        $unwind: "$posts",
+      },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "posts",
+          foreignField: "_id",
+          pipeline: [
+            {
+              $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "author",
+              },
+            },
+            {
+              $unwind: "$author",
+            },
+          ],
+          as: "posts",
+        },
+      },
+      {
+        $unwind: "$posts",
+      },
+      {
+        $project: {
+          _id: "$posts._id",
+          content: "$posts.content",
+          author: "$posts.author",
+          createdAt: "$posts.createdAt",
+          updatedAt: "$posts.updatedAt",
+          hasLiked: {
+            $cond: {
+              if: {
+                $in: ["$posts._id", "$likedPosts"],
+              },
+              then: true,
+              else: false,
+            },
+          },
+          hasBookmarked: {
+            $cond: {
+              if: {
+                $in: ["$posts._id", "$bookmarkedPosts"],
+              },
+              then: true,
+              else: false,
+            },
+          },
+          likes: "$posts.likes",
+          comments: "$posts.comments",
+          reposts: "$posts.reposts",
+        },
+      },
+    ]);
+    return res.map((p) => {
+      return {
+        id: p._id.toString(),
+        authorName: p.author.name,
+        authorHandle: p.author.handle,
+        comments: p.comments,
+        content: p.content,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
+        hasBookmarked: p.hasBookmarked,
+        hasLiked: p.hasLiked,
+        likes: p.likes,
+        pfp: p.author.pfp,
+        reposts: p.reposts,
+      } as Ripple;
+    });
+  } catch (e) {
+    console.log(e);
+    return [] as Ripple[];
   }
 }
 

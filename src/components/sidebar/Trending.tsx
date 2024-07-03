@@ -1,6 +1,7 @@
 import { For } from "solid-js";
 import { createResource } from "solid-js";
 import { getTrending } from "~/lib/server";
+import { A } from "@solidjs/router";
 
 type Tag = {
   name: string;
@@ -9,13 +10,15 @@ type Tag = {
 
 function TrendEntry(props: { tag: Tag; index: number }) {
   return (
-    <div class="px-4 py-3 hover:bg-highlightextra ">
-      <div class="flex flex-col">
-        <div class=" text-faint text-sm  ">{`${props.index} · Trending`}</div>
-        <div class=" text-foreground text-md font-bold mt-[1px]">{`#${props.tag.name}`}</div>
-        <div class="text-faint text-sm mt-1">{`${props.tag.count} posts`}</div>
+    <A href={`/search?searchType=hashtag&q=${props.tag.name}`}>
+      <div class="px-4 py-3 hover:bg-highlightextra ">
+        <div class="flex flex-col">
+          <div class=" text-faint text-sm  ">{`${props.index} · Trending`}</div>
+          <div class=" text-foreground text-md font-bold mt-[1px]">{`#${props.tag.name}`}</div>
+          <div class="text-faint text-sm mt-1">{`${props.tag.count} posts`}</div>
+        </div>
       </div>
-    </div>
+    </A>
   );
 }
 
@@ -24,11 +27,14 @@ export default function Trending() {
     return getTrending() as Promise<Tag[]>;
   });
   return (
-    <div class="rounded-2xl bg-highlight ">
+    <div class="rounded-2xl bg-highlight overflow-hidden">
       <h2 class=" px-4 py-3 text-foreground text-xl font-extrabold ">
         Trending
       </h2>
-      <For each={tags()}>
+      <For
+        each={tags()}
+        fallback={<div class="px-4 py-3 text-sm">No hashtags found</div>}
+      >
         {(tag, i) => {
           return <TrendEntry tag={tag} index={i() + 1} />;
         }}

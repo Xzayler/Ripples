@@ -19,6 +19,7 @@ import {
   updateUserData as uud,
   getSuggestedUsers as gsu,
   getTrending as gt,
+  getHashtags as gh,
 } from "./database";
 import mongoose from "mongoose";
 
@@ -137,7 +138,12 @@ export const updateUserData = async (
 
 export const getSuggestedUsers = async () => {
   const currUserId = (await getCurrentUser()).id;
-  return gsu(currUserId);
+  return await gsu(currUserId);
 };
 
 export const getTrending = gt;
+
+export const getHashtags = async (hashtag: string) => {
+  const currUId = new mongoose.Types.ObjectId((await getCurrentUser()).id);
+  return await gh(currUId, hashtag);
+};
