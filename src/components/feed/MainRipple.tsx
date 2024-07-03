@@ -3,6 +3,7 @@ import Reactions from "./Reactions";
 import ParentChain from "./ParentChain";
 import WriteComment from "./WriteComment";
 import UserWrapper from "../user/UserWrapper";
+import PostContent from "./PostContent";
 
 export default function MainRipple(props: { post: Ripple | undefined | null }) {
   return (
@@ -35,7 +36,9 @@ export default function MainRipple(props: { post: Ripple | undefined | null }) {
             </div>
           </div>
           <div class="flex text-md flex-col w-full">
-            <div>{props.post ? props.post.content : ""}</div>
+            <div>
+              {props.post ? <PostContent content={props.post.content} /> : null}
+            </div>
           </div>
         </div>
         <div class="my-4">

@@ -8,8 +8,10 @@ import BookmarksModel, { type InferredBookmark } from "~/models/BookmarksModel";
 import { isServer } from "solid-js/web";
 import FollowerModel, { InferredFollower } from "~/models/FollowerModel";
 import FollowingModel, { InferredFollowing } from "~/models/FollowingModel";
+import HashtagsModel, { InferredHashtag } from "~/models/HashtagsModel";
 import type { User, Ripple } from "~/types";
 import { uploadPfp } from "./cloudinary";
+import { processPost } from "./postParsing";
 
 export async function initDb() {
   if (
@@ -26,6 +28,7 @@ export async function initDb() {
 
 export async function addPost(postData: { content: string; author: string }) {
   const id = new mongoose.Types.ObjectId();
+  const { hashtags } = processPost(postData.content);
   try {
     await Promise.all([
       PostModel.create({
@@ -34,14 +37,9 @@ export async function addPost(postData: { content: string; author: string }) {
         likes: 0,
         comments: 0,
         reposts: 0,
-      }).catch((err) => {
-        console.log("Creating post failed");
-        console.log(err);
       }),
-      LikerModel.create({ _id: id, users: [] }).catch((err) => {
-        console.log("Creating Liker document failed");
-        console.log(err);
-      }),
+      LikerModel.create({ _id: id, users: [] }),
+      addHashtags(id, hashtags),
     ]);
   } catch (e) {
     console.log(e);
@@ -54,6 +52,7 @@ export async function addComment(postData: {
   parent: mongoose.Types.ObjectId;
 }) {
   const id = new mongoose.Types.ObjectId();
+  const { hashtags } = processPost(postData.content);
   try {
     await PostModel.create({
       _id: id,
@@ -66,6 +65,7 @@ export async function addComment(postData: {
       { _id: postData.parent },
       { $inc: { comments: 1 } }
     );
+    await addHashtags(id, hashtags);
   } catch (error) {
     console.log(error);
   }
@@ -1453,7 +1453,6 @@ export async function updateUserData(
     if (bio) {
       toChange.bio = bio;
     }
-    console.log(toChange);
     await UserModel.updateOne({ _id: currUserId }, toChange);
   } catch (error) {
     console.log(error);
@@ -1465,7 +1464,7 @@ export async function updateUserData(
 export async function getSuggestedUsers(currUserId: string) {
   const currUObjId = new mongoose.Types.ObjectId(currUserId);
   try {
-    const users = await FollowerModel.aggregate([
+    const users = await FollowingModel.aggregate([
       {
         $match: {
           _id: currUObjId,
@@ -1561,6 +1560,196 @@ export async function getSuggestedUsers(currUserId: string) {
   } catch (e) {
     console.log(e);
     return [] as User[];
+  }
+}
+
+export async function addHashtags(
+  postId: mongoose.Types.ObjectId,
+  hashtags: Set<string>
+) {
+  try {
+    hashtags.forEach(async (hashtag) => {
+      await HashtagsModel.findOneAndUpdate(
+        { _id: hashtag },
+        { $inc: { count: 1 }, $push: { posts: postId } },
+        { upsert: true }
+      );
+    });
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function getHashtags(
+  uObjId: mongoose.Types.ObjectId,
+  hashtag: string
+) {
+  try {
+    const res = await HashtagsModel.aggregate([
+      {
+        $match: {
+          _id: hashtag,
+        },
+      },
+      {
+        $project: {
+          posts: true,
+          _id: false,
+        },
+      },
+      {
+        $lookup: {
+          from: "likes",
+          pipeline: [
+            {
+              $match: {
+                _id: uObjId,
+              },
+            },
+          ],
+          as: "likedPosts",
+        },
+      },
+      {
+        $unwind: {
+          path: "$likedPosts",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          likedPosts: "$likedPosts.posts",
+        },
+      },
+      // Check if the post is bookmarked by the User
+      {
+        $lookup: {
+          from: "bookmarks",
+          let: {
+            postId: "$_id",
+          },
+          pipeline: [
+            {
+              $match: {
+                _id: uObjId,
+              },
+            },
+          ],
+          as: "bookmarkedPosts",
+        },
+      },
+      {
+        $unwind: {
+          path: "$bookmarkedPosts",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          bookmarkedPosts: "$bookmarkedPosts.posts",
+        },
+      },
+      {
+        $unwind: "$posts",
+      },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "posts",
+          foreignField: "_id",
+          pipeline: [
+            {
+              $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "_id",
+                as: "author",
+              },
+            },
+            {
+              $unwind: "$author",
+            },
+          ],
+          as: "posts",
+        },
+      },
+      {
+        $unwind: "$posts",
+      },
+      {
+        $project: {
+          _id: "$posts._id",
+          content: "$posts.content",
+          author: "$posts.author",
+          createdAt: "$posts.createdAt",
+          updatedAt: "$posts.updatedAt",
+          hasLiked: {
+            $cond: {
+              if: {
+                $in: ["$posts._id", "$likedPosts"],
+              },
+              then: true,
+              else: false,
+            },
+          },
+          hasBookmarked: {
+            $cond: {
+              if: {
+                $in: ["$posts._id", "$bookmarkedPosts"],
+              },
+              then: true,
+              else: false,
+            },
+          },
+          likes: "$posts.likes",
+          comments: "$posts.comments",
+          reposts: "$posts.reposts",
+        },
+      },
+    ]);
+    return res.map((p) => {
+      return {
+        id: p._id.toString(),
+        authorName: p.author.name,
+        authorHandle: p.author.handle,
+        comments: p.comments,
+        content: p.content,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
+        hasBookmarked: p.hasBookmarked,
+        hasLiked: p.hasLiked,
+        likes: p.likes,
+        pfp: p.author.pfp,
+        reposts: p.reposts,
+      } as Ripple;
+    });
+  } catch (e) {
+    console.log(e);
+    return [] as Ripple[];
+  }
+}
+
+export async function getTrending() {
+  try {
+    const topTrending: InferredHashtag[] = await HashtagsModel.aggregate([
+      {
+        $sort: { count: -1 },
+      },
+      {
+        $limit: 5,
+      },
+      {
+        $match: { count: { $ne: 0 } },
+      },
+    ]);
+    return topTrending.map((t) => {
+      return {
+        name: t._id,
+        count: t.count,
+      };
+    });
+  } catch (e) {
+    console.log(e);
   }
 }
 

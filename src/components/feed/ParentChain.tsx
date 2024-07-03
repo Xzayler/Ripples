@@ -4,6 +4,7 @@ import { useNavigate } from "@solidjs/router";
 import Reactions from "./Reactions";
 import { calcDate } from "~/lib/date";
 import UserWrapper from "../user/UserWrapper";
+import PostContent from "./PostContent";
 
 function Parent(props: { parent: Ripple }) {
   const navigate = useNavigate();
@@ -43,7 +44,9 @@ function Parent(props: { parent: Ripple }) {
           </div>
         </div>
         {/* Post Content */}
-        <div>{props.parent.content}</div>
+        <p>
+          <PostContent content={props.parent.content} />
+        </p>
         <div class="py-4">
           <Reactions post={props.parent} />
         </div>
