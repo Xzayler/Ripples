@@ -35,11 +35,13 @@ function Suggestion(props: { user: User }) {
 
 export default function FollowSuggestions() {
   const [users] = createResource(async () => {
-    await new Promise((r) => setTimeout(r, 2000));
     return ((await getSuggestedUsers()) ?? []) as User[];
   });
   return (
-    <div class="rounded-2xl bg-highlight" onclick={() => console.log(users())}>
+    <div
+      class="rounded-2xl bg-highlight overflow-hidden"
+      onclick={() => console.log(users())}
+    >
       <h2 class=" px-4 py-3 text-foreground text-xl font-extrabold ">
         Who to follow
       </h2>

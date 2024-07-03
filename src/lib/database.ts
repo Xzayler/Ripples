@@ -1464,7 +1464,7 @@ export async function updateUserData(
 export async function getSuggestedUsers(currUserId: string) {
   const currUObjId = new mongoose.Types.ObjectId(currUserId);
   try {
-    const users = await FollowerModel.aggregate([
+    const users = await FollowingModel.aggregate([
       {
         $match: {
           _id: currUObjId,
