@@ -1729,6 +1729,75 @@ export async function getHashtags(
   }
 }
 
+export async function getUserResults(
+  currUObjId: mongoose.Types.ObjectId,
+  searchQ: string
+) {
+  try {
+    const res = await FollowingModel.aggregate([
+      {
+        $match: {
+          _id: currUObjId,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          let: {
+            followedUsers: "$users",
+          },
+          pipeline: [
+            {
+              $match: {
+                handle: searchQ,
+              },
+            },
+          ],
+          as: "searchedUsers",
+        },
+      },
+      {
+        $unwind: "$searchedUsers",
+      },
+      {
+        $project: {
+          _id: "$searchedUsers._id",
+          handle: "$searchedUsers.handle",
+          name: "$searchedUsers.name",
+          pfp: "$searchedUsers.pfp",
+          bio: "$searchedUsers.bio",
+          followers: "$searchedUsers.followers",
+          following: "$searchedUsers.following",
+          isFollowing: {
+            $cond: {
+              if: {
+                $in: ["$searchedUsers._id", "$users"],
+              },
+              then: true,
+              else: false,
+            },
+          },
+        },
+      },
+    ]);
+    return res.map((u) => {
+      return {
+        id: u._id.toString(),
+        handle: u.handle,
+        name: u.name,
+        pfp: u.pfp,
+        bio: u.bio ?? "",
+        followers: u.followers,
+        following: u.following,
+        isFollowed: u.isFollowed,
+      } as User;
+    });
+  } catch (e) {
+    console.log(e);
+    return [] as User[];
+  }
+}
+
 export async function getTrending() {
   try {
     const topTrending: InferredHashtag[] = await HashtagsModel.aggregate([

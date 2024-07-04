@@ -3,18 +3,20 @@ import {
   createSignal,
   Switch,
   Match,
-  Show,
+  For,
   createEffect,
+  createResource,
 } from "solid-js";
+import { useSearchParams } from "@solidjs/router";
 import BackButton from "~/components/shared/BackButton";
 import Feed from "~/components/feed/Feed";
-import SearchFeed from "~/components/feed/SearchFeed";
 import Sidebar from "~/components/sidebar/Sidebar";
-import { useSearchParams } from "@solidjs/router";
-import { createResource } from "solid-js";
+import UserPfp from "~/components/user/UserPfp";
+import UserWrapper from "~/components/user/UserWrapper";
+import MultiLineText from "~/components/shared/MultiLineText";
 
-import { getHashtags } from "~/lib/server";
-import { Ripple } from "~/types";
+import { getHashtags, getUserResults } from "~/lib/server";
+import { Ripple, User } from "~/types";
 
 type SearchParams = {
   searchType: "general" | "hashtag" | "user";
@@ -55,7 +57,14 @@ export default function Search() {
           </div>
         </nav>
         <Suspense>
-          <Feed fetcher={fetcher()} />
+          <Switch>
+            <Match when={searchParams.searchType == "user"}>
+              <UserFeed q={searchParams.q ?? ""} />
+            </Match>
+            <Match when={searchParams.searchType == "hashtag"}>
+              <Feed fetcher={fetcher()} />
+            </Match>
+          </Switch>
         </Suspense>
       </div>
       {/* Sidebar */}
@@ -63,5 +72,49 @@ export default function Search() {
         <Sidebar />
       </div>
     </main>
+  );
+}
+
+function UserFeed(props: { q: string }) {
+  const [users] = createResource(
+    () => props.q,
+    async (q) => {
+      return await getUserResults(q);
+    }
+  );
+  return (
+    <For
+      each={users()}
+      fallback={<div class="text-center text-xl mt-6">No users found</div>}
+    >
+      {(item) => {
+        return <UserEntry user={item} />;
+      }}
+    </For>
+  );
+}
+
+function UserEntry(props: { user: User }) {
+  return (
+    <div class="border-b border-ui p-2 ">
+      <div class="flex items-start gap-1">
+        <div class="w-14 aspect-square ">
+          <UserPfp pfp={props.user.pfp} />
+        </div>
+        <div class="">
+          <div class="mr-1">
+            <UserWrapper handle={props.user.handle}>
+              <span class="font-bold text-foreground">{props.user.name}</span>
+            </UserWrapper>
+          </div>
+          <div class="flex text-faint">
+            <UserWrapper handle={props.user.handle}>
+              <span>{`@${props.user.handle}`}</span>
+            </UserWrapper>
+          </div>
+          {props.user.bio != "" ? <p>{props.user.bio}</p> : null}
+        </div>
+      </div>
+    </div>
   );
 }

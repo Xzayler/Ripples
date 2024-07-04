@@ -20,6 +20,7 @@ import {
   getSuggestedUsers as gsu,
   getTrending as gt,
   getHashtags as gh,
+  getUserResults as gur,
 } from "./database";
 import mongoose from "mongoose";
 
@@ -146,4 +147,9 @@ export const getTrending = gt;
 export const getHashtags = async (hashtag: string) => {
   const currUId = new mongoose.Types.ObjectId((await getCurrentUser()).id);
   return await gh(currUId, hashtag);
+};
+
+export const getUserResults = async (searchQ: string) => {
+  const currUObjId = new mongoose.Types.ObjectId((await getCurrentUser()).id);
+  return await gur(currUObjId, searchQ);
 };

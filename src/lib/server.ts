@@ -21,6 +21,7 @@ import {
   getSuggestedUsers as gsu,
   getTrending as gt,
   getHashtags as gh,
+  getUserResults as gur,
 } from "./interactions";
 
 // session / auth
@@ -51,3 +52,4 @@ export const getUserData = gud;
 export const getSuggestedUsers = gsu;
 export const getTrending = gt;
 export const getHashtags = gh;
+export const getUserResults = gur;
