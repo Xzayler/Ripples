@@ -1,6 +1,7 @@
 import { For } from "solid-js";
 import { A } from "@solidjs/router";
 import { hashtagReg } from "~/lib/postParsing";
+import MultiLineText from "../shared/MultiLineText";
 
 export default function PostContent(props: { content: string }) {
   const text = props.content.split(hashtagReg);
@@ -9,18 +10,13 @@ export default function PostContent(props: { content: string }) {
     tags.push(match[0]);
   }
 
-  // let res = "";
-  // for (let i = 0; i < text.length; i++) {
-  //   res += `${text[i]}${tags[i] ?? ""}`;
-  // }
-
   return (
     <>
       <For each={text}>
         {(item, ind) => {
           return (
             <>
-              {item}
+              <MultiLineText text={item} />
               <HashtagLink tag={tags[ind()]} />
             </>
           );

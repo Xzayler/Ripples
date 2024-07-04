@@ -14,6 +14,7 @@ import Sidebar from "~/components/sidebar/Sidebar";
 import UserPfp from "~/components/user/UserPfp";
 import UserWrapper from "~/components/user/UserWrapper";
 import FollowButton from "~/components/user/FollowButton";
+import MultiLineText from "~/components/shared/MultiLineText";
 
 import { getHashtags, getUserResults } from "~/lib/server";
 import { Ripple, User } from "~/types";
@@ -124,7 +125,11 @@ function UserEntry(props: { user: User }) {
               />
             </div>
           </div>
-          {props.user.bio != "" ? <p>{props.user.bio}</p> : null}
+          {props.user.bio != "" ? (
+            <p>
+              <MultiLineText text={props.user.bio} />
+            </p>
+          ) : null}
         </div>
       </div>
     </div>

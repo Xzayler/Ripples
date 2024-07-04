@@ -19,6 +19,7 @@ import EditProfileModal, {
   openModal,
 } from "~/components/user/EditProfileModal";
 import UserPfp from "~/components/user/UserPfp";
+import MultiLineText from "~/components/shared/MultiLineText";
 
 export default function UserPage() {
   const params = useParams();
@@ -95,18 +96,9 @@ export default function UserPage() {
                 </Switch>
               </div>
             </div>
-            <Show when={user()?.bio != ""}>
+            <Show when={user() && user()!.bio != ""}>
               <p>
-                <For each={user()!.bio.split("\n")}>
-                  {(line) => {
-                    return (
-                      <>
-                        {line}
-                        <br />
-                      </>
-                    );
-                  }}
-                </For>
+                <MultiLineText text={user()!.bio} />
               </p>
             </Show>
             <div class="flex gap-3 text-md">
