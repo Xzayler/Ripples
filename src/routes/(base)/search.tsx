@@ -13,7 +13,7 @@ import Feed from "~/components/feed/Feed";
 import Sidebar from "~/components/sidebar/Sidebar";
 import UserPfp from "~/components/user/UserPfp";
 import UserWrapper from "~/components/user/UserWrapper";
-import MultiLineText from "~/components/shared/MultiLineText";
+import FollowButton from "~/components/user/FollowButton";
 
 import { getHashtags, getUserResults } from "~/lib/server";
 import { Ripple, User } from "~/types";
@@ -97,20 +97,32 @@ function UserFeed(props: { q: string }) {
 function UserEntry(props: { user: User }) {
   return (
     <div class="border-b border-ui p-2 ">
-      <div class="flex items-start gap-1">
+      <div class="flex gap-1 items-start">
         <div class="w-14 aspect-square ">
           <UserPfp pfp={props.user.pfp} />
         </div>
-        <div class="">
-          <div class="mr-1">
-            <UserWrapper handle={props.user.handle}>
-              <span class="font-bold text-foreground">{props.user.name}</span>
-            </UserWrapper>
-          </div>
-          <div class="flex text-faint">
-            <UserWrapper handle={props.user.handle}>
-              <span>{`@${props.user.handle}`}</span>
-            </UserWrapper>
+        <div class="grow">
+          <div class="flex items-start">
+            <div>
+              <div class="mr-1">
+                <UserWrapper handle={props.user.handle}>
+                  <span class="font-bold text-foreground">
+                    {props.user.name}
+                  </span>
+                </UserWrapper>
+              </div>
+              <div class="flex text-faint">
+                <UserWrapper handle={props.user.handle}>
+                  <span>{`@${props.user.handle}`}</span>
+                </UserWrapper>
+              </div>
+            </div>
+            <div class="grow flex justify-end">
+              <FollowButton
+                isFollowed={props.user.isFollowed}
+                uId={props.user.id}
+              />
+            </div>
           </div>
           {props.user.bio != "" ? <p>{props.user.bio}</p> : null}
         </div>
