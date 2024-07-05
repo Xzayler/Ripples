@@ -587,6 +587,7 @@ export async function getFeed(userId: string) {
     });
   } catch (error) {
     console.log(error);
+    return [] as Ripple[];
   }
 }
 
@@ -703,6 +704,7 @@ export async function getUserPosts(
     });
   } catch (error) {
     console.log(error);
+    return [] as Ripple[];
   }
 }
 
@@ -864,6 +866,7 @@ export async function getUserLikedPosts(
     });
   } catch (error) {
     console.log(error);
+    return [] as Ripple[];
   }
 }
 
@@ -1028,6 +1031,7 @@ export async function getSubFeed(userId: string) {
     });
   } catch (error) {
     console.log(error);
+    return [] as Ripple[];
   }
 }
 
@@ -1157,6 +1161,7 @@ export async function getBookmarks(uObjId: mongoose.Types.ObjectId) {
     });
   } catch (error) {
     console.log(error);
+    return [] as Ripple[];
   }
 }
 
