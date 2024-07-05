@@ -10,7 +10,7 @@ import WavesIcon from "~/components/shared/icons/WavesIcon";
 
 export default function BaseLayout(props: { children: JSX.Element }) {
   const [user] = createResource(async () => {
-    return (await getCurrentUser()) as LuciaUser;
+    return await getCurrentUser();
   });
 
   return (

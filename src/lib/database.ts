@@ -26,6 +26,32 @@ export async function initDb() {
   }
 }
 
+export async function getCurrentUser(id: string) {
+  const currU: InferredUser = (
+    await UserModel.aggregate([
+      {
+        $match: {
+          _id: id,
+        },
+      },
+      {
+        $project: {
+          _id: true,
+          name: true,
+          handle: true,
+          pfp: true,
+        },
+      },
+    ])
+  )[0];
+  return {
+    id: currU._id.toString(),
+    handle: currU.handle,
+    name: currU.name,
+    pfp: currU.pfp,
+  } as Omit<User, "isFollowed" | "followers" | "following" | "bio">;
+}
+
 export async function addPost(postData: { content: string; author: string }) {
   const id = new mongoose.Types.ObjectId();
   const { hashtags } = processPost(postData.content);
