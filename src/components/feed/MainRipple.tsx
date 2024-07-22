@@ -5,7 +5,10 @@ import WriteComment from "./WriteComment";
 import UserWrapper from "../user/UserWrapper";
 import PostContent from "./PostContent";
 
-export default function MainRipple(props: { post: Ripple | undefined | null }) {
+export default function MainRipple(props: {
+  post: Ripple | undefined | null;
+  addComment: (comment: string, id: string) => void;
+}) {
   return (
     <div class="px-4 border-b border-ui">
       <div class="pt-3 pb-2"></div>
@@ -70,6 +73,7 @@ export default function MainRipple(props: { post: Ripple | undefined | null }) {
       <WriteComment
         parentid={props.post ? props.post.id : ""}
         replyTo={props.post ? props.post.authorHandle : ""}
+        addComment={props.addComment}
       />
     </div>
   );

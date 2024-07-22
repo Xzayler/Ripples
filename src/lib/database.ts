@@ -52,8 +52,7 @@ export async function getCurrentUser(id: string) {
   } as Omit<User, "isFollowed" | "followers" | "following" | "bio">;
 }
 
-export async function addPost(postData: { content: string; author: string }) {
-  const id = new mongoose.Types.ObjectId();
+export async function addPost(id: mongoose.Types.ObjectId, postData: { content: string; author: string }) {
   const { hashtags } = processPost(postData.content);
   try {
     await Promise.all([
@@ -72,12 +71,11 @@ export async function addPost(postData: { content: string; author: string }) {
   }
 }
 
-export async function addComment(postData: {
+export async function addComment(id: mongoose.Types.ObjectId, postData: {
   content: string;
   author: string;
   parent: mongoose.Types.ObjectId;
 }) {
-  const id = new mongoose.Types.ObjectId();
   const { hashtags } = processPost(postData.content);
   try {
     await PostModel.create({
