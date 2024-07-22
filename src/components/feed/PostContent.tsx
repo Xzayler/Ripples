@@ -1,23 +1,29 @@
-import { For } from "solid-js";
+import { createResource, For } from "solid-js";
 import { A } from "@solidjs/router";
 import { hashtagReg } from "~/lib/postParsing";
 import MultiLineText from "../shared/MultiLineText";
 
 export default function PostContent(props: { content: string }) {
-  const text = props.content.split(hashtagReg);
-  const tags: string[] = [];
-  for (const match of props.content.matchAll(hashtagReg)) {
-    tags.push(match[0]);
-  }
+  const [res] = createResource(
+    () => props.content,
+    (content) => {
+      const text = props.content.split(hashtagReg);
+      const tags: string[] = [];
+      for (const match of props.content.matchAll(hashtagReg)) {
+        tags.push(match[0]);
+      }
+      return { text, tags };
+    }
+  );
 
   return (
     <>
-      <For each={text}>
+      <For each={res()?.text}>
         {(item, ind) => {
           return (
             <>
               <MultiLineText text={item} />
-              <HashtagLink tag={tags[ind()]} />
+              <HashtagLink tag={res()?.tags[ind()]} />
             </>
           );
         }}

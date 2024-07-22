@@ -19,8 +19,7 @@ export const lucia = await (async () => {
     },
     getUserAttributes: (attributes) => {
       return {
-        name: attributes.name,
-        handle: attributes.handle,
+        _id: attributes._id,
       };
     },
   });
@@ -34,8 +33,7 @@ declare module "lucia" {
 }
 
 export interface DatabaseUserAttributes {
-  name: string;
-  handle: string;
+  _id: string;
 }
 
 export const register = async (formData: FormData) => {

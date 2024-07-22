@@ -1,5 +1,5 @@
 import { useAction, action } from "@solidjs/router";
-import { createEffect, createSignal } from "solid-js";
+import { createEffect, createSignal, Show } from "solid-js";
 import type { Ripple } from "~/types";
 import {
   addBookmark,
@@ -7,7 +7,7 @@ import {
   likePost,
   unlikePost,
 } from "~/lib/server";
-import { openCommentModal } from "../shared/PostModal";
+import PostModal, { openModal } from "../shared/PostModal";
 
 const defaultPost = {
   id: "idasd",
@@ -67,13 +67,15 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
     }
   };
 
+  const [a, setActive] = createSignal<boolean>(false);
+
   return (
     <div class="flex flex-row justify-between ">
       <div
         class="cursor-pointer flex items-center text-faint hover:text-comment"
         onClick={(e) => {
           e.preventDefault();
-          openCommentModal(props.post ?? defaultPost);
+          openModal(() => setActive(true));
           e.stopPropagation();
         }}
       >
@@ -81,6 +83,12 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
         <div class="px-2">
           <span class="text-sm">{props.post ? props.post.comments : []}</span>
         </div>
+        <Show when={a()}>
+          <PostModal
+            closeFn={() => setActive(false)}
+            parent={props.post ?? undefined}
+          />
+        </Show>
       </div>
       <div
         class={

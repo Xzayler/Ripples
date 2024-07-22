@@ -8,6 +8,7 @@ import {
   Suspense,
   useContext,
   createSignal,
+  createEffect,
 } from "solid-js";
 import { getUserData, getUserLikedPosts, getUserPosts } from "~/lib/server";
 import Sidebar from "~/components/sidebar/Sidebar";
@@ -20,16 +21,26 @@ import EditProfileModal, {
 } from "~/components/user/EditProfileModal";
 import UserPfp from "~/components/user/UserPfp";
 import MultiLineText from "~/components/shared/MultiLineText";
+import type { Ripple } from "~/types";
 
 export default function UserPage() {
   const params = useParams();
-  const [user] = createResource(() => {
-    return getUserData(params.handle);
-  });
+  const [user] = createResource(
+    () => params.handle,
+    (handle) => {
+      return getUserData(handle);
+    }
+  );
+
   const currUser = useContext(UserContext);
   const [editActive, setEditActive] = createSignal<boolean>(false);
 
   const [toShow, setToShow] = createSignal<"posts" | "likes">("posts");
+
+  createEffect(() => {
+    const id = params.handle;
+    setToShow("posts");
+  });
 
   return (
     <main class="w-[990px] flex justify-between h-full relative items-end ">
@@ -139,22 +150,16 @@ export default function UserPage() {
             Likes
           </div>
         </div>
-        <Suspense>
-          <Switch
-            fallback={
-              <div class="w-full h-full flex items-center justify-center">
-                Loading...
-              </div>
-            }
-          >
-            <Match when={user() && toShow() == "posts"}>
-              <Feed fetcher={() => getUserPosts(user()!.id)} />
-            </Match>
-            <Match when={user() && toShow() == "likes"}>
-              <Feed fetcher={() => getUserLikedPosts(user()!.id)} />
-            </Match>
-          </Switch>
-        </Suspense>
+
+        {/* <Feed fetcher={} /> */}
+        <Switch>
+          <Match when={user() && toShow() == "posts"}>
+            <Feed fetcher={(id) => getUserPosts(id)} arg={user()!.id} />
+          </Match>
+          <Match when={toShow() == "likes"}>
+            <Feed fetcher={(id) => getUserLikedPosts(id)} arg={user()!.id} />
+          </Match>
+        </Switch>
       </div>
       <div class="shrink w-[350px] mr-[10px] border-l border-ui p">
         <Sidebar />

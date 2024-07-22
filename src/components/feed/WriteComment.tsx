@@ -15,12 +15,16 @@ const updatePlaceholder = (e: Event) => {
 export default function WriteComment(props: {
   parentid: string;
   replyTo: string;
+  addComment: (comment: string, id: string) => void;
 }) {
   return (
     <form
       method="post"
-      action={action((formData: FormData) => {
-        return submitComment(formData, props.parentid);
+      action={action(async (formData: FormData) => {
+        // const { comment, id } = await submitComment(formData, props.parentid);
+        const { comment, id } = { comment: "asdasdasd", id: "1234567890" };
+
+        props.addComment(comment ?? "", id);
       }, "postcomment")}
       class=" pt-2 "
     >

@@ -3,7 +3,7 @@ export type Ripple = {
   id: string;
   authorName: string;
   authorHandle: string;
-  pfp: string;
+  pfp?: string;
   createdAt: Date;
   updatedAt: Date;
   content: string;

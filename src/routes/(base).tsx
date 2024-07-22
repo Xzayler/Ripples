@@ -1,16 +1,14 @@
 import Navbar from "~/components/navbar/Navbar";
 import MessageBox from "~/components/chat/MessageBox";
 import { JSX, Show, createResource } from "solid-js";
-import PostModal from "~/components/shared/PostModal";
 import { UserContext } from "~/lib/UserContext";
-import type { User as LuciaUser } from "lucia";
 import { Suspense } from "solid-js";
 import { getCurrentUser } from "~/lib/gcu";
 import WavesIcon from "~/components/shared/icons/WavesIcon";
 
 export default function BaseLayout(props: { children: JSX.Element }) {
   const [user] = createResource(async () => {
-    return (await getCurrentUser()) as LuciaUser;
+    return await getCurrentUser();
   });
 
   return (
@@ -45,7 +43,7 @@ export default function BaseLayout(props: { children: JSX.Element }) {
             <MessageBox />
           </div> */}
       </div>
-      <PostModal></PostModal>
+      {/* <PostModal></PostModal> */}
     </div>
   );
 }
