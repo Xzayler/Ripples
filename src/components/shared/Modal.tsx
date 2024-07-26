@@ -20,14 +20,14 @@ export default function Modal(props: {
 }) {
   return (
     <Portal mount={document.getElementById("modal-root")!}>
-      <div class="fixed left-0 top-0 w-full h-full bg-faint/40 z-50 flex justify-center items-center">
+      <div class="fixed left-0 top-0 w-full h-full bg-faint/40 z-50 flex justify-center items-start pt-[5vh] ">
         <div
           class={
-            " bg-background rounded-2xl w-[600px] overflow-hidden min-w-[600px] min-h-[400px] max-h-[90vh] h-[650px] max-w-[80vw] " +
+            " bg-background rounded-2xl w-[600px] overflow-hidden min-w-[600px] max-h-[90vh] max-w-[80vw] " +
             props.class
           }
         >
-          <div class=" overflow-x-auto h-full flex flex-col">
+          <div class=" h-full flex flex-col">
             <Suspense>{props.children}</Suspense>
           </div>
         </div>

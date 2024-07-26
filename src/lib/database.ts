@@ -1365,7 +1365,7 @@ export async function getUserData(
   currUserId: mongoose.Types.ObjectId
 ) {
   try {
-    const user = (
+    const res = (
       await UserModel.aggregate([
         { $match: { handle: uHandle } },
         {
@@ -1446,7 +1446,11 @@ export async function getUserData(
           },
         },
       ])
-    )[0];
+    );
+    if (res.length === 0) {
+      return null;
+    }
+    const user = res[0];
     return {
       id: user._id.toString(),
       name: user.name,

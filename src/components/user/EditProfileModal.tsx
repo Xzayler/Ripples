@@ -17,6 +17,7 @@ import { UserContext } from "~/lib/UserContext";
 import { getUserData, updateUserData } from "~/lib/server";
 import UserPfp from "./UserPfp";
 import { action, useAction, useSubmission } from "@solidjs/router";
+import CharacterLimit from "../shared/CharacterLimit";
 
 export const openModal = om;
 
@@ -113,15 +114,7 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
                 Describe Yourself
               </p>
               <div class="flex flex-col items-stretch ">
-                <p
-                  class={
-                    name() && name()!.length > 16
-                      ? "text-red-500"
-                      : "text-faint"
-                  }
-                >{`${name()?.length ?? 0}/16${
-                  name() && name()!.length > 16 ? " Name too long" : ""
-                }`}</p>
+                <CharacterLimit text={name()} limit={16}/>
                 <input
                   type="text"
                   placeholder="Your Name"
@@ -130,13 +123,7 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
                 />
               </div>
               <div class="mt-2 mb-4 grow flex flex-col items-stretch ">
-                <p
-                  class={
-                    bio() && bio()!.length > 160 ? "text-red-500" : "text-faint"
-                  }
-                >{`${bio()?.length ?? 0}/160${
-                  bio() && bio()!.length > 160 ? " Bio too long" : ""
-                }`}</p>
+                <CharacterLimit text={bio()} limit={20}/>
                 <textarea
                   placeholder="Your Bio"
                   rows={4}

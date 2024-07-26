@@ -28,21 +28,21 @@ export const submitPost = async (formData: FormData) => {
   const id = (await getCurrentUser()).id;
   const body = formData.get("body")?.toString();
   const postId = new mongoose.Types.ObjectId();
-  // addPost(postId, {
-  //   content: body ?? "",
-  //   author: id,
-  // });
+  addPost(postId, {
+    content: body ?? "",
+    author: id,
+  });
   return postId.toString();
 };
 export const submitComment = async (formData: FormData, postId: string) => {
   const id = (await getCurrentUser()).id;
   const body = formData.get("body")?.toString();
   const commentId = new mongoose.Types.ObjectId();
-  // addComment(commentId, {
-  //   content: body ?? "",
-  //   author: id,
-  //   parent: new mongoose.Types.ObjectId(postId),
-  // });
+  addComment(commentId, {
+    content: body ?? "",
+    author: id,
+    parent: new mongoose.Types.ObjectId(postId),
+  });
   return { comment: body, id: commentId.toString() };
 };
 
