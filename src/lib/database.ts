@@ -1179,6 +1179,7 @@ export async function getBookmarks(uObjId: mongoose.Types.ObjectId) {
         updatedAt: bm.updatedAt,
         authorName: bm.authorName,
         authorHandle: bm.authorHandle,
+        pfp: bm.authorPfp,
         hasLiked: bm.hasLiked,
         hasBookmarked: true,
       } as Ripple;
