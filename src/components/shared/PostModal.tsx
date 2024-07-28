@@ -1,10 +1,12 @@
 import { action, useNavigate, A } from "@solidjs/router";
-import { createSignal, Show } from "solid-js";
+import { createSignal, Show, useContext } from "solid-js";
 import { submitPost, submitComment } from "~/lib/server";
 import { Ripple } from "~/types";
 import Modal, { openModal as om, ModalFoot, ModalHeadClose } from "./Modal";
 import PostContent from "../feed/PostContent";
 import CharacterLimit from "./CharacterLimit";
+import UserPfp from "../user/UserPfp";
+import { UserContext } from "~/lib/UserContext";
 
 export const openModal = om;
 
@@ -23,6 +25,8 @@ export default function PostModal(props: {
     }
   };
 
+  const user = useContext(UserContext);
+
   return (
     <Modal>
       <ModalHeadClose closeFn={props.closeFn} />
@@ -30,7 +34,9 @@ export default function PostModal(props: {
         <Show when={props.parent}>
           <div class="flex gap-3 w-full">
             <div class="flex gap-1 flex-col items-center basis-10">
-              <div class="h-10 w-10 bg-gray-300 rounded-full"></div>
+              <div class="w-10 aspect-square rounded-full">
+                <UserPfp pfp={props.parent!.pfp} />
+              </div>
               <div class="grow border-x border-ui border-solid"></div>
             </div>
             <div class="flex text-md flex-col w-full">
@@ -80,9 +86,9 @@ export default function PostModal(props: {
             props.closeFn();
           })}
         >
-          <div class=" flex gap-2.5 ">
-            <div class="pt-3">
-              <div class="h-10 w-10 bg-gray-300 rounded-full"></div>
+          <div class=" flex gap-2.5 items-start">
+            <div class="mt-3 w-10 aspect-square rounded-full">
+              <UserPfp pfp={user ? user()?.pfp : undefined} />
             </div>
             <p
               contentEditable

@@ -3,6 +3,7 @@ import UserProfileMenu from "./UserProfileMenu";
 import { createSignal, useContext } from "solid-js";
 import { UserContext } from "~/lib/UserContext";
 import { Show } from "solid-js";
+import UserPfp from "../user/UserPfp";
 
 export default function UserProfile() {
   const user = useContext(UserContext);
@@ -25,9 +26,8 @@ export default function UserProfile() {
         </div>
       </Show>
       <div class="cursor-pointer rounded-full w-full p-3 flex items-center hover:bg-highlight">
-        <div>
-          {/* Image */}
-          <div class="bg-gray-400 h-10 w-10 rounded-full"></div>
+        <div class="h-10 w-10 rounded-full" >
+          <UserPfp pfp={user!() ? user!()!.pfp : undefined} />
         </div>
         <div class="flex flex-col mx-3 text-foreground">
           <span class="text-md font-bold ">

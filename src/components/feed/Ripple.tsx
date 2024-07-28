@@ -3,12 +3,12 @@ import Reactions from "./Reactions";
 import { calcDate } from "~/lib/date";
 import UserWrapper from "../user/UserWrapper";
 import { redirect, useNavigate } from "@solidjs/router";
-
+import UserPfp from "../user/UserPfp";
 import PostContent from "./PostContent";
 
 export default function Ripple(props: { post: Ripple }) {
   const post = props.post;
-  const { id, authorName, authorHandle, createdAt, content } = post;
+  const { id, authorName, authorHandle, pfp, createdAt, content } = post;
   const navigate = useNavigate();
 
   return (
@@ -33,8 +33,8 @@ export default function Ripple(props: { post: Ripple }) {
       </div>
       {/* content */}
       <div class="flex gap-3 w-full">
-        <div class="basis-10">
-          <div class="h-10 w-10 bg-gray-300 rounded-full"></div>
+        <div class="h-10 aspect-square rounded-full">
+          <UserPfp pfp={pfp} />
         </div>
         <div class="flex text-md flex-col w-full">
           {/* Post Meta */}

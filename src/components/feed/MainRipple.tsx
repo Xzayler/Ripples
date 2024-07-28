@@ -4,6 +4,7 @@ import ParentChain from "./ParentChain";
 import WriteComment from "./WriteComment";
 import UserWrapper from "../user/UserWrapper";
 import PostContent from "./PostContent";
+import UserPfp from "../user/UserPfp";
 
 export default function MainRipple(props: {
   post: Ripple | undefined | null;
@@ -20,8 +21,8 @@ export default function MainRipple(props: {
       <article class="flex flex-col w-full">
         <div class=" w-full flex-col gap-3">
           <div class="flex gap-2 items-center text-md">
-            <div class="basis-10">
-              <div class="h-10 w-10 bg-gray-300 rounded-full"></div>
+            <div class="w-10 aspect-square rounded-full">
+              <UserPfp pfp={props.post?.pfp} />
             </div>
             <div class="flex flex-col">
               <div class="mr-1">

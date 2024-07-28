@@ -12,7 +12,9 @@ export default function UserPopup(props: { userHandle: string }) {
     <div class="absolute cursor-default w-[256px] bottom-full left-1/2 -translate-x-[50%]">
       <div class="flex flex-col p-4 gap-2 mb-2 rounded-2xl bg-background shadow-[0px_0px_4px_rgba(255,255,255,0.3)] overflow-hidden">
         <div class="flex justify-between w-full">
-          <UserPfp pfp={user()?.pfp} />
+          <div class=" w-16 aspect-square rounded-full ">
+            <UserPfp pfp={user()?.pfp} />
+          </div>
           <Show
             when={user()}
             fallback={

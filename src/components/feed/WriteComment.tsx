@@ -1,6 +1,8 @@
 import { action } from "@solidjs/router";
 import { submitComment } from "~/lib/server";
-import { createSignal } from "solid-js";
+import { createSignal, useContext } from "solid-js";
+import { UserContext } from "~/lib/UserContext";
+import UserPfp from "../user/UserPfp";
 
 const [postBody, setPostBody] = createSignal<string | null>("");
 
@@ -17,6 +19,9 @@ export default function WriteComment(props: {
   replyTo: string;
   addComment: (comment: string, id: string) => void;
 }) {
+
+  const user = useContext(UserContext);
+
   return (
     <form
       method="post"
@@ -34,8 +39,8 @@ export default function WriteComment(props: {
         </p>
       </div>
       <div class=" flex gap-2.5 pt-2 ">
-        <div class="pt-3">
-          <div class="h-10 w-10 bg-gray-300 rounded-full"></div>
+        <div class="mt-3 max-h-10 w-10 aspect-square rounded-full">
+          <UserPfp pfp={user ? user()?.pfp : undefined} />
         </div>
         <p
           contentEditable
