@@ -1,4 +1,5 @@
 export default function(props: {text: string | null, limit: number, color?: string}) {
+  // "text-red-500"; This is required so tailwind includes this class.
 
   return (
     <p
