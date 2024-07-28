@@ -87,13 +87,13 @@ export default function PostModal(props: {
           })}
         >
           <div class=" flex gap-2.5 items-start">
-            <div class="mt-3 w-10 aspect-square rounded-full">
+            <div class="mt-3 w-10 aspect-square rounded-full shrink-0">
               <UserPfp pfp={user ? user()?.pfp : undefined} />
             </div>
             <p
               contentEditable
               onInput={updateInput}
-              class=" overflow-y-auto mb-4 mt-5 w-[32.375rem] text-pretty [&:empty:not(:focus)]:after:content-['Write_Something'] after:text-faint grow text-xl leading-6 min-h-14 resize-none text-foreground outline-none bg-background focus-within:placeholder-background "
+              class=" overflow-y-auto mb-4 mt-5 text-pretty [&:empty:not(:focus)]:after:content-['Write_Something'] after:text-faint grow text-xl leading-6 min-h-14 resize-none text-foreground outline-none bg-background focus-within:placeholder-background "
               id=""
             ></p>
             <textarea name="body" class="hidden">

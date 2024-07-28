@@ -3,6 +3,7 @@ import { submitComment } from "~/lib/server";
 import { createSignal, useContext } from "solid-js";
 import { UserContext } from "~/lib/UserContext";
 import UserPfp from "../user/UserPfp";
+import CharacterLimit from "../shared/CharacterLimit";
 
 const [postBody, setPostBody] = createSignal<string | null>("");
 
@@ -38,25 +39,25 @@ export default function WriteComment(props: {
           Replying to <span class=" text-accent">{`@${props.replyTo}`}</span>
         </p>
       </div>
-      <div class=" flex gap-2.5 pt-2 ">
-        <div class="mt-3 max-h-10 w-10 aspect-square rounded-full">
+      <div class=" flex gap-2.5 pt-2 items-start">
+        <div class="mt-3 max-h-10 w-10 aspect-square rounded-full shrink-0">
           <UserPfp pfp={user ? user()?.pfp : undefined} />
         </div>
         <p
           contentEditable
           onInput={updatePlaceholder}
-          class="pb-2 pt-5 overflow-hidden text-pretty [&:empty:not(:focus)]:after:content-['Write_your_reply'] after:text-faint grow text-xl leading-6 min-h-6 resize-none text-foreground outline-none bg-background focus-within:placeholder-background "
+          class="cursor-text pb-2 pt-5 whitespace-break-spaces break-words overflow-y-auto text-pretty [&:empty:not(:focus)]:after:content-['Write_your_reply'] after:text-faint grow text-xl leading-6 min-h-6 resize-none text-foreground outline-none bg-background focus-within:placeholder-background "
           id=""
         ></p>
         <textarea name="body" id="" class="hidden">
           {postBody()}
         </textarea>
       </div>
-      <div class="flex justify-between pb-5 bg-background">
-        <div></div>
+      <div class="flex gap-2 justify-end items-center pb-5 pt-2 bg-background">
+          <CharacterLimit limit={280} color="accent" text={postBody()} />
         <button
           type="submit"
-          class="px-4 py-2 cursor-pointer bg-accent transition hover:bg-accent/90 rounded-full text-white font-bold mt-2"
+          class="px-4 py-2 cursor-pointer bg-accent transition hover:bg-accent/90 rounded-full text-white font-bold"
         >
           <div class="flex items-center justify-center">
             <span class="text-md">Reply</span>
