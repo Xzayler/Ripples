@@ -16,8 +16,10 @@ export default function Navbar() {
   return (
     <header class="w-[275px] h-screen flex flex-col justify-between border-solid border-r border-ui">
       <div class="pt-6 px-2">
-        <div class="ml-3 h-8 w-8">
-          <WavesIcon />
+        <div class="p-3">
+          <div class="h-8 w-max">
+            <WavesIcon />
+          </div>
         </div>
         <nav class="pb-3 flex flex-col items-start my-1">
           <MenuItem href={"/home"} text="Home">
