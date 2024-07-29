@@ -2,6 +2,7 @@ import { createResource, Show } from 'solid-js';
 import UserPfp from './UserPfp';
 import { getUserSummary } from '~/lib/server';
 import FollowButton, { FollowButtonDisabled } from './FollowButton';
+import MultiLineText from '../shared/MultiLineText';
 
 export default function UserPopup(props: { userHandle: string }) {
   const [user] = createResource(() => {
@@ -43,7 +44,9 @@ export default function UserPopup(props: { userHandle: string }) {
           </div>
         </Show>
         <Show when={user()?.bio} fallback={null}>
-          <p>{user()!.bio}</p>
+          <p>
+            <MultiLineText text={user()!.bio} />
+          </p>
         </Show>
         <div class="flex text-sm gap-3">
           <div>
