@@ -8,6 +8,10 @@ import {
   unlikePost,
 } from "~/lib/server";
 import PostModal, { openModal } from "../shared/PostModal";
+import LikeIcon from "../shared/icons/LikeIcon";
+import CommentIcon from "../shared/icons/CommentIcon";
+import RepostIcon from "../shared/icons/RepostIcon";
+import BookmarkIcon from "../shared/icons/BookmarkIcon";
 
 const defaultPost = {
   id: "idasd",
@@ -30,13 +34,13 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
   const bookmark = useAction(action(addBookmark));
   const unBookmark = useAction(action(removeBookmark));
   const [likesCount, setLikesCount] = createSignal<number>(
-    props.post ? props.post.likes : 0
+    props.post ? props.post.likes : 0,
   );
   const [hasLiked, setHasLiked] = createSignal<boolean>(
-    props.post ? props.post.hasLiked : false
+    props.post ? props.post.hasLiked : false,
   );
   const [hasBookmarked, setHasBookmarked] = createSignal<boolean>(
-    props.post ? props.post.hasBookmarked : false
+    props.post ? props.post.hasBookmarked : false,
   );
 
   createEffect(() => {
@@ -79,7 +83,11 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
           e.stopPropagation();
         }}
       >
-        <div class="h-[18px] w-[18px] rounded-sm bg-faint"></div>
+        {/* <div class="h-[18px] w-[18px] rounded-sm bg-faint">
+        </div> */}
+        <div class="h-4 w-auto">
+          <CommentIcon />
+        </div>
         <div class="px-2">
           <span class="text-sm">{props.post ? props.post.comments : []}</span>
         </div>
@@ -93,7 +101,7 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
       <div
         class={
           "cursor-pointer flex items-center " +
-          (hasLiked() ? " text-like " : " text-faint ") +
+          (hasLiked() ? " text-like " : " text-faint fill-transparent ") +
           " hover:text-like"
         }
         onclick={(e) => {
@@ -102,13 +110,23 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
           e.stopPropagation();
         }}
       >
-        <div class="h-[18px] w-[18px] rounded-sm bg-faint "></div>
+        {/* <div class="h-[18px] w-[18px] rounded-sm bg-faint "></div> */}
+        <div class="h-4 w-auto">
+          <LikeIcon toFill={hasLiked()} />
+        </div>
         <div class="px-2">
           <span class=" text-sm">{likesCount()}</span>
         </div>
       </div>
-      <div class="cursor-pointer flex items-center text-faint hover:text-repost">
-        <div class="h-[18px] w-[18px] rounded-sm bg-faint"></div>
+      <div
+        class={
+          "cursor-pointer flex items-center hover:text-repost " + "text-faint"
+          // + (hasReposted() ? " text-repost" : "text-faint") For future implementation
+        }
+      >
+        <div class="h-4 w-auto">
+          <RepostIcon />
+        </div>
         <div class="px-2">
           <span class="text-sm">{props.post ? props.post.reposts : 0}</span>
         </div>
@@ -122,13 +140,12 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
               e.stopPropagation();
             }}
             class={
-              "h-[18px] w-[18px] rounded-sm " +
-              (hasBookmarked() ? "bg-comment" : "bg-faint")
+              "h-6 w-auto hover:text-comment " +
+              (hasBookmarked() ? "text-comment" : "text-faint")
             }
-          ></div>
-        </div>
-        <div class="flex items-center">
-          <div class="h-[18px] w-[18px] rounded-sm bg-faint"></div>
+          >
+            <BookmarkIcon toFill={hasBookmarked()} />
+          </div>
         </div>
       </div>
     </div>

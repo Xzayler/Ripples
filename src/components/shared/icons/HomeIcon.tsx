@@ -1,19 +1,17 @@
-type Props = {
-  stroke?: string;
-  fill?: string;
-};
-
-export default function HomeIcon({ stroke, fill }: Props) {
+export default function HomeIcon(props: { toFill: boolean }) {
   return (
     <svg
+      stroke="currentColor"
+      fill="currentColor"
+      stroke-width="100"
+      fill-opacity={props.toFill ? "1" : "0"}
       xmlns="http://www.w3.org/2000/svg"
-      width={32}
-      height={32}
-      viewBox="100 -860 760 760"
+      viewBox="0 0 1024 1024"
+      style="overflow: visible; color: currentcolor;"
+      height="100%"
+      width="100%"
     >
-      <g class="fill-foreground">
-        <path d="M240-200h133.847v-237.692h212.306V-200H720v-360L480-740.769 240-560v360Zm-59.999 59.999v-449.998L480-815.767l299.999 225.768v449.998H526.154v-237.693h-92.308v237.693H180.001ZM480-470.385Z" />
-      </g>
+      <path d="M946.5 505 534.6 93.4a31.93 31.93 0 0 0-45.2 0L77.5 505c-12 12-18.8 28.3-18.8 45.3 0 35.3 28.7 64 64 64h43.4V908c0 17.7 14.3 32 32 32H404V716h242v224h188.9c17.7 0 32-14.3 32-32V614.3h43.4c17 0 33.3-6.7 45.3-18.8 24.9-25 24.9-65.5-.1-90.5z"></path>
     </svg>
   );
 }

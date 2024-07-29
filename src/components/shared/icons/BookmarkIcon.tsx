@@ -1,22 +1,17 @@
-type Props = {
-  stroke?: string;
-  fill?: string;
-};
-
-export default function BookmarkIcon({ stroke, fill }: Props) {
+export default function BookmarkIcon(props: { toFill: boolean }) {
   return (
     <svg
-      width="32"
-      height="32"
-      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="80"
+      fill="currentColor"
+      fill-opacity={props.toFill ? "1" : "0"}
       xmlns="http://www.w3.org/2000/svg"
+      viewBox="-100 -100 584 662"
+      style="overflow: visible; color: currentcolor;"
+      height="100%"
+      width="100%"
     >
-      <path
-        d="M12.197 17.5404L12 17.456L11.803 17.5404L7.60443 19.3398C7.60423 19.3399 7.60404 19.34 7.60384 19.3401C7.08882 19.5588 6.6317 19.518 6.17331 19.2188C5.71477 18.9195 5.5 18.5228 5.5 17.975V5C5.5 4.58366 5.64241 4.2397 5.94105 3.94105C6.2397 3.64241 6.58366 3.5 7 3.5H17C17.4163 3.5 17.7603 3.64241 18.0589 3.94105C18.3576 4.2397 18.5 4.58366 18.5 5V17.975C18.5 18.5228 18.2852 18.9195 17.8267 19.2188C17.3683 19.518 16.9112 19.5588 16.3962 19.3401C16.396 19.34 16.3958 19.3399 16.3956 19.3398L12.197 17.5404Z"
-        stroke={stroke}
-        fill={fill}
-        stroke-width={2}
-      />
+      <path d="M0 48v439.7C0 501.1 10.9 512 24.3 512c5 0 9.9-1.5 14-4.4L192 400l153.7 107.6c4.1 2.9 9 4.4 14 4.4 13.4 0 24.3-10.9 24.3-24.3V48c0-26.5-21.5-48-48-48H48C21.5 0 0 21.5 0 48z"></path>
     </svg>
   );
 }
