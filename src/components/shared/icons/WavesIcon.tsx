@@ -1,5 +1,5 @@
 export default function WavesIcon() {
-  const fill = "rgb(var(--color-accent))";
+  const fill = 'rgb(var(--color-accent))';
   return (
     <svg
       width="100%"

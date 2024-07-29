@@ -1,13 +1,13 @@
-import { createMiddleware } from "@solidjs/start/middleware";
-import { getCookie, setCookie, getHeader } from "vinxi/http";
-import { Session, User, verifyRequestOrigin } from "lucia";
-import { lucia } from "./lib/auth";
+import { createMiddleware } from '@solidjs/start/middleware';
+import { getCookie, setCookie, getHeader } from 'vinxi/http';
+import { Session, User, verifyRequestOrigin } from 'lucia';
+import { lucia } from './lib/auth';
 
 export default createMiddleware({
   onRequest: async (event) => {
-    if (event.request.method !== "GET") {
-      const originHeader = getHeader(event.nativeEvent, "Origin") ?? null;
-      const hostHeader = getHeader(event.nativeEvent, "Host") ?? null;
+    if (event.request.method !== 'GET') {
+      const originHeader = getHeader(event.nativeEvent, 'Origin') ?? null;
+      const hostHeader = getHeader(event.nativeEvent, 'Host') ?? null;
       if (
         !originHeader ||
         !hostHeader ||
@@ -30,13 +30,13 @@ export default createMiddleware({
     if (session && session.fresh) {
       event.response.headers.set(
         lucia.sessionCookieName,
-        lucia.createSessionCookie(session.id).serialize()
+        lucia.createSessionCookie(session.id).serialize(),
       );
     }
     if (!session) {
       event.response.headers.set(
         lucia.sessionCookieName,
-        lucia.createBlankSessionCookie().serialize()
+        lucia.createBlankSessionCookie().serialize(),
       );
     }
 

@@ -1,12 +1,12 @@
-import { action, useNavigate, A } from "@solidjs/router";
-import { createSignal, Show, useContext } from "solid-js";
-import { submitPost, submitComment } from "~/lib/server";
-import { Ripple } from "~/types";
-import Modal, { openModal as om, ModalFoot, ModalHeadClose } from "./Modal";
-import PostContent from "../feed/PostContent";
-import CharacterLimit from "./CharacterLimit";
-import UserPfp from "../user/UserPfp";
-import { UserContext } from "~/lib/UserContext";
+import { action, useNavigate, A } from '@solidjs/router';
+import { createSignal, Show, useContext } from 'solid-js';
+import { submitPost, submitComment } from '~/lib/server';
+import { Ripple } from '~/types';
+import Modal, { openModal as om, ModalFoot, ModalHeadClose } from './Modal';
+import PostContent from '../feed/PostContent';
+import CharacterLimit from './CharacterLimit';
+import UserPfp from '../user/UserPfp';
+import { UserContext } from '~/lib/UserContext';
 
 export const openModal = om;
 
@@ -15,12 +15,12 @@ export default function PostModal(props: {
   closeFn: () => void;
 }) {
   const navigate = useNavigate();
-  const [postBody, setPostBody] = createSignal<string | null>("");
+  const [postBody, setPostBody] = createSignal<string | null>('');
 
   const updateInput = (e: Event) => {
     const el: HTMLElement = e.target as HTMLElement;
     setPostBody(el.textContent);
-    if (el.textContent == "" && el.firstChild) {
+    if (el.textContent == '' && el.firstChild) {
       el.removeChild(el.firstChild);
     }
   };
@@ -64,7 +64,7 @@ export default function PostModal(props: {
                 <PostContent content={props.parent!.content} />
               </div>
               <div class="py-4 text-md text-faint">
-                Replying to{" "}
+                Replying to{' '}
                 <A class="text-accent" href={`/${props.parent!.authorHandle}`}>
                   {`@${props.parent!.authorHandle}`}
                 </A>
@@ -78,7 +78,7 @@ export default function PostModal(props: {
           action={action(async (formData: FormData) => {
             if (props.parent) {
               navigate(
-                `/post/${(await submitComment(formData, props.parent.id)).id}`
+                `/post/${(await submitComment(formData, props.parent.id)).id}`,
               );
             } else {
               navigate(`/post/${await submitPost(formData)}`);
@@ -104,8 +104,8 @@ export default function PostModal(props: {
       </div>
       <ModalFoot>
         <div class="flex justify-between items-center py-2 bg-background px-4 w-full gap-2 ">
-          <div class=" ml-auto text-accent " >
-            <CharacterLimit text={postBody()} limit={280} color="accent"/>
+          <div class=" ml-auto text-accent ">
+            <CharacterLimit text={postBody()} limit={280} color="accent" />
           </div>
           <button
             form="postform"

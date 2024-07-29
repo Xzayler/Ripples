@@ -1,5 +1,5 @@
-import { createHandler, StartServer } from "@solidjs/start/server";
-import { initDb } from "./lib/database";
+import { createHandler, StartServer } from '@solidjs/start/server';
+import { initDb } from './lib/database';
 initDb();
 
 export default createHandler(() => (

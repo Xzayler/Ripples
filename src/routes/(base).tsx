@@ -1,10 +1,10 @@
-import Navbar from "~/components/navbar/Navbar";
-import MessageBox from "~/components/chat/MessageBox";
-import { JSX, Show, createResource } from "solid-js";
-import { UserContext } from "~/lib/UserContext";
-import { Suspense } from "solid-js";
-import { getCurrentUser } from "~/lib/gcu";
-import WavesIcon from "~/components/shared/icons/WavesIcon";
+import Navbar from '~/components/navbar/Navbar';
+// import MessageBox from '~/components/chat/MessageBox';
+import { JSX, Show, createResource } from 'solid-js';
+import { UserContext } from '~/lib/UserContext';
+import { Suspense } from 'solid-js';
+import { getCurrentUser } from '~/lib/gcu';
+import WavesIcon from '~/components/shared/icons/WavesIcon';
 
 export default function BaseLayout(props: { children: JSX.Element }) {
   const [user] = createResource(async () => {

@@ -1,8 +1,8 @@
-import { A } from "@solidjs/router";
-import QuickPost from "~/components/feed/QuickPost";
-import Sidebar from "~/components/sidebar/Sidebar";
-import { Suspense } from "solid-js";
-import type { JSX } from "solid-js";
+import { A } from '@solidjs/router';
+import QuickPost from '~/components/feed/QuickPost';
+import Sidebar from '~/components/sidebar/Sidebar';
+import { Suspense } from 'solid-js';
+import type { JSX } from 'solid-js';
 
 export default function FeedPage(props: { children: JSX.Element }) {
   return (

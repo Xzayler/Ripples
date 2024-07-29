@@ -1,10 +1,9 @@
-import { Suspense } from "solid-js";
-import Trending, { TrendingSkeleton } from "./Trending";
+import { Suspense } from 'solid-js';
+import Trending, { TrendingSkeleton } from './Trending';
 import FollowSuggestions, {
   FollowSuggestionsSkeleton,
-} from "./FollowSuggestions";
-import SearchBar from "./SearchBar";
-import type { User } from "~/types";
+} from './FollowSuggestions';
+import SearchBar from './SearchBar';
 
 export default function Sidebar() {
   return (

@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import { Schema, InferSchemaType } from "mongoose";
+import mongoose from 'mongoose';
+import { Schema, InferSchemaType } from 'mongoose';
 
 const postSchema = new Schema(
   {
@@ -9,17 +9,17 @@ const postSchema = new Schema(
       // type: mongoose.Schema.Types.ObjectId,
       type: String,
       required: true,
-      ref: "users",
+      ref: 'users',
     },
     content: { type: String, required: true },
     likes: { type: Number },
     comments: { type: Number },
     reposts: { type: Number },
-    parent: { type: mongoose.Schema.ObjectId, ref: "posts" },
+    parent: { type: mongoose.Schema.ObjectId, ref: 'posts' },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export type InferredPost = InferSchemaType<typeof postSchema>;
 export default mongoose.models?.PostModel ||
-  mongoose.model<InferredPost>("PostModel", postSchema, "posts");
+  mongoose.model<InferredPost>('PostModel', postSchema, 'posts');

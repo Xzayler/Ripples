@@ -1,7 +1,7 @@
-import { For } from "solid-js";
-import { createResource } from "solid-js";
-import { getTrending } from "~/lib/server";
-import { A } from "@solidjs/router";
+import { For } from 'solid-js';
+import { createResource } from 'solid-js';
+import { getTrending } from '~/lib/server';
+import { A } from '@solidjs/router';
 
 type Tag = {
   name: string;

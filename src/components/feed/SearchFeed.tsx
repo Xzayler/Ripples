@@ -1,10 +1,10 @@
-import Ripple from "./Ripple";
-import { type Ripple as RippleType } from "~/types";
-import { createResource, For } from "solid-js";
-import { useSearchParams } from "@solidjs/router";
+import Ripple from './Ripple';
+import { type Ripple as RippleType } from '~/types';
+import { createResource, For } from 'solid-js';
+import { useSearchParams } from '@solidjs/router';
 
 type SearchParams = {
-  searchType: "general" | "hashtag" | "user";
+  searchType: 'general' | 'hashtag' | 'user';
   q: string;
 };
 
@@ -14,8 +14,8 @@ export default function SearchFeed(props: {
   const [posts] = createResource(
     useSearchParams<SearchParams>,
     async (params) => {
-      return (await props.fetcher(params[0].q ?? "")) as RippleType[];
-    }
+      return (await props.fetcher(params[0].q ?? '')) as RippleType[];
+    },
   );
 
   return (

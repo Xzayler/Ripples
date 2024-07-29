@@ -1,8 +1,8 @@
-import { action, redirect } from "@solidjs/router";
-import { RouterResponseInit } from "@solidjs/router/dist/data/response";
+import { action, redirect } from '@solidjs/router';
+import { RouterResponseInit } from '@solidjs/router/dist/data/response';
 
 export default function SearchBar() {
-  const resp: RouterResponseInit = { revalidate: "true" };
+  const resp: RouterResponseInit = { revalidate: 'true' };
 
   // const [searchType, setSearchType]
 
@@ -10,13 +10,13 @@ export default function SearchBar() {
     <form
       method="post"
       action={action(async (formData: FormData) => {
-        "use server";
+        'use server';
         return redirect(
-          `/search?searchType=${formData.get("searchType")}&q=${formData.get(
-            "searchQuery"
-          )}`
+          `/search?searchType=${formData.get('searchType')}&q=${formData.get(
+            'searchQuery',
+          )}`,
         );
-      }, "search")}
+      }, 'search')}
       class="flex bg-background mb-3 w-full sticky top-0 h-[53px] items-center "
     >
       <div class="flex h-11 w-full bg-highlight rounded-full outline-[3px] outline-accent/60 focus-within:outline ">

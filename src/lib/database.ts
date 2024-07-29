@@ -1,17 +1,17 @@
-import mongoose from "mongoose";
-import { MongodbAdapter } from "@lucia-auth/adapter-mongodb";
-import UserModel, { InferredUser } from "~/models/UserModel";
-import PostModel, { type InferredPost } from "~/models/PostModel";
-import LikeModel, { type InferredLike } from "~/models/LikeModel";
-import LikerModel, { type InferredLiker } from "~/models/LikerModel";
-import BookmarksModel, { type InferredBookmark } from "~/models/BookmarksModel";
-import { isServer } from "solid-js/web";
-import FollowerModel, { InferredFollower } from "~/models/FollowerModel";
-import FollowingModel, { InferredFollowing } from "~/models/FollowingModel";
-import HashtagsModel, { InferredHashtag } from "~/models/HashtagsModel";
-import type { User, Ripple } from "~/types";
-import { uploadPfp } from "./cloudinary";
-import { processPost } from "./postParsing";
+import mongoose from 'mongoose';
+import { MongodbAdapter } from '@lucia-auth/adapter-mongodb';
+import UserModel, { InferredUser } from '~/models/UserModel';
+import PostModel from '~/models/PostModel';
+import LikeModel, { type InferredLike } from '~/models/LikeModel';
+import LikerModel from '~/models/LikerModel';
+import BookmarksModel, { type InferredBookmark } from '~/models/BookmarksModel';
+import { isServer } from 'solid-js/web';
+import FollowerModel, { InferredFollower } from '~/models/FollowerModel';
+import FollowingModel, { InferredFollowing } from '~/models/FollowingModel';
+import HashtagsModel, { InferredHashtag } from '~/models/HashtagsModel';
+import type { User, Ripple } from '~/types';
+import { uploadPfp } from './cloudinary';
+import { processPost } from './postParsing';
 
 export async function initDb() {
   if (
@@ -49,10 +49,13 @@ export async function getCurrentUser(id: string) {
     handle: currU.handle,
     name: currU.name,
     pfp: currU.pfp,
-  } as Omit<User, "isFollowed" | "followers" | "following" | "bio">;
+  } as Omit<User, 'isFollowed' | 'followers' | 'following' | 'bio'>;
 }
 
-export async function addPost(id: mongoose.Types.ObjectId, postData: { content: string; author: string }) {
+export async function addPost(
+  id: mongoose.Types.ObjectId,
+  postData: { content: string; author: string },
+) {
   const { hashtags } = processPost(postData.content);
   try {
     await Promise.all([
@@ -71,11 +74,14 @@ export async function addPost(id: mongoose.Types.ObjectId, postData: { content: 
   }
 }
 
-export async function addComment(id: mongoose.Types.ObjectId, postData: {
-  content: string;
-  author: string;
-  parent: mongoose.Types.ObjectId;
-}) {
+export async function addComment(
+  id: mongoose.Types.ObjectId,
+  postData: {
+    content: string;
+    author: string;
+    parent: mongoose.Types.ObjectId;
+  },
+) {
   const { hashtags } = processPost(postData.content);
   try {
     await PostModel.create({
@@ -87,7 +93,7 @@ export async function addComment(id: mongoose.Types.ObjectId, postData: {
     });
     await PostModel.updateOne(
       { _id: postData.parent },
-      { $inc: { comments: 1 } }
+      { $inc: { comments: 1 } },
     );
     await addHashtags(id, hashtags);
   } catch (error) {
@@ -116,7 +122,7 @@ export async function getUserByUsername(un: string) {
 export async function createUser(
   name: string,
   handle: string,
-  password: string
+  password: string,
 ) {
   const id = new mongoose.Types.ObjectId();
   const newUser: InferredUser = {
@@ -148,23 +154,23 @@ export async function createUser(
   try {
     await Promise.allSettled([
       UserModel.create(newUser).catch((err) => {
-        console.log("Creating User failed");
+        console.log('Creating User failed');
         console.log(err);
       }),
       BookmarksModel.create(newBookmarks).catch((err) => {
-        console.log("Creating Bookmarks failed");
+        console.log('Creating Bookmarks failed');
         console.log(err);
       }),
       FollowerModel.create(newFollowers).catch((err) => {
-        console.log("Creating Follower failed");
+        console.log('Creating Follower failed');
         console.log(err);
       }),
       FollowingModel.create(newFollowings).catch((err) => {
-        console.log("Creating Following failed");
+        console.log('Creating Following failed');
         console.log(err);
       }),
       LikeModel.create(newLikes).catch((err) => {
-        console.log("Creating Likes failed");
+        console.log('Creating Likes failed');
         console.log(err);
       }),
     ]);
@@ -185,7 +191,7 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
         },
         {
           $lookup: {
-            from: "likes",
+            from: 'likes',
             pipeline: [
               {
                 $match: {
@@ -193,26 +199,26 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
                 },
               },
             ],
-            as: "likedPosts",
+            as: 'likedPosts',
           },
         },
         {
           $unwind: {
-            path: "$likedPosts",
+            path: '$likedPosts',
             preserveNullAndEmptyArrays: true,
           },
         },
         {
           $addFields: {
-            likedPosts: "$likedPosts.posts",
+            likedPosts: '$likedPosts.posts',
           },
         },
         // Check if the post is bookmarked by the User
         {
           $lookup: {
-            from: "bookmarks",
+            from: 'bookmarks',
             let: {
-              postId: "$_id",
+              postId: '$_id',
             },
             pipeline: [
               {
@@ -221,62 +227,62 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
                 },
               },
             ],
-            as: "bookmarkedPosts",
+            as: 'bookmarkedPosts',
           },
         },
         {
           $unwind: {
-            path: "$bookmarkedPosts",
+            path: '$bookmarkedPosts',
             preserveNullAndEmptyArrays: true,
           },
         },
         {
           $addFields: {
-            bookmarkedPosts: "$bookmarkedPosts.posts",
+            bookmarkedPosts: '$bookmarkedPosts.posts',
           },
         },
         // Get all comments whose parent is the post
         {
           $lookup: {
-            from: "posts",
-            localField: "_id",
-            foreignField: "parent",
+            from: 'posts',
+            localField: '_id',
+            foreignField: 'parent',
             let: {
-              bookmarkedPosts: "$bookmarkedPosts",
-              likedPosts: "$likedPosts",
+              bookmarkedPosts: '$bookmarkedPosts',
+              likedPosts: '$likedPosts',
             },
             pipeline: [
               {
                 // Get child author
                 $lookup: {
-                  from: "users",
-                  localField: "author",
-                  foreignField: "_id",
-                  as: "childauthor",
+                  from: 'users',
+                  localField: 'author',
+                  foreignField: '_id',
+                  as: 'childauthor',
                 },
               },
               {
-                $unwind: "$childauthor",
+                $unwind: '$childauthor',
               },
               {
                 $project: {
                   _id: true,
                   content: true,
-                  authorName: "$childauthor.name",
-                  authorHandle: "$childauthor.handle",
-                  authorPfp: "$childauthor.pfp",
+                  authorName: '$childauthor.name',
+                  authorHandle: '$childauthor.handle',
+                  authorPfp: '$childauthor.pfp',
                   createdAt: true,
                   updatedAt: true,
                   hasLiked: {
                     $cond: {
-                      if: { $in: ["$_id", "$$likedPosts"] },
+                      if: { $in: ['$_id', '$$likedPosts'] },
                       then: true,
                       else: false,
                     },
                   },
                   hasBookmarked: {
                     $cond: {
-                      if: { $in: ["$_id", "$$bookmarkedPosts"] },
+                      if: { $in: ['$_id', '$$bookmarkedPosts'] },
                       then: true,
                       else: false,
                     },
@@ -287,75 +293,75 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
                 },
               },
             ],
-            as: "children",
+            as: 'children',
           },
         },
         // Get the post author's data
         {
           $lookup: {
-            from: "users",
-            localField: "author",
-            foreignField: "_id",
-            as: "author",
+            from: 'users',
+            localField: 'author',
+            foreignField: '_id',
+            as: 'author',
           },
         },
         // Post author single element array unwinding
         {
-          $unwind: "$author",
+          $unwind: '$author',
         },
         // Get the post's parent
         {
           $graphLookup: {
-            from: "posts",
-            startWith: "$parent",
-            connectFromField: "parent",
-            connectToField: "_id",
-            as: "ancestors",
-            depthField: "depth",
+            from: 'posts',
+            startWith: '$parent',
+            connectFromField: 'parent',
+            connectToField: '_id',
+            as: 'ancestors',
+            depthField: 'depth',
           },
         },
         // Process each parent.
         {
           $unwind: {
-            path: "$ancestors",
+            path: '$ancestors',
             preserveNullAndEmptyArrays: true,
           },
         },
         // Get parent author
         {
           $lookup: {
-            from: "users",
-            localField: "ancestors.author",
-            foreignField: "_id",
-            as: "ancestorauthor",
+            from: 'users',
+            localField: 'ancestors.author',
+            foreignField: '_id',
+            as: 'ancestorauthor',
           },
         },
         // Build the output document
         {
           $group: {
-            _id: "$_id",
+            _id: '$_id',
             content: {
-              $first: "$content",
+              $first: '$content',
             },
             authorName: {
-              $first: "$author.name",
+              $first: '$author.name',
             },
             authorHandle: {
-              $first: "$author.handle",
+              $first: '$author.handle',
             },
             authorPfp: {
-              $first: "$author.pfp",
+              $first: '$author.pfp',
             },
             createdAt: {
-              $first: "$createdAt",
+              $first: '$createdAt',
             },
             updatedAt: {
-              $first: "$updatedAt",
+              $first: '$updatedAt',
             },
             hasLiked: {
               $first: {
                 $cond: {
-                  if: { $in: ["$_id", "$likedPosts"] },
+                  if: { $in: ['$_id', '$likedPosts'] },
                   then: true,
                   else: false,
                 },
@@ -364,41 +370,41 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
             hasBookmarked: {
               $first: {
                 $cond: {
-                  if: { $in: ["$_id", "$bookmarkedPosts"] },
+                  if: { $in: ['$_id', '$bookmarkedPosts'] },
                   then: true,
                   else: false,
                 },
               },
             },
             likes: {
-              $first: "$likes",
+              $first: '$likes',
             },
             comments: {
-              $first: "$comments",
+              $first: '$comments',
             },
             reposts: {
-              $first: "$reposts",
+              $first: '$reposts',
             },
             children: {
-              $first: "$children",
+              $first: '$children',
             },
             ancestors: {
               $push: {
                 $mergeObjects: [
-                  "$ancestors",
+                  '$ancestors',
                   {
                     authorName: {
-                      $first: "$ancestorauthor.name",
+                      $first: '$ancestorauthor.name',
                     },
                   },
                   {
                     authorHandle: {
-                      $first: "$ancestorauthor.handle",
+                      $first: '$ancestorauthor.handle',
                     },
                   },
                   {
                     authorPfp: {
-                      $first: "$ancestorauthor.pfp",
+                      $first: '$ancestorauthor.pfp',
                     },
                   },
                   {
@@ -407,7 +413,7 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
                   {
                     hasLiked: {
                       $cond: {
-                        if: { $in: ["$ancestors._id", "$likedPosts"] },
+                        if: { $in: ['$ancestors._id', '$likedPosts'] },
                         then: true,
                         else: false,
                       },
@@ -416,7 +422,7 @@ export async function getPost(userId: string, postId: mongoose.Types.ObjectId) {
                   {
                     hasBookmarked: {
                       $cond: {
-                        if: { $in: ["$ancestors._id", "$bookmarkedPosts"] },
+                        if: { $in: ['$ancestors._id', '$bookmarkedPosts'] },
                         then: true,
                         else: false,
                       },
@@ -501,7 +507,7 @@ export async function getFeed(userId: string) {
       },
       {
         $lookup: {
-          from: "likes",
+          from: 'likes',
           pipeline: [
             {
               $match: {
@@ -509,26 +515,26 @@ export async function getFeed(userId: string) {
               },
             },
           ],
-          as: "likedPosts",
+          as: 'likedPosts',
         },
       },
       {
         $unwind: {
-          path: "$likedPosts",
+          path: '$likedPosts',
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $addFields: {
-          likedPosts: "$likedPosts.posts",
+          likedPosts: '$likedPosts.posts',
         },
       },
       // Check if the post is bookmarked by the User
       {
         $lookup: {
-          from: "bookmarks",
+          from: 'bookmarks',
           let: {
-            postId: "$_id",
+            postId: '$_id',
           },
           pipeline: [
             {
@@ -537,42 +543,42 @@ export async function getFeed(userId: string) {
               },
             },
           ],
-          as: "bookmarkedPosts",
+          as: 'bookmarkedPosts',
         },
       },
       {
         $unwind: {
-          path: "$bookmarkedPosts",
+          path: '$bookmarkedPosts',
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $addFields: {
-          bookmarkedPosts: "$bookmarkedPosts.posts",
+          bookmarkedPosts: '$bookmarkedPosts.posts',
         },
       },
       {
         $lookup: {
-          from: "users",
-          localField: "author",
-          foreignField: "_id",
-          as: "author",
+          from: 'users',
+          localField: 'author',
+          foreignField: '_id',
+          as: 'author',
         },
       },
       {
-        $unwind: "$author",
+        $unwind: '$author',
       },
       {
         $project: {
           _id: true,
           content: true,
-          author: "$author",
+          author: '$author',
           createdAt: true,
           updatedAt: true,
           hasLiked: {
             $cond: {
               if: {
-                $in: ["$_id", "$likedPosts"],
+                $in: ['$_id', '$likedPosts'],
               },
               then: true,
               else: false,
@@ -581,7 +587,7 @@ export async function getFeed(userId: string) {
           hasBookmarked: {
             $cond: {
               if: {
-                $in: ["$_id", "$bookmarkedPosts"],
+                $in: ['$_id', '$bookmarkedPosts'],
               },
               then: true,
               else: false,
@@ -617,7 +623,7 @@ export async function getFeed(userId: string) {
 
 export async function getUserPosts(
   userId: string,
-  uObjId: mongoose.Types.ObjectId
+  uObjId: mongoose.Types.ObjectId,
 ) {
   const currUserIdString = uObjId.toString();
   try {
@@ -625,7 +631,7 @@ export async function getUserPosts(
       { $match: { $and: [{ author: userId }, { parent: null }] } },
       {
         $lookup: {
-          from: "likes",
+          from: 'likes',
           pipeline: [
             {
               $match: {
@@ -633,73 +639,73 @@ export async function getUserPosts(
               },
             },
           ],
-          as: "likedPosts",
+          as: 'likedPosts',
         },
       },
       {
         $unwind: {
-          path: "$likedPosts",
+          path: '$likedPosts',
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $addFields: {
-          likedPosts: "$likedPosts.posts",
+          likedPosts: '$likedPosts.posts',
         },
       },
       // Check if the post is bookmarked by the User
       {
         $lookup: {
-          from: "bookmarks",
-          let: { postId: "$_id" },
+          from: 'bookmarks',
+          let: { postId: '$_id' },
           pipeline: [
             {
               $match: { _id: uObjId },
             },
           ],
-          as: "bookmarkedPosts",
+          as: 'bookmarkedPosts',
         },
       },
       {
         $unwind: {
-          path: "$bookmarkedPosts",
+          path: '$bookmarkedPosts',
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $addFields: {
-          bookmarkedPosts: "$bookmarkedPosts.posts",
+          bookmarkedPosts: '$bookmarkedPosts.posts',
         },
       },
       // User is looked up every time even though we know the author is always the same.
       {
         $lookup: {
-          from: "users",
-          localField: "author",
-          foreignField: "_id",
-          as: "author",
+          from: 'users',
+          localField: 'author',
+          foreignField: '_id',
+          as: 'author',
         },
       },
       {
-        $unwind: "$author",
+        $unwind: '$author',
       },
       {
         $project: {
           _id: true,
           content: true,
-          author: "$author",
+          author: '$author',
           createdAt: true,
           updatedAt: true,
           hasLiked: {
             $cond: {
-              if: { $in: ["$_id", "$likedPosts"] },
+              if: { $in: ['$_id', '$likedPosts'] },
               then: true,
               else: false,
             },
           },
           hasBookmarked: {
             $cond: {
-              if: { $in: ["$_id", "$bookmarkedPosts"] },
+              if: { $in: ['$_id', '$bookmarkedPosts'] },
               then: true,
               else: false,
             },
@@ -734,7 +740,7 @@ export async function getUserPosts(
 
 export async function getUserLikedPosts(
   userId: string,
-  currUObjId: mongoose.Types.ObjectId
+  currUObjId: mongoose.Types.ObjectId,
 ) {
   const uObjId = new mongoose.Types.ObjectId(userId);
   try {
@@ -746,7 +752,7 @@ export async function getUserLikedPosts(
       },
       {
         $lookup: {
-          from: "likes",
+          from: 'likes',
           pipeline: [
             {
               $match: {
@@ -754,33 +760,33 @@ export async function getUserLikedPosts(
               },
             },
           ],
-          as: "likedPosts",
+          as: 'likedPosts',
         },
       },
       {
         $unwind: {
-          path: "$likedPosts",
+          path: '$likedPosts',
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $addFields: {
-          likedPosts: "$likedPosts.posts",
+          likedPosts: '$likedPosts.posts',
         },
       },
       {
         $lookup: {
-          from: "posts",
-          localField: "posts",
-          foreignField: "_id",
-          as: "post",
+          from: 'posts',
+          localField: 'posts',
+          foreignField: '_id',
+          as: 'post',
         },
       },
       {
         $lookup: {
-          from: "bookmarks",
+          from: 'bookmarks',
           let: {
-            postId: "$_id",
+            postId: '$_id',
           },
           pipeline: [
             {
@@ -789,18 +795,18 @@ export async function getUserLikedPosts(
               },
             },
           ],
-          as: "bookmarkedPosts",
+          as: 'bookmarkedPosts',
         },
       },
       {
         $unwind: {
-          path: "$bookmarkedPosts",
+          path: '$bookmarkedPosts',
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $addFields: {
-          bookmarkedPosts: "$bookmarkedPosts.posts",
+          bookmarkedPosts: '$bookmarkedPosts.posts',
         },
       },
       {
@@ -811,23 +817,23 @@ export async function getUserLikedPosts(
       },
       {
         $unwind: {
-          path: "$post",
+          path: '$post',
         },
       },
       {
         $project: {
-          _id: "$post._id",
-          author: "$post.author",
-          content: "$post.content",
-          reposts: "$post.reposts",
-          updataedAt: "$post.updatedAt",
-          createdAt: "$post.createdAt",
-          likes: "$post.likes",
-          comments: "$post.comments",
+          _id: '$post._id',
+          author: '$post.author',
+          content: '$post.content',
+          reposts: '$post.reposts',
+          updataedAt: '$post.updatedAt',
+          createdAt: '$post.createdAt',
+          likes: '$post.likes',
+          comments: '$post.comments',
           hasLiked: {
             $cond: {
               if: {
-                $in: ["$post._id", "$likedPosts"],
+                $in: ['$post._id', '$likedPosts'],
               },
               then: true,
               else: false,
@@ -836,7 +842,7 @@ export async function getUserLikedPosts(
           hasBookmarked: {
             $cond: {
               if: {
-                $in: ["$post._id", "$bookmarkedPosts"],
+                $in: ['$post._id', '$bookmarkedPosts'],
               },
               then: true,
               else: false,
@@ -846,22 +852,22 @@ export async function getUserLikedPosts(
       },
       {
         $lookup: {
-          from: "users",
-          localField: "author",
-          foreignField: "_id",
-          as: "author",
+          from: 'users',
+          localField: 'author',
+          foreignField: '_id',
+          as: 'author',
         },
       },
       {
         $unwind: {
-          path: "$author",
+          path: '$author',
         },
       },
       {
         $project: {
           _id: true,
           content: true,
-          author: "$author",
+          author: '$author',
           createdAt: true,
           updatedAt: true,
           likes: true,
@@ -903,7 +909,7 @@ export async function getSubFeed(userId: string) {
       },
       {
         $lookup: {
-          from: "likes",
+          from: 'likes',
           pipeline: [
             {
               $match: {
@@ -911,47 +917,47 @@ export async function getSubFeed(userId: string) {
               },
             },
           ],
-          as: "likedPosts",
+          as: 'likedPosts',
         },
       },
       {
         $unwind: {
-          path: "$likedPosts",
+          path: '$likedPosts',
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $addFields: {
-          likedPosts: "$likedPosts.posts",
+          likedPosts: '$likedPosts.posts',
         },
       },
       // Check if the post is bookmarked by the User
       {
         $lookup: {
-          from: "bookmarks",
+          from: 'bookmarks',
           pipeline: [
             {
               $match: { _id: uObjId },
             },
           ],
-          as: "bookmarkedPosts",
+          as: 'bookmarkedPosts',
         },
       },
       {
-        $unwind: { path: "$bookmarkedPosts", preserveNullAndEmptyArrays: true },
+        $unwind: { path: '$bookmarkedPosts', preserveNullAndEmptyArrays: true },
       },
       {
         $addFields: {
-          bookmarkedPosts: "$bookmarkedPosts.posts",
+          bookmarkedPosts: '$bookmarkedPosts.posts',
         },
       },
       {
         $lookup: {
-          from: "posts",
+          from: 'posts',
           let: {
-            users: "$users",
-            likedPosts: "$likedPosts",
-            bookmarkedPosts: "$bookmarkedPosts",
+            users: '$users',
+            likedPosts: '$likedPosts',
+            bookmarkedPosts: '$bookmarkedPosts',
           },
           pipeline: [
             {
@@ -964,7 +970,7 @@ export async function getSubFeed(userId: string) {
                     $expr: {
                       $cond: {
                         if: {
-                          $in: [{ $toObjectId: "$author" }, "$$users"],
+                          $in: [{ $toObjectId: '$author' }, '$$users'],
                         },
                         then: true,
                         else: false,
@@ -976,32 +982,32 @@ export async function getSubFeed(userId: string) {
             },
             {
               $lookup: {
-                from: "users",
-                localField: "author",
-                foreignField: "_id",
-                as: "author",
+                from: 'users',
+                localField: 'author',
+                foreignField: '_id',
+                as: 'author',
               },
             },
             {
-              $unwind: "$author",
+              $unwind: '$author',
             },
             {
               $project: {
                 _id: true,
                 content: true,
-                author: "$author",
+                author: '$author',
                 createdAt: true,
                 updatedAt: true,
                 hasLiked: {
                   $cond: {
-                    if: { $in: ["$_id", "$$likedPosts"] },
+                    if: { $in: ['$_id', '$$likedPosts'] },
                     then: true,
                     else: false,
                   },
                 },
                 hasBookmarked: {
                   $cond: {
-                    if: { $in: ["$_id", "$$bookmarkedPosts"] },
+                    if: { $in: ['$_id', '$$bookmarkedPosts'] },
                     then: true,
                     else: false,
                   },
@@ -1012,7 +1018,7 @@ export async function getSubFeed(userId: string) {
               },
             },
           ],
-          as: "followedPosts",
+          as: 'followedPosts',
         },
       },
       {
@@ -1021,19 +1027,19 @@ export async function getSubFeed(userId: string) {
           users: false,
         },
       },
-      { $unwind: "$followedPosts" },
+      { $unwind: '$followedPosts' },
       {
         $project: {
-          _id: "$followedPosts._id",
-          author: "$followedPosts.author",
-          createdAt: "$followedPosts.createdAt",
-          updatedAt: "$followedPosts.updatedAt",
-          content: "$followedPosts.content",
-          likes: "$followedPosts.likes",
-          hasLiked: "$followedPosts.hasLiked",
-          hasBookmarked: "$followedPosts.hasBookmarked",
-          reposts: "$followedPosts.reposts",
-          comments: "$followedPosts.comments",
+          _id: '$followedPosts._id',
+          author: '$followedPosts.author',
+          createdAt: '$followedPosts.createdAt',
+          updatedAt: '$followedPosts.updatedAt',
+          content: '$followedPosts.content',
+          likes: '$followedPosts.likes',
+          hasLiked: '$followedPosts.hasLiked',
+          hasBookmarked: '$followedPosts.hasBookmarked',
+          reposts: '$followedPosts.reposts',
+          comments: '$followedPosts.comments',
         },
       },
     ]);
@@ -1061,7 +1067,7 @@ export async function getSubFeed(userId: string) {
 
 export async function addBookmark(
   bmId: mongoose.Types.ObjectId,
-  postId: mongoose.Types.ObjectId
+  postId: mongoose.Types.ObjectId,
 ) {
   try {
     await BookmarksModel.updateOne({ _id: bmId }, { $push: { posts: postId } });
@@ -1072,7 +1078,7 @@ export async function addBookmark(
 
 export async function removeBookmark(
   bmId: mongoose.Types.ObjectId,
-  postId: mongoose.Types.ObjectId
+  postId: mongoose.Types.ObjectId,
 ) {
   try {
     await BookmarksModel.updateOne({ _id: bmId }, { $pull: { posts: postId } });
@@ -1088,7 +1094,7 @@ export async function getBookmarks(uObjId: mongoose.Types.ObjectId) {
       { $match: { _id: uObjId } },
       {
         $lookup: {
-          from: "likes",
+          from: 'likes',
           pipeline: [
             {
               $match: {
@@ -1096,56 +1102,56 @@ export async function getBookmarks(uObjId: mongoose.Types.ObjectId) {
               },
             },
           ],
-          as: "likedPosts",
+          as: 'likedPosts',
         },
       },
       {
         $unwind: {
-          path: "$likedPosts",
+          path: '$likedPosts',
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $addFields: {
-          likedPosts: "$likedPosts.posts",
+          likedPosts: '$likedPosts.posts',
         },
       },
       // { $unwind: "$likedPosts" },
       {
-        $unwind: "$posts",
+        $unwind: '$posts',
       },
       {
         $lookup: {
-          from: "posts",
-          localField: "posts",
-          foreignField: "_id",
-          let: { likedPosts: "$likedPosts" },
+          from: 'posts',
+          localField: 'posts',
+          foreignField: '_id',
+          let: { likedPosts: '$likedPosts' },
           pipeline: [
             // Check if the post is bookmarked by the User
             {
               // Get author
               $lookup: {
-                from: "users",
-                localField: "author",
-                foreignField: "_id",
-                as: "author",
+                from: 'users',
+                localField: 'author',
+                foreignField: '_id',
+                as: 'author',
               },
             },
             {
-              $unwind: "$author",
+              $unwind: '$author',
             },
             {
               $project: {
                 _id: true,
                 content: true,
-                authorName: "$author.name",
-                authorHandle: "$author.handle",
-                authorPfp: "$author.pfp",
+                authorName: '$author.name',
+                authorHandle: '$author.handle',
+                authorPfp: '$author.pfp',
                 createdAt: true,
                 updatedAt: true,
                 hasLiked: {
                   $cond: {
-                    if: { $in: ["$_id", "$$likedPosts"] },
+                    if: { $in: ['$_id', '$$likedPosts'] },
                     then: true,
                     else: false,
                   },
@@ -1156,7 +1162,7 @@ export async function getBookmarks(uObjId: mongoose.Types.ObjectId) {
               },
             },
           ],
-          as: "bookmarkedPost",
+          as: 'bookmarkedPost',
         },
       },
       {
@@ -1192,16 +1198,16 @@ export async function getBookmarks(uObjId: mongoose.Types.ObjectId) {
 
 export async function addFollow(
   followerId: mongoose.Types.ObjectId,
-  followeeId: mongoose.Types.ObjectId
+  followeeId: mongoose.Types.ObjectId,
 ) {
   try {
     await FollowerModel.updateOne(
       { _id: followeeId },
-      { $push: { users: followerId } }
+      { $push: { users: followerId } },
     );
     await FollowingModel.updateOne(
       { _id: followerId },
-      { $push: { users: followeeId } }
+      { $push: { users: followeeId } },
     );
     await UserModel.updateOne({ _id: followerId }, { $inc: { following: 1 } });
     await UserModel.updateOne({ _id: followeeId }, { $inc: { followers: 1 } });
@@ -1212,16 +1218,16 @@ export async function addFollow(
 
 export async function removeFollow(
   followerId: mongoose.Types.ObjectId,
-  followeeId: mongoose.Types.ObjectId
+  followeeId: mongoose.Types.ObjectId,
 ) {
   try {
     await FollowerModel.updateOne(
       { _id: followeeId },
-      { $pull: { users: followerId } }
+      { $pull: { users: followerId } },
     );
     await FollowingModel.updateOne(
       { _id: followerId },
-      { $pull: { users: followeeId } }
+      { $pull: { users: followeeId } },
     );
     await UserModel.updateOne({ _id: followerId }, { $inc: { following: -1 } });
     await UserModel.updateOne({ _id: followeeId }, { $inc: { followers: -1 } });
@@ -1232,28 +1238,28 @@ export async function removeFollow(
 
 export async function likePost(
   postId: mongoose.Types.ObjectId,
-  userId: string
+  userId: string,
 ) {
   const uObjId = new mongoose.Types.ObjectId(userId);
   try {
     await Promise.all([
       LikerModel.updateOne({ _id: postId }, { $push: { users: uObjId } }).catch(
         (err) => {
-          console.log("Liker update failed");
+          console.log('Liker update failed');
           console.log(err);
-        }
+        },
       ),
       LikeModel.updateOne({ _id: uObjId }, { $push: { posts: postId } }).catch(
         (err) => {
-          console.log("Like update failed");
+          console.log('Like update failed');
           console.log(err);
-        }
+        },
       ),
       PostModel.updateOne({ _id: postId }, { $inc: { likes: 1 } }).catch(
         (err) => {
-          console.log("Post like incrementing failed");
+          console.log('Post like incrementing failed');
           console.log(err);
-        }
+        },
       ),
     ]);
   } catch (e) {
@@ -1263,28 +1269,28 @@ export async function likePost(
 
 export async function unlikePost(
   postId: mongoose.Types.ObjectId,
-  userId: string
+  userId: string,
 ) {
   const uObjId = new mongoose.Types.ObjectId(userId);
   try {
     await Promise.all([
       LikerModel.updateOne({ _id: postId }, { $pull: { users: uObjId } }).catch(
         (err) => {
-          console.log("Liker update failed");
+          console.log('Liker update failed');
           console.log(err);
-        }
+        },
       ),
       LikeModel.updateOne({ _id: uObjId }, { $pull: { posts: postId } }).catch(
         (err) => {
-          console.log("Like update failed");
+          console.log('Like update failed');
           console.log(err);
-        }
+        },
       ),
       PostModel.updateOne({ _id: postId }, { $inc: { likes: -1 } }).catch(
         (err) => {
-          console.log("Post like incrementing failed");
+          console.log('Post like incrementing failed');
           console.log(err);
-        }
+        },
       ),
     ]);
   } catch (e) {
@@ -1294,7 +1300,7 @@ export async function unlikePost(
 
 export async function getUserSummary(
   uHandle: string,
-  currUserId: mongoose.Types.ObjectId
+  currUserId: mongoose.Types.ObjectId,
 ) {
   try {
     const user = (
@@ -1307,10 +1313,10 @@ export async function getUserSummary(
         },
         {
           $lookup: {
-            from: "followings",
-            localField: "currentUser",
-            foreignField: "_id",
-            let: { toFind: { $toObjectId: "$_id" } },
+            from: 'followings',
+            localField: 'currentUser',
+            foreignField: '_id',
+            let: { toFind: { $toObjectId: '$_id' } },
             pipeline: [
               {
                 $project: {
@@ -1318,7 +1324,7 @@ export async function getUserSummary(
                   found: {
                     $cond: {
                       if: {
-                        $in: ["$$toFind", "$users"],
+                        $in: ['$$toFind', '$users'],
                       },
                       then: true,
                       else: false,
@@ -1327,10 +1333,10 @@ export async function getUserSummary(
                 },
               },
             ],
-            as: "isFollowed",
+            as: 'isFollowed',
           },
         },
-        { $unwind: "$isFollowed" },
+        { $unwind: '$isFollowed' },
         {
           $project: {
             id: true,
@@ -1340,7 +1346,7 @@ export async function getUserSummary(
             bio: true,
             followers: true,
             following: true,
-            isFollowed: "$isFollowed.found",
+            isFollowed: '$isFollowed.found',
             convertedId: true,
           },
         },
@@ -1351,7 +1357,7 @@ export async function getUserSummary(
       name: user.name,
       handle: user.handle,
       pfp: user.pfp,
-      bio: user.bio ?? "",
+      bio: user.bio ?? '',
       followers: user.followers,
       following: user.following,
       isFollowed: user.isFollowed,
@@ -1363,91 +1369,89 @@ export async function getUserSummary(
 
 export async function getUserData(
   uHandle: string,
-  currUserId: mongoose.Types.ObjectId
+  currUserId: mongoose.Types.ObjectId,
 ) {
   try {
-    const res = (
-      await UserModel.aggregate([
-        { $match: { handle: uHandle } },
-        {
-          $addFields: {
-            currentUser: currUserId,
-            objectId: { $toObjectId: "$_id" },
-          },
+    const res = await UserModel.aggregate([
+      { $match: { handle: uHandle } },
+      {
+        $addFields: {
+          currentUser: currUserId,
+          objectId: { $toObjectId: '$_id' },
         },
-        {
-          $lookup: {
-            from: "followings",
-            localField: "currentUser",
-            foreignField: "_id",
-            let: { toFind: "$objectId" },
-            pipeline: [
-              {
-                $project: {
-                  _id: false,
-                  found: {
-                    $cond: {
-                      if: {
-                        $in: ["$$toFind", "$users"],
-                      },
-                      then: true,
-                      else: false,
+      },
+      {
+        $lookup: {
+          from: 'followings',
+          localField: 'currentUser',
+          foreignField: '_id',
+          let: { toFind: '$objectId' },
+          pipeline: [
+            {
+              $project: {
+                _id: false,
+                found: {
+                  $cond: {
+                    if: {
+                      $in: ['$$toFind', '$users'],
                     },
+                    then: true,
+                    else: false,
                   },
                 },
               },
-            ],
-            as: "isFollowed",
-          },
-        },
-        {
-          $lookup: {
-            from: "followers",
-            localField: "currentUser",
-            foreignField: "_id",
-            let: {
-              toFind: "$objectIf",
             },
-            pipeline: [
-              {
-                $project: {
-                  _id: false,
-                  found: {
-                    $cond: {
-                      if: {
-                        $in: ["$$toFind", "$users"],
-                      },
-                      then: true,
-                      else: false,
+          ],
+          as: 'isFollowed',
+        },
+      },
+      {
+        $lookup: {
+          from: 'followers',
+          localField: 'currentUser',
+          foreignField: '_id',
+          let: {
+            toFind: '$objectIf',
+          },
+          pipeline: [
+            {
+              $project: {
+                _id: false,
+                found: {
+                  $cond: {
+                    if: {
+                      $in: ['$$toFind', '$users'],
                     },
+                    then: true,
+                    else: false,
                   },
                 },
               },
-            ],
-            as: "isFollowing",
-          },
+            },
+          ],
+          as: 'isFollowing',
         },
-        {
-          $unwind: "$isFollowed",
+      },
+      {
+        $unwind: '$isFollowed',
+      },
+      {
+        $unwind: '$isFollowing',
+      },
+      {
+        $project: {
+          id: true,
+          name: true,
+          handle: true,
+          pfp: true,
+          bio: true,
+          followers: true,
+          following: true,
+          isFollowed: '$isFollowed.found',
+          isFollowing: '$isFollowing.found',
         },
-        {
-          $unwind: "$isFollowing",
-        },
-        {
-          $project: {
-            id: true,
-            name: true,
-            handle: true,
-            pfp: true,
-            bio: true,
-            followers: true,
-            following: true,
-            isFollowed: "$isFollowed.found",
-            isFollowing: "$isFollowing.found",
-          },
-        },
-      ])
-    );
+      },
+    ]);
     if (res.length === 0) {
       return null;
     }
@@ -1457,7 +1461,7 @@ export async function getUserData(
       name: user.name,
       handle: user.handle,
       pfp: user.pfp,
-      bio: user.bio ?? "",
+      bio: user.bio ?? '',
       followers: user.followers,
       following: user.following,
       isFollowed: user.isFollowed,
@@ -1472,13 +1476,13 @@ export async function updateUserData(
   currUserId: string,
   pfp: File | null,
   name: string | null,
-  bio: string | null
+  bio: string | null,
 ) {
   try {
     let toChange: { pfp?: string; bio?: string; name?: string } = {};
     if (pfp) {
       const response = await uploadPfp(pfp);
-      if (!response) throw new Error("no response");
+      if (!response) throw new Error('no response');
       toChange.pfp = response.url;
     }
     if (name) {
@@ -1490,9 +1494,9 @@ export async function updateUserData(
     await UserModel.updateOne({ _id: currUserId }, toChange);
   } catch (error) {
     console.log(error);
-    return "failed";
+    return 'failed';
   }
-  return "ok";
+  return 'ok';
 }
 
 export async function getSuggestedUsers(currUserId: string) {
@@ -1506,19 +1510,19 @@ export async function getSuggestedUsers(currUserId: string) {
       },
       {
         $lookup: {
-          from: "users",
+          from: 'users',
           let: {
-            followers: "$users",
+            followers: '$users',
           },
           pipeline: [
             {
               $addFields: {
                 stringIds: {
                   $map: {
-                    input: "$$followers",
-                    as: "id",
+                    input: '$$followers',
+                    as: 'id',
                     in: {
-                      $toString: "$$id",
+                      $toString: '$$id',
                     },
                   },
                 },
@@ -1530,35 +1534,35 @@ export async function getSuggestedUsers(currUserId: string) {
                   $and: [
                     {
                       $not: {
-                        $in: ["$_id", "$stringIds"],
+                        $in: ['$_id', '$stringIds'],
                       },
                     },
                     {
-                      $ne: [currUserId, "$_id"],
+                      $ne: [currUserId, '$_id'],
                     },
                   ],
                 },
               },
             },
           ],
-          as: "users",
+          as: 'users',
         },
       },
       {
         $unwind: {
-          path: "$users",
+          path: '$users',
           preserveNullAndEmptyArrays: false,
         },
       },
       {
         $project: {
-          _id: "$users._id",
-          name: "$users.name",
-          handle: "$users.handle",
-          pfp: "$users.pfp",
-          bio: "$users.bio",
-          followers: "$users.followers",
-          followings: "$users.followings",
+          _id: '$users._id',
+          name: '$users.name',
+          handle: '$users.handle',
+          pfp: '$users.pfp',
+          bio: '$users.bio',
+          followers: '$users.followers',
+          followings: '$users.followings',
         },
       },
       {
@@ -1599,14 +1603,14 @@ export async function getSuggestedUsers(currUserId: string) {
 
 export async function addHashtags(
   postId: mongoose.Types.ObjectId,
-  hashtags: Set<string>
+  hashtags: Set<string>,
 ) {
   try {
     hashtags.forEach(async (hashtag) => {
       await HashtagsModel.findOneAndUpdate(
         { _id: hashtag },
         { $inc: { count: 1 }, $push: { posts: postId } },
-        { upsert: true }
+        { upsert: true },
       );
     });
   } catch (e) {
@@ -1616,7 +1620,7 @@ export async function addHashtags(
 
 export async function getHashtags(
   uObjId: mongoose.Types.ObjectId,
-  hashtag: string
+  hashtag: string,
 ) {
   try {
     const res = await HashtagsModel.aggregate([
@@ -1633,7 +1637,7 @@ export async function getHashtags(
       },
       {
         $lookup: {
-          from: "likes",
+          from: 'likes',
           pipeline: [
             {
               $match: {
@@ -1641,26 +1645,26 @@ export async function getHashtags(
               },
             },
           ],
-          as: "likedPosts",
+          as: 'likedPosts',
         },
       },
       {
         $unwind: {
-          path: "$likedPosts",
+          path: '$likedPosts',
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $addFields: {
-          likedPosts: "$likedPosts.posts",
+          likedPosts: '$likedPosts.posts',
         },
       },
       // Check if the post is bookmarked by the User
       {
         $lookup: {
-          from: "bookmarks",
+          from: 'bookmarks',
           let: {
-            postId: "$_id",
+            postId: '$_id',
           },
           pipeline: [
             {
@@ -1669,58 +1673,58 @@ export async function getHashtags(
               },
             },
           ],
-          as: "bookmarkedPosts",
+          as: 'bookmarkedPosts',
         },
       },
       {
         $unwind: {
-          path: "$bookmarkedPosts",
+          path: '$bookmarkedPosts',
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $addFields: {
-          bookmarkedPosts: "$bookmarkedPosts.posts",
+          bookmarkedPosts: '$bookmarkedPosts.posts',
         },
       },
       {
-        $unwind: "$posts",
+        $unwind: '$posts',
       },
       {
         $lookup: {
-          from: "posts",
-          localField: "posts",
-          foreignField: "_id",
+          from: 'posts',
+          localField: 'posts',
+          foreignField: '_id',
           pipeline: [
             {
               $lookup: {
-                from: "users",
-                localField: "author",
-                foreignField: "_id",
-                as: "author",
+                from: 'users',
+                localField: 'author',
+                foreignField: '_id',
+                as: 'author',
               },
             },
             {
-              $unwind: "$author",
+              $unwind: '$author',
             },
           ],
-          as: "posts",
+          as: 'posts',
         },
       },
       {
-        $unwind: "$posts",
+        $unwind: '$posts',
       },
       {
         $project: {
-          _id: "$posts._id",
-          content: "$posts.content",
-          author: "$posts.author",
-          createdAt: "$posts.createdAt",
-          updatedAt: "$posts.updatedAt",
+          _id: '$posts._id',
+          content: '$posts.content',
+          author: '$posts.author',
+          createdAt: '$posts.createdAt',
+          updatedAt: '$posts.updatedAt',
           hasLiked: {
             $cond: {
               if: {
-                $in: ["$posts._id", "$likedPosts"],
+                $in: ['$posts._id', '$likedPosts'],
               },
               then: true,
               else: false,
@@ -1729,15 +1733,15 @@ export async function getHashtags(
           hasBookmarked: {
             $cond: {
               if: {
-                $in: ["$posts._id", "$bookmarkedPosts"],
+                $in: ['$posts._id', '$bookmarkedPosts'],
               },
               then: true,
               else: false,
             },
           },
-          likes: "$posts.likes",
-          comments: "$posts.comments",
-          reposts: "$posts.reposts",
+          likes: '$posts.likes',
+          comments: '$posts.comments',
+          reposts: '$posts.reposts',
         },
       },
     ]);
@@ -1765,7 +1769,7 @@ export async function getHashtags(
 
 export async function getUserResults(
   currUObjId: mongoose.Types.ObjectId,
-  searchQ: string
+  searchQ: string,
 ) {
   try {
     const res = await FollowingModel.aggregate([
@@ -1776,9 +1780,9 @@ export async function getUserResults(
       },
       {
         $lookup: {
-          from: "users",
+          from: 'users',
           let: {
-            followedUsers: "$users",
+            followedUsers: '$users',
           },
           pipeline: [
             {
@@ -1787,25 +1791,25 @@ export async function getUserResults(
               },
             },
           ],
-          as: "searchedUsers",
+          as: 'searchedUsers',
         },
       },
       {
-        $unwind: "$searchedUsers",
+        $unwind: '$searchedUsers',
       },
       {
         $project: {
-          _id: "$searchedUsers._id",
-          handle: "$searchedUsers.handle",
-          name: "$searchedUsers.name",
-          pfp: "$searchedUsers.pfp",
-          bio: "$searchedUsers.bio",
-          followers: "$searchedUsers.followers",
-          following: "$searchedUsers.following",
+          _id: '$searchedUsers._id',
+          handle: '$searchedUsers.handle',
+          name: '$searchedUsers.name',
+          pfp: '$searchedUsers.pfp',
+          bio: '$searchedUsers.bio',
+          followers: '$searchedUsers.followers',
+          following: '$searchedUsers.following',
           isFollowing: {
             $cond: {
               if: {
-                $in: ["$searchedUsers._id", "$users"],
+                $in: ['$searchedUsers._id', '$users'],
               },
               then: true,
               else: false,
@@ -1820,7 +1824,7 @@ export async function getUserResults(
         handle: u.handle,
         name: u.name,
         pfp: u.pfp,
-        bio: u.bio ?? "",
+        bio: u.bio ?? '',
         followers: u.followers,
         following: u.following,
         isFollowed: u.isFollowed,
@@ -1862,7 +1866,7 @@ export const getAdapter = async () => {
   }
   return new MongodbAdapter(
     // @ts-ignore
-    mongoose.connection.collection("sessions"),
-    mongoose.connection.collection("users")
+    mongoose.connection.collection('sessions'),
+    mongoose.connection.collection('users'),
   );
 };

@@ -1,5 +1,5 @@
-import { createSignal, Show } from "solid-js";
-import PostModal, { openModal } from "./PostModal";
+import { createSignal, Show } from 'solid-js';
+import PostModal, { openModal } from './PostModal';
 
 export default function PostButton() {
   const [active, setActive] = createSignal<boolean>(false);

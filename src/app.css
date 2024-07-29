@@ -14,7 +14,7 @@
   --color-repost: 0 186 124;
   --color-comment: 29 155 240;
 
-  --font-family: "Helvetica Neue", Roboto, -apple-system, BlinkMacSystemFont;
+  --font-family: 'Helvetica Neue', Roboto, -apple-system, BlinkMacSystemFont;
 }
 
 @media (prefers-color-scheme: dark) {

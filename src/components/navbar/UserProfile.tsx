@@ -1,9 +1,9 @@
-import { useNavigate } from "@solidjs/router";
-import UserProfileMenu from "./UserProfileMenu";
-import { createSignal, useContext } from "solid-js";
-import { UserContext } from "~/lib/UserContext";
-import { Show } from "solid-js";
-import UserPfp from "../user/UserPfp";
+import { useNavigate } from '@solidjs/router';
+import UserProfileMenu from './UserProfileMenu';
+import { createSignal, useContext } from 'solid-js';
+import { UserContext } from '~/lib/UserContext';
+import { Show } from 'solid-js';
+import UserPfp from '../user/UserPfp';
 
 export default function UserProfile() {
   const user = useContext(UserContext);
@@ -15,26 +15,26 @@ export default function UserProfile() {
     <div
       class="group"
       onclick={() => {
-        navigate(`/${user!() ? user!()!.handle : "/"}`);
+        navigate(`/${user!() ? user!()!.handle : '/'}`);
       }}
     >
       <Show when={menuOpen()}>
         <div class="relative w-full">
           <div class=" absolute bottom-0 w-full">
-            <UserProfileMenu handle={user!() ? user!()!.handle : "loading"} />
+            <UserProfileMenu handle={user!() ? user!()!.handle : 'loading'} />
           </div>
         </div>
       </Show>
       <div class="cursor-pointer rounded-full w-full p-3 flex items-center hover:bg-highlight">
-        <div class="h-10 w-10 rounded-full" >
+        <div class="h-10 w-10 rounded-full">
           <UserPfp pfp={user!() ? user!()!.pfp : undefined} />
         </div>
         <div class="flex flex-col mx-3 text-foreground">
           <span class="text-md font-bold ">
-            {user!() ? user!()!.name : "Loading"}
+            {user!() ? user!()!.name : 'Loading'}
           </span>
           <span class="text-md text-faint">{`@${
-            user!() ? user!()!.handle : "loading"
+            user!() ? user!()!.handle : 'loading'
           }`}</span>
         </div>
         <div class="grow flex justify-end">

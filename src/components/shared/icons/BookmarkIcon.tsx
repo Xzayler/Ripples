@@ -4,7 +4,7 @@ export default function BookmarkIcon(props: { toFill: boolean }) {
       stroke="currentColor"
       stroke-width="80"
       fill="currentColor"
-      fill-opacity={props.toFill ? "1" : "0"}
+      fill-opacity={props.toFill ? '1' : '0'}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="-100 -100 584 662"
       style="overflow: visible; color: currentcolor;"

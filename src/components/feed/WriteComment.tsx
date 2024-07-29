@@ -1,16 +1,15 @@
-import { action } from "@solidjs/router";
-import { submitComment } from "~/lib/server";
-import { createSignal, useContext } from "solid-js";
-import { UserContext } from "~/lib/UserContext";
-import UserPfp from "../user/UserPfp";
-import CharacterLimit from "../shared/CharacterLimit";
+import { action } from '@solidjs/router';
+import { createSignal, useContext } from 'solid-js';
+import { UserContext } from '~/lib/UserContext';
+import UserPfp from '../user/UserPfp';
+import CharacterLimit from '../shared/CharacterLimit';
 
-const [postBody, setPostBody] = createSignal<string | null>("");
+const [postBody, setPostBody] = createSignal<string | null>('');
 
 const updatePlaceholder = (e: Event) => {
   const el: HTMLElement = e.target as HTMLElement;
   setPostBody(el.textContent);
-  if (el.textContent == "") {
+  if (el.textContent == '') {
     el.removeChild(el.firstChild!);
   }
 };
@@ -20,7 +19,6 @@ export default function WriteComment(props: {
   replyTo: string;
   addComment: (comment: string, id: string) => void;
 }) {
-
   const user = useContext(UserContext);
 
   return (
@@ -28,10 +26,10 @@ export default function WriteComment(props: {
       method="post"
       action={action(async (formData: FormData) => {
         // const { comment, id } = await submitComment(formData, props.parentid);
-        const { comment, id } = { comment: "asdasdasd", id: "1234567890" };
+        const { comment, id } = { comment: 'asdasdasd', id: '1234567890' };
 
-        props.addComment(comment ?? "", id);
-      }, "postcomment")}
+        props.addComment(comment ?? '', id);
+      }, 'postcomment')}
       class=" pt-2 "
     >
       <div class="pl-10">
@@ -54,7 +52,7 @@ export default function WriteComment(props: {
         </textarea>
       </div>
       <div class="flex gap-2 justify-end items-center pb-5 pt-2 bg-background">
-          <CharacterLimit limit={280} color="accent" text={postBody()} />
+        <CharacterLimit limit={280} color="accent" text={postBody()} />
         <button
           type="submit"
           class="px-4 py-2 cursor-pointer bg-accent transition hover:bg-accent/90 rounded-full text-white font-bold"

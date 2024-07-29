@@ -1,4 +1,4 @@
-import { UploadApiResponse, v2 as cloudinary } from "cloudinary";
+import { UploadApiResponse, v2 as cloudinary } from 'cloudinary';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -16,13 +16,13 @@ export async function uploadPfp(img: File) {
     cloudinary.uploader
       .upload_stream(
         {
-          upload_preset: "profilepics",
-          format: "webp",
+          upload_preset: 'profilepics',
+          format: 'webp',
           public_id: handle,
         },
         (error, uploadResult) => {
           return resolve(uploadResult);
-        }
+        },
       )
       .end(stuff);
   });

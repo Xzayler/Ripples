@@ -3,7 +3,7 @@ import Modal, {
   ModalHeadClose,
   ModalHeadBack,
   ModalFoot,
-} from "../shared/Modal";
+} from '../shared/Modal';
 import {
   Show,
   Switch,
@@ -12,12 +12,12 @@ import {
   useContext,
   createResource,
   Suspense,
-} from "solid-js";
-import { UserContext } from "~/lib/UserContext";
-import { getUserData, updateUserData } from "~/lib/server";
-import UserPfp from "./UserPfp";
-import { action, useAction, useSubmission } from "@solidjs/router";
-import CharacterLimit from "../shared/CharacterLimit";
+} from 'solid-js';
+import { UserContext } from '~/lib/UserContext';
+import { getUserData, updateUserData } from '~/lib/server';
+import UserPfp from './UserPfp';
+import { action, useAction, useSubmission } from '@solidjs/router';
+import CharacterLimit from '../shared/CharacterLimit';
 
 export const openModal = om;
 
@@ -31,16 +31,16 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
     (u) => {
       if (u == undefined) return null;
       return getUserData(u.handle);
-    }
+    },
   );
 
-  const [stage, setStage] = createSignal<"pfp" | "bio" | "pending">("pfp");
+  const [stage, setStage] = createSignal<'pfp' | 'bio' | 'pending'>('pfp');
   const [pfp, setPfp] = createSignal<File | null>(null);
 
   const [bio, setBio] = createSignal<string | null>(null);
   const updateBio = (e: Event) => {
     const el: HTMLTextAreaElement = e.target as HTMLTextAreaElement;
-    setBio(el.value ?? "");
+    setBio(el.value ?? '');
   };
 
   const [name, setName] = createSignal<string | null>(null);
@@ -61,7 +61,7 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
       <Suspense>
         <Switch>
           {/* Pfp Selection */}
-          <Match when={stage() == "pfp"}>
+          <Match when={stage() == 'pfp'}>
             <ModalHeadClose closeFn={props.closeFn} />
             <div class="justify-between h-full px-20 flex flex-col">
               <p class="font-bold text-foreground text-3xl mt-5 ">
@@ -89,7 +89,7 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
                   <button
                     type="button"
                     onClick={() => {
-                      setStage("bio");
+                      setStage('bio');
                     }}
                     class=" w-full px-8 group cursor-pointer transition rounded-full border text-foreground border-faint border-solid bg-background hover:bg-foreground/10"
                   >
@@ -103,10 +103,10 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
           </Match>
 
           {/* Name & bio */}
-          <Match when={stage() == "bio"}>
+          <Match when={stage() == 'bio'}>
             <ModalHeadBack
               fn={() => {
-                setStage("pfp");
+                setStage('pfp');
               }}
             />
             <div class="justify-between h-full px-20 flex flex-col">
@@ -114,7 +114,7 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
                 Describe Yourself
               </p>
               <div class="flex flex-col items-stretch ">
-                <CharacterLimit text={name()} limit={16}/>
+                <CharacterLimit text={name()} limit={16} />
                 <input
                   type="text"
                   placeholder="Your Name"
@@ -123,7 +123,7 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
                 />
               </div>
               <div class="mt-2 mb-4 grow flex flex-col items-stretch ">
-                <CharacterLimit text={bio()} limit={20}/>
+                <CharacterLimit text={bio()} limit={20} />
                 <textarea
                   placeholder="Your Bio"
                   rows={4}
@@ -139,7 +139,7 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
                     type="button"
                     onClick={() => {
                       submitChanges();
-                      setStage("pending");
+                      setStage('pending');
                     }}
                     class=" w-full px-8 group cursor-pointer transition rounded-full border text-foreground border-faint border-solid bg-background hover:bg-foreground/10"
                   >
@@ -153,7 +153,7 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
           </Match>
 
           {/* Submission */}
-          <Match when={stage() == "pending"}>
+          <Match when={stage() == 'pending'}>
             <Show
               when={submitRes.result}
               fallback={<p class="text-xl">Saving...</p>}

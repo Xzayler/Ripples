@@ -1,5 +1,5 @@
-"use server";
-import { register as rg, login as li, logout as lo } from "./auth";
+'use server';
+import { register as rg, login as li, logout as lo } from './auth';
 import {
   submitPost as sp,
   submitComment as sc,
@@ -22,7 +22,7 @@ import {
   getTrending as gt,
   getHashtags as gh,
   getUserResults as gur,
-} from "./interactions";
+} from './interactions';
 
 // session / auth
 export const register = rg;

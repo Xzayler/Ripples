@@ -1,4 +1,4 @@
-import { A } from "@solidjs/router";
+import { A } from '@solidjs/router';
 
 export default function MainPage() {
   return (

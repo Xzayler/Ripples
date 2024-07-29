@@ -1,13 +1,13 @@
-import { useParams } from "@solidjs/router";
-import Sidebar from "~/components/sidebar/Sidebar";
-import { getPost } from "~/lib/server";
-import { createResource, For, useContext } from "solid-js";
-import Ripple from "~/components/feed/Ripple";
-import MainRipple from "~/components/feed/MainRipple";
-import { Suspense } from "solid-js";
-import BackButton from "~/components/shared/BackButton";
-import type { Ripple as RippleType } from "~/types";
-import { UserContext } from "~/lib/UserContext";
+import { useParams } from '@solidjs/router';
+import Sidebar from '~/components/sidebar/Sidebar';
+import { getPost } from '~/lib/server';
+import { createResource, For, useContext } from 'solid-js';
+import Ripple from '~/components/feed/Ripple';
+import MainRipple from '~/components/feed/MainRipple';
+import { Suspense } from 'solid-js';
+import BackButton from '~/components/shared/BackButton';
+import type { Ripple as RippleType } from '~/types';
+import { UserContext } from '~/lib/UserContext';
 
 export default function Post() {
   const params = useParams();
@@ -15,7 +15,7 @@ export default function Post() {
     () => params.postid,
     (postid) => {
       return getPost(postid);
-    }
+    },
   );
   const user = useContext(UserContext);
 

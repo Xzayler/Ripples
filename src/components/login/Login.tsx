@@ -1,18 +1,18 @@
-import { A, action, useAction, useSubmission } from "@solidjs/router";
-import { login } from "~/lib/server";
-import { getRequestEvent } from "solid-js/web";
-import { Switch, Match } from "solid-js";
-import { Navigate } from "@solidjs/router";
+import { A, action, useAction, useSubmission } from '@solidjs/router';
+import { login } from '~/lib/server';
+import { getRequestEvent } from 'solid-js/web';
+import { Switch, Match } from 'solid-js';
+import { Navigate } from '@solidjs/router';
 
 const isLoggedIn = action(async () => {
-  "use server";
+  'use server';
   const event = getRequestEvent();
   if (event?.locals.session) {
-    return "home";
+    return 'home';
   } else {
-    return "login";
+    return 'login';
   }
-}, "user");
+}, 'user');
 
 export default function Login() {
   const checkLoggedIn = useAction(isLoggedIn);
@@ -28,12 +28,12 @@ export default function Login() {
       }
     >
       <Match
-        when={!checkLoggedInResp.pending && checkLoggedInResp.result == "home"}
+        when={!checkLoggedInResp.pending && checkLoggedInResp.result == 'home'}
       >
-        <Navigate href={"/home"} />
+        <Navigate href={'/home'} />
       </Match>
       <Match
-        when={!checkLoggedInResp.pending && checkLoggedInResp.result == "login"}
+        when={!checkLoggedInResp.pending && checkLoggedInResp.result == 'login'}
       >
         <div class="min-h-screen flex flex-col justify-center items-center">
           <form

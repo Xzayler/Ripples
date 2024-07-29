@@ -1,27 +1,24 @@
-import { useParams } from "@solidjs/router";
+import { useParams } from '@solidjs/router';
 import {
   Switch,
   Match,
   Show,
-  For,
   createResource,
-  Suspense,
   useContext,
   createSignal,
   createEffect,
-} from "solid-js";
-import { getUserData, getUserLikedPosts, getUserPosts } from "~/lib/server";
-import Sidebar from "~/components/sidebar/Sidebar";
-import BackButton from "~/components/shared/BackButton";
-import FollowButton from "~/components/user/FollowButton";
-import Feed from "~/components/feed/Feed";
-import { UserContext } from "~/lib/UserContext";
+} from 'solid-js';
+import { getUserData, getUserLikedPosts, getUserPosts } from '~/lib/server';
+import Sidebar from '~/components/sidebar/Sidebar';
+import BackButton from '~/components/shared/BackButton';
+import FollowButton from '~/components/user/FollowButton';
+import Feed from '~/components/feed/Feed';
+import { UserContext } from '~/lib/UserContext';
 import EditProfileModal, {
   openModal,
-} from "~/components/user/EditProfileModal";
-import UserPfp from "~/components/user/UserPfp";
-import MultiLineText from "~/components/shared/MultiLineText";
-import type { Ripple } from "~/types";
+} from '~/components/user/EditProfileModal';
+import UserPfp from '~/components/user/UserPfp';
+import MultiLineText from '~/components/shared/MultiLineText';
 
 export default function UserPage() {
   const params = useParams();
@@ -29,17 +26,17 @@ export default function UserPage() {
     () => params.handle,
     (handle) => {
       return getUserData(handle);
-    }
+    },
   );
 
   const currUser = useContext(UserContext);
   const [editActive, setEditActive] = createSignal<boolean>(false);
 
-  const [toShow, setToShow] = createSignal<"posts" | "likes">("posts");
+  const [toShow, setToShow] = createSignal<'posts' | 'likes'>('posts');
 
   createEffect(() => {
     const id = params.handle;
-    setToShow("posts");
+    setToShow('posts');
   });
 
   return (
@@ -89,7 +86,7 @@ export default function UserPage() {
                         openModal(() => setEditActive(true));
                       }}
                       class={
-                        "px-4 group cursor-pointer transition rounded-full border text-foreground border-foreground border-solid bg-background hover:text-background hover:bg-foreground "
+                        'px-4 group cursor-pointer transition rounded-full border text-foreground border-foreground border-solid bg-background hover:text-background hover:bg-foreground '
                       }
                     >
                       <div class="flex items-center justify-center py-2">
@@ -107,7 +104,7 @@ export default function UserPage() {
                 </Switch>
               </div>
             </div>
-            <Show when={user() && user()!.bio != ""}>
+            <Show when={user() && user()!.bio != ''}>
               <p>
                 <MultiLineText text={user()!.bio} />
               </p>
@@ -127,24 +124,24 @@ export default function UserPage() {
         <div class="mt-4 flex border-b border-ui">
           <div
             class={`flex w-1/2 grow items-stretch justify-center cursor-pointer py-2 hover:bg-highlight ${
-              toShow() == "posts"
-                ? " underline decoration-accent decoration-8 underline-offset-8"
-                : ""
+              toShow() == 'posts'
+                ? ' underline decoration-accent decoration-8 underline-offset-8'
+                : ''
             }`}
             onclick={() => {
-              setToShow("posts");
+              setToShow('posts');
             }}
           >
             Posts
           </div>
           <div
             class={`flex w-1/2 grow items-stretch justify-center cursor-pointer py-2 hover:bg-highlight ${
-              toShow() == "likes"
-                ? " underline decoration-accent decoration-8 underline-offset-8"
-                : ""
+              toShow() == 'likes'
+                ? ' underline decoration-accent decoration-8 underline-offset-8'
+                : ''
             }`}
             onclick={() => {
-              setToShow("likes");
+              setToShow('likes');
             }}
           >
             Likes
@@ -153,10 +150,10 @@ export default function UserPage() {
 
         {/* <Feed fetcher={} /> */}
         <Switch>
-          <Match when={user() && toShow() == "posts"}>
+          <Match when={user() && toShow() == 'posts'}>
             <Feed fetcher={(id) => getUserPosts(id)} arg={user()!.id} />
           </Match>
-          <Match when={toShow() == "likes"}>
+          <Match when={toShow() == 'likes'}>
             <Feed fetcher={(id) => getUserLikedPosts(id)} arg={user()!.id} />
           </Match>
         </Switch>

@@ -1,6 +1,6 @@
-import { A, useSubmission } from "@solidjs/router";
-import { action } from "@solidjs/router";
-import { register } from "~/lib/server";
+import { A, useSubmission } from '@solidjs/router';
+import { action } from '@solidjs/router';
+import { register } from '~/lib/server';
 
 export default function Signup() {
   const registerResponse = useSubmission(action(register));
@@ -17,7 +17,7 @@ export default function Signup() {
     if (confPass.value != (pwInput as HTMLInputElement).value) {
       confPass.setCustomValidity("The passwords don't match!");
     } else {
-      confPass.setCustomValidity("");
+      confPass.setCustomValidity('');
     }
   }
 

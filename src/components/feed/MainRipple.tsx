@@ -1,10 +1,10 @@
-import { Ripple } from "~/types";
-import Reactions from "./Reactions";
-import ParentChain from "./ParentChain";
-import WriteComment from "./WriteComment";
-import UserWrapper from "../user/UserWrapper";
-import PostContent from "./PostContent";
-import UserPfp from "../user/UserPfp";
+import { Ripple } from '~/types';
+import Reactions from './Reactions';
+import ParentChain from './ParentChain';
+import WriteComment from './WriteComment';
+import UserWrapper from '../user/UserWrapper';
+import PostContent from './PostContent';
+import UserPfp from '../user/UserPfp';
 
 export default function MainRipple(props: {
   post: Ripple | undefined | null;
@@ -26,15 +26,15 @@ export default function MainRipple(props: {
             </div>
             <div class="flex flex-col">
               <div class="mr-1">
-                <UserWrapper handle={props.post ? props.post.authorHandle : ""}>
+                <UserWrapper handle={props.post ? props.post.authorHandle : ''}>
                   <span class="font-bold text-foreground">
-                    {props.post ? props.post.authorName : ""}
+                    {props.post ? props.post.authorName : ''}
                   </span>
                 </UserWrapper>
               </div>
               <div class="flex text-faint">
-                <UserWrapper handle={props.post ? props.post.authorHandle : ""}>
-                  <span>{`@${props.post ? props.post.authorHandle : ""}`}</span>
+                <UserWrapper handle={props.post ? props.post.authorHandle : ''}>
+                  <span>{`@${props.post ? props.post.authorHandle : ''}`}</span>
                 </UserWrapper>
               </div>
             </div>
@@ -48,20 +48,20 @@ export default function MainRipple(props: {
         <div class="my-4">
           <span class="text-faint ">
             {props.post
-              ? props.post.createdAt.toLocaleTimeString("default", {
-                  hour: "numeric",
-                  minute: "2-digit",
+              ? props.post.createdAt.toLocaleTimeString('default', {
+                  hour: 'numeric',
+                  minute: '2-digit',
                 })
-              : ""}{" "}
-            <span>⋅</span>{" "}
+              : ''}{' '}
+            <span>⋅</span>{' '}
             {`${
               props.post
-                ? props.post.createdAt.toLocaleString("default", {
-                    month: "short",
+                ? props.post.createdAt.toLocaleString('default', {
+                    month: 'short',
                   })
-                : ""
-            } ${props.post ? props.post.createdAt.getDate() : ""}, ${
-              props.post ? props.post.createdAt.getFullYear() : ""
+                : ''
+            } ${props.post ? props.post.createdAt.getDate() : ''}, ${
+              props.post ? props.post.createdAt.getFullYear() : ''
             }`}
           </span>
         </div>
@@ -72,8 +72,8 @@ export default function MainRipple(props: {
       </div>
       <div class="border-b border-ui"></div>
       <WriteComment
-        parentid={props.post ? props.post.id : ""}
-        replyTo={props.post ? props.post.authorHandle : ""}
+        parentid={props.post ? props.post.id : ''}
+        replyTo={props.post ? props.post.authorHandle : ''}
         addComment={props.addComment}
       />
     </div>

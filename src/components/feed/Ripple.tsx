@@ -1,10 +1,10 @@
-import { type Ripple } from "~/types";
-import Reactions from "./Reactions";
-import { calcDate } from "~/lib/date";
-import UserWrapper from "../user/UserWrapper";
-import { redirect, useNavigate } from "@solidjs/router";
-import UserPfp from "../user/UserPfp";
-import PostContent from "./PostContent";
+import { type Ripple } from '~/types';
+import Reactions from './Reactions';
+import { calcDate } from '~/lib/date';
+import UserWrapper from '../user/UserWrapper';
+import { useNavigate } from '@solidjs/router';
+import UserPfp from '../user/UserPfp';
+import PostContent from './PostContent';
 
 export default function Ripple(props: { post: Ripple }) {
   const post = props.post;

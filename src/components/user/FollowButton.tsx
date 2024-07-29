@@ -1,6 +1,5 @@
-import { action, useAction } from "@solidjs/router";
-import { createSignal, createEffect } from "solid-js";
-import { addFollow, removeFollow } from "~/lib/server";
+import { createSignal, createEffect } from 'solid-js';
+import { addFollow, removeFollow } from '~/lib/server';
 
 export default function FollowButton(props: {
   isFollowed: boolean;
@@ -9,7 +8,7 @@ export default function FollowButton(props: {
   const follow = addFollow;
   const unfollow = removeFollow;
   const [isFollowed, setIsFollowed] = createSignal<boolean>(
-    props.isFollowed ?? false
+    props.isFollowed ?? false,
   );
 
   createEffect(() => {
@@ -34,16 +33,16 @@ export default function FollowButton(props: {
         pressFollow();
       }}
       class={
-        "px-4 group cursor-pointer transition rounded-full border text-foreground border-foreground border-solid bg-background " +
+        'px-4 group cursor-pointer transition rounded-full border text-foreground border-foreground border-solid bg-background ' +
         (isFollowed()
-          ? " hover:text-red-500 hover:border-red-500"
-          : " hover:text-background hover:bg-foreground ")
+          ? ' hover:text-red-500 hover:border-red-500'
+          : ' hover:text-background hover:bg-foreground ')
       }
     >
       <div class="flex items-center justify-center py-2">
         <span
           class={
-            "text-sm font-bold " +
+            'text-sm font-bold ' +
             (isFollowed()
               ? " after:content-['Following'] group-hover:after:content-['Unfollow'] "
               : " after:content-['Follow']")

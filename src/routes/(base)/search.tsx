@@ -6,36 +6,36 @@ import {
   For,
   createEffect,
   createResource,
-} from "solid-js";
-import { useSearchParams } from "@solidjs/router";
-import BackButton from "~/components/shared/BackButton";
-import Feed from "~/components/feed/Feed";
-import Sidebar from "~/components/sidebar/Sidebar";
-import UserPfp from "~/components/user/UserPfp";
-import UserWrapper from "~/components/user/UserWrapper";
-import FollowButton from "~/components/user/FollowButton";
-import MultiLineText from "~/components/shared/MultiLineText";
+} from 'solid-js';
+import { useSearchParams } from '@solidjs/router';
+import BackButton from '~/components/shared/BackButton';
+import Feed from '~/components/feed/Feed';
+import Sidebar from '~/components/sidebar/Sidebar';
+import UserPfp from '~/components/user/UserPfp';
+import UserWrapper from '~/components/user/UserWrapper';
+import FollowButton from '~/components/user/FollowButton';
+import MultiLineText from '~/components/shared/MultiLineText';
 
-import { getHashtags, getUserResults } from "~/lib/server";
-import { Ripple, User } from "~/types";
+import { getHashtags, getUserResults } from '~/lib/server';
+import { Ripple, User } from '~/types';
 
 type SearchParams = {
-  searchType: "general" | "hashtag" | "user";
+  searchType: 'general' | 'hashtag' | 'user';
   q: string;
 };
 
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams<SearchParams>();
   const [fetcher, setFetcher] = createSignal(
-    () => new Promise<Ripple[]>((resolve) => resolve([] as Ripple[]))
+    () => new Promise<Ripple[]>((resolve) => resolve([] as Ripple[])),
   );
 
   createEffect(() => {
     const q = searchParams.q;
     switch (searchParams.searchType) {
-      case "hashtag":
+      case 'hashtag':
         setFetcher(() => {
-          return () => getHashtags(q ?? "");
+          return () => getHashtags(q ?? '');
         });
         break;
 
@@ -59,10 +59,10 @@ export default function Search() {
         </nav>
         <Suspense>
           <Switch>
-            <Match when={searchParams.searchType == "user"}>
-              <UserFeed q={searchParams.q ?? ""} />
+            <Match when={searchParams.searchType == 'user'}>
+              <UserFeed q={searchParams.q ?? ''} />
             </Match>
-            <Match when={searchParams.searchType == "hashtag"}>
+            <Match when={searchParams.searchType == 'hashtag'}>
               <Feed fetcher={fetcher()} />
             </Match>
           </Switch>
@@ -81,7 +81,7 @@ function UserFeed(props: { q: string }) {
     () => props.q,
     async (q) => {
       return await getUserResults(q);
-    }
+    },
   );
   return (
     <For
@@ -125,7 +125,7 @@ function UserEntry(props: { user: User }) {
               />
             </div>
           </div>
-          {props.user.bio != "" ? (
+          {props.user.bio != '' ? (
             <p>
               <MultiLineText text={props.user.bio} />
             </p>

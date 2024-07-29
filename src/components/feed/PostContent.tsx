@@ -1,7 +1,7 @@
-import { createResource, For } from "solid-js";
-import { A } from "@solidjs/router";
-import { hashtagReg } from "~/lib/postParsing";
-import MultiLineText from "../shared/MultiLineText";
+import { createResource, For } from 'solid-js';
+import { A } from '@solidjs/router';
+import { hashtagReg } from '~/lib/postParsing';
+import MultiLineText from '../shared/MultiLineText';
 
 export default function PostContent(props: { content: string }) {
   const [res] = createResource(
@@ -13,7 +13,7 @@ export default function PostContent(props: { content: string }) {
         tags.push(match[0]);
       }
       return { text, tags };
-    }
+    },
   );
 
   return (

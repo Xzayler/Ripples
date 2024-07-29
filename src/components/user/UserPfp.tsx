@@ -1,5 +1,5 @@
 //@ts-ignore
-import defaultPfp from "~/assets/pfps/defaultPfp.svg";
+import defaultPfp from '../../assets/pfps/defaultPfp.svg';
 
 export default function UserPfp(props: { pfp?: string }) {
   return (

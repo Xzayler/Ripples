@@ -1,8 +1,8 @@
-import Feed from "~/components/feed/Feed";
-import { getBookmarks } from "~/lib/server";
-import { Suspense } from "solid-js";
-import Sidebar from "~/components/sidebar/Sidebar";
-import BackButton from "~/components/shared/BackButton";
+import Feed from '~/components/feed/Feed';
+import { getBookmarks } from '~/lib/server';
+import { Suspense } from 'solid-js';
+import Sidebar from '~/components/sidebar/Sidebar';
+import BackButton from '~/components/shared/BackButton';
 
 export default function Bookmarks() {
   return (

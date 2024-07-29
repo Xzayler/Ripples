@@ -1,4 +1,4 @@
-import { getCurrentUser } from "./gcu";
+import { getCurrentUser } from './gcu';
 import {
   addPost,
   addComment,
@@ -21,25 +21,25 @@ import {
   getTrending as gt,
   getHashtags as gh,
   getUserResults as gur,
-} from "./database";
-import mongoose from "mongoose";
+} from './database';
+import mongoose from 'mongoose';
 
 export const submitPost = async (formData: FormData) => {
   const id = (await getCurrentUser()).id;
-  const body = formData.get("body")?.toString();
+  const body = formData.get('body')?.toString();
   const postId = new mongoose.Types.ObjectId();
   addPost(postId, {
-    content: body ?? "",
+    content: body ?? '',
     author: id,
   });
   return postId.toString();
 };
 export const submitComment = async (formData: FormData, postId: string) => {
   const id = (await getCurrentUser()).id;
-  const body = formData.get("body")?.toString();
+  const body = formData.get('body')?.toString();
   const commentId = new mongoose.Types.ObjectId();
   addComment(commentId, {
-    content: body ?? "",
+    content: body ?? '',
     author: id,
     parent: new mongoose.Types.ObjectId(postId),
   });
@@ -129,7 +129,7 @@ export const getUserData = async (uHandle: string) => {
 export const updateUserData = async (
   pfp: File | null,
   name: string | null,
-  bio: string | null
+  bio: string | null,
 ) => {
   const currUser = await getCurrentUser();
   let newImg: File | null = null;

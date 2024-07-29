@@ -1,6 +1,6 @@
-import { createSignal, type JSX, Show, Suspense } from "solid-js";
-import { A } from "@solidjs/router";
-import UserPopup from "./UserPopup";
+import { createSignal, type JSX, Show, Suspense } from 'solid-js';
+import { A } from '@solidjs/router';
+import UserPopup from './UserPopup';
 
 export default function UserWrapper(props: {
   handle: string;
@@ -17,12 +17,12 @@ export default function UserWrapper(props: {
       onMouseEnter={() => {
         let timer: number = setTimeout(() => {
           setActive(true);
-          (tooltipbox as HTMLElement).classList.add("opacity-100");
+          (tooltipbox as HTMLElement).classList.add('opacity-100');
         }, 1000) as unknown as number;
         setTimeoutId(timer);
       }}
       onMouseLeave={() => {
-        (tooltipbox as HTMLElement).classList.remove("opacity-100");
+        (tooltipbox as HTMLElement).classList.remove('opacity-100');
         setTimeout(() => {
           setActive(false);
         }, 400);
@@ -31,7 +31,7 @@ export default function UserWrapper(props: {
     >
       <div
         ref={tooltipbox}
-        class={"transition duration-200 opacity-0 overflow-visible "}
+        class={'transition duration-200 opacity-0 overflow-visible '}
       >
         <Suspense>
           <Show when={active()}>

@@ -1,9 +1,9 @@
-import { For, Show, createResource } from "solid-js";
-import FollowButton, { FollowButtonDisabled } from "../user/FollowButton";
-import type { User } from "~/types";
-import { getSuggestedUsers } from "~/lib/server";
-import UserWrapper from "../user/UserWrapper";
-import UserPfp from "../user/UserPfp";
+import { For, createResource } from 'solid-js';
+import FollowButton, { FollowButtonDisabled } from '../user/FollowButton';
+import type { User } from '~/types';
+import { getSuggestedUsers } from '~/lib/server';
+import UserWrapper from '../user/UserWrapper';
+import UserPfp from '../user/UserPfp';
 
 function Suggestion(props: { user: User }) {
   return (

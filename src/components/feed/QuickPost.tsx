@@ -1,7 +1,7 @@
-import { createSignal, Show, useContext } from "solid-js";
-import PostModal, { openModal } from "../shared/PostModal";
-import UserPfp from "../user/UserPfp";
-import { UserContext } from "~/lib/UserContext";
+import { createSignal, Show, useContext } from 'solid-js';
+import PostModal, { openModal } from '../shared/PostModal';
+import UserPfp from '../user/UserPfp';
+import { UserContext } from '~/lib/UserContext';
 
 export default function QuickPost() {
   const [active, setActive] = createSignal<boolean>(false);

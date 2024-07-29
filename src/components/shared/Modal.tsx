@@ -1,15 +1,15 @@
-import { JSX, Suspense } from "solid-js";
-import { Portal } from "solid-js/web";
+import { JSX, Suspense } from 'solid-js';
+import { Portal } from 'solid-js/web';
 
 export const openModal = (openFn: () => void) => {
-  const html = document.getElementsByTagName("html")[0] as HTMLElement;
-  html.classList.add("overflow-hidden");
+  const html = document.getElementsByTagName('html')[0] as HTMLElement;
+  html.classList.add('overflow-hidden');
   openFn();
 };
 
 export const closeModal = (fn: () => void) => {
-  (document.getElementsByTagName("html")[0] as HTMLElement).classList.remove(
-    "overflow-hidden",
+  (document.getElementsByTagName('html')[0] as HTMLElement).classList.remove(
+    'overflow-hidden',
   );
   fn();
 };
@@ -19,11 +19,11 @@ export default function Modal(props: {
   class?: string;
 }) {
   return (
-    <Portal mount={document.getElementById("modal-root")!}>
+    <Portal mount={document.getElementById('modal-root')!}>
       <div class="fixed left-0 top-0 w-full h-full bg-faint/40 z-50 flex justify-center items-start pt-[5vh] ">
         <div
           class={
-            " bg-background rounded-2xl w-[600px] overflow-hidden min-w-[600px] max-h-[90vh] max-w-[80vw] " +
+            ' bg-background rounded-2xl w-[600px] overflow-hidden min-w-[600px] max-h-[90vh] max-w-[80vw] ' +
             props.class
           }
         >

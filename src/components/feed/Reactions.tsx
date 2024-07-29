@@ -1,26 +1,26 @@
-import { useAction, action } from "@solidjs/router";
-import { createEffect, createSignal, Show } from "solid-js";
-import type { Ripple } from "~/types";
+import { useAction, action } from '@solidjs/router';
+import { createEffect, createSignal, Show } from 'solid-js';
+import type { Ripple } from '~/types';
 import {
   addBookmark,
   removeBookmark,
   likePost,
   unlikePost,
-} from "~/lib/server";
-import PostModal, { openModal } from "../shared/PostModal";
-import LikeIcon from "../shared/icons/LikeIcon";
-import CommentIcon from "../shared/icons/CommentIcon";
-import RepostIcon from "../shared/icons/RepostIcon";
-import BookmarkIcon from "../shared/icons/BookmarkIcon";
+} from '~/lib/server';
+import PostModal, { openModal } from '../shared/PostModal';
+import LikeIcon from '../shared/icons/LikeIcon';
+import CommentIcon from '../shared/icons/CommentIcon';
+import RepostIcon from '../shared/icons/RepostIcon';
+import BookmarkIcon from '../shared/icons/BookmarkIcon';
 
 const defaultPost = {
-  id: "idasd",
-  pfp: "",
-  authorName: "default",
-  authorHandle: "def",
+  id: 'idasd',
+  pfp: '',
+  authorName: 'default',
+  authorHandle: 'def',
   createdAt: new Date(),
   updatedAt: new Date(),
-  content: "Default",
+  content: 'Default',
   likes: 0,
   hasLiked: false,
   hasBookmarked: false,
@@ -100,9 +100,9 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
       </div>
       <div
         class={
-          "cursor-pointer flex items-center " +
-          (hasLiked() ? " text-like " : " text-faint fill-transparent ") +
-          " hover:text-like"
+          'cursor-pointer flex items-center ' +
+          (hasLiked() ? ' text-like ' : ' text-faint fill-transparent ') +
+          ' hover:text-like'
         }
         onclick={(e) => {
           e.preventDefault();
@@ -120,7 +120,7 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
       </div>
       <div
         class={
-          "cursor-pointer flex items-center hover:text-repost " + "text-faint"
+          'cursor-pointer flex items-center hover:text-repost ' + 'text-faint'
           // + (hasReposted() ? " text-repost" : "text-faint") For future implementation
         }
       >
@@ -140,8 +140,8 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
               e.stopPropagation();
             }}
             class={
-              "h-6 w-auto hover:text-comment " +
-              (hasBookmarked() ? "text-comment" : "text-faint")
+              'h-6 w-auto hover:text-comment ' +
+              (hasBookmarked() ? 'text-comment' : 'text-faint')
             }
           >
             <BookmarkIcon toFill={hasBookmarked()} />

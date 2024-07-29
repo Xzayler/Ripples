@@ -1,7 +1,7 @@
-import { createResource, Show } from "solid-js";
-import UserPfp from "./UserPfp";
-import { getUserSummary } from "~/lib/server";
-import FollowButton, { FollowButtonDisabled } from "./FollowButton";
+import { createResource, Show } from 'solid-js';
+import UserPfp from './UserPfp';
+import { getUserSummary } from '~/lib/server';
+import FollowButton, { FollowButtonDisabled } from './FollowButton';
 
 export default function UserPopup(props: { userHandle: string }) {
   const [user] = createResource(() => {
@@ -53,7 +53,7 @@ export default function UserPopup(props: { userHandle: string }) {
             >
               <span class="text-foreground">{user()!.following}</span>
             </Show>
-            <span class="text-faint">{" Following"}</span>
+            <span class="text-faint">{' Following'}</span>
           </div>
           <div>
             <Show
@@ -62,7 +62,7 @@ export default function UserPopup(props: { userHandle: string }) {
             >
               <span class="text-foreground">{user()!.followers}</span>
             </Show>
-            <span class="text-faint">{" Followers"}</span>
+            <span class="text-faint">{' Followers'}</span>
           </div>
         </div>
       </div>

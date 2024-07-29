@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import { Schema, InferSchemaType } from "mongoose";
+import mongoose from 'mongoose';
+import { Schema, InferSchemaType } from 'mongoose';
 
 const bookmarksSchema = new Schema({
   _id: { type: mongoose.Schema.Types.ObjectId, required: true },
@@ -13,7 +13,7 @@ export type InferredBookmark = InferSchemaType<typeof bookmarksSchema>;
 
 export default mongoose.models?.BookmarksModel ||
   mongoose.model<InferredBookmark>(
-    "BookmarksModel",
+    'BookmarksModel',
     bookmarksSchema,
-    "bookmarks"
+    'bookmarks',
   );

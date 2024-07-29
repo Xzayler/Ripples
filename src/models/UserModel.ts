@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import { Schema, InferSchemaType } from "mongoose";
+import mongoose from 'mongoose';
+import { Schema, InferSchemaType } from 'mongoose';
 
 const userSchema = new Schema({
   _id: { type: String, required: true },
@@ -15,4 +15,4 @@ const userSchema = new Schema({
 export type InferredUser = InferSchemaType<typeof userSchema>;
 
 export default mongoose.models?.UserModel ||
-  mongoose.model<InferredUser>("UserModel", userSchema, "users");
+  mongoose.model<InferredUser>('UserModel', userSchema, 'users');

@@ -1,6 +1,6 @@
-import Ripple from "./Ripple";
-import { type Ripple as RippleType } from "~/types";
-import { createResource, For, Suspense } from "solid-js";
+import Ripple from './Ripple';
+import { type Ripple as RippleType } from '~/types';
+import { createResource, For, Suspense } from 'solid-js';
 
 type RippleFetcherWithArg<T> = (t: T) => Promise<RippleType[]>;
 type RippleFetcherWithoutArg = () => Promise<RippleType[]>;
@@ -17,7 +17,7 @@ export default function Feed<T>(props: {
       return (
         arg ? await f(arg) : await (f as RippleFetcherWithoutArg)()
       ) as RippleType[];
-    }
+    },
   );
 
   return (
