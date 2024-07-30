@@ -17,6 +17,9 @@ importers:
       '@solidjs/start':
         specifier: ^1.0.2
         version: 1.0.2(rollup@4.18.0)(solid-js@1.8.17)(vinxi@0.3.12(@opentelemetry/api@1.9.0)(@types/node@20.14.8)(ioredis@5.4.1)(magicast@0.3.4)(terser@5.31.1))(vite@5.3.1(@types/node@20.14.8)(terser@5.31.1))
+      '@tailwindcss/container-queries':
+        specifier: ^0.1.1
+        version: 0.1.1(tailwindcss@3.4.4)
       '@types/bcryptjs':
         specifier: ^2.4.6
         version: 2.4.6
@@ -1130,6 +1133,11 @@ packages:
 
   '@solidjs/start@1.0.2':
     resolution: {integrity: sha512-SRoFvSnL47O1hg4/Er2es2AVoOWRdGBm0C8h2KsHFjbiRe1r2AxsONHR9job+Hmzbl5icSaGmNoXoQ8qpTy4UA==}
+
+  '@tailwindcss/container-queries@0.1.1':
+    resolution: {integrity: sha512-p18dswChx6WnTSaJCSGx6lTmrGzNNvm2FtXmiO6AuA1V4U5REyoqwmT6kgAsIMdjo07QdAfYXHJ4hnMtfHzWgA==}
+    peerDependencies:
+      tailwindcss: '>=3.2.0'
 
   '@tybys/wasm-util@0.8.3':
     resolution: {integrity: sha512-Z96T/L6dUFFxgFJ+pQtkPpne9q7i6kIPYCFnQBHSgSPV9idTsKfIhCss0h5iM9irweZCatkrdeP8yi5uM1eX6Q==}
@@ -4116,6 +4124,10 @@ snapshots:
       - supports-color
       - vinxi
       - vite
+
+  '@tailwindcss/container-queries@0.1.1(tailwindcss@3.4.4)':
+    dependencies:
+      tailwindcss: 3.4.4
 
   '@tybys/wasm-util@0.8.3':
     dependencies:

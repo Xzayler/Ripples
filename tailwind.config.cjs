@@ -28,5 +28,5 @@ module.exports = {
       main: 'var(--font-family)',
     },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/container-queries')],
 };
