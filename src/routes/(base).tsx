@@ -13,7 +13,7 @@ export default function BaseLayout(props: { children: JSX.Element }) {
 
   return (
     <div class="relative w-full min-h-screen bg-background text-foreground flex justify-center items-center">
-      <div class="flex flex-row relative items-start justify-center">
+      <div class="flex flex-row items-start justify-center">
         <Suspense
           fallback={
             <div class="w-full h-dvh bg-background flex items-center justify-center  ">

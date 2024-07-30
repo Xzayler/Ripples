@@ -3,14 +3,18 @@ import UserPfp from './UserPfp';
 import { getUserSummary } from '~/lib/server';
 import FollowButton, { FollowButtonDisabled } from './FollowButton';
 import MultiLineText from '../shared/MultiLineText';
+import Tooltip from '../shared/Tooltip';
 
-export default function UserPopup(props: { userHandle: string }) {
+export default function UserPopup(props: {
+  userHandle: string;
+  pos: { x: number; y: number };
+}) {
   const [user] = createResource(() => {
     return getUserSummary(props.userHandle);
   });
 
   return (
-    <div class="absolute cursor-default w-[256px] bottom-full left-1/2 -translate-x-[50%]">
+    <Tooltip pos={props.pos}>
       <div class="flex flex-col p-4 gap-2 mb-2 rounded-2xl bg-background shadow-[0px_0px_4px_rgba(255,255,255,0.3)] overflow-hidden">
         <div class="flex justify-between w-full">
           <div class=" w-16 aspect-square rounded-full ">
@@ -69,6 +73,6 @@ export default function UserPopup(props: { userHandle: string }) {
           </div>
         </div>
       </div>
-    </div>
+    </Tooltip>
   );
 }

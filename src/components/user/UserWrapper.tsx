@@ -9,36 +9,43 @@ export default function UserWrapper(props: {
   const [timeoutId, setTimeoutId] = createSignal<number>();
   const [active, setActive] = createSignal<boolean>(false);
 
-  let tooltipbox: HTMLDivElement | ((el: HTMLDivElement) => void) | undefined;
+  let wrapperEl: HTMLDivElement | ((el: HTMLDivElement) => void) | undefined;
+
+  // let eldiv: HTMLDivElement;
 
   return (
     <div
+      ref={wrapperEl}
       class="relative"
-      onMouseEnter={() => {
+      onMouseEnter={(event: MouseEvent) => {
         let timer: number = setTimeout(() => {
           setActive(true);
-          (tooltipbox as HTMLElement).classList.add('opacity-100');
         }, 1000) as unknown as number;
         setTimeoutId(timer);
       }}
       onMouseLeave={() => {
-        (tooltipbox as HTMLElement).classList.remove('opacity-100');
         setTimeout(() => {
           setActive(false);
         }, 400);
         clearTimeout(timeoutId());
       }}
     >
-      <div
-        ref={tooltipbox}
-        class={'transition duration-200 opacity-0 overflow-visible '}
-      >
-        <Suspense>
-          <Show when={active()}>
-            <UserPopup userHandle={props.handle} />
-          </Show>
-        </Suspense>
-      </div>
+      <Suspense>
+        <Show when={active()}>
+          <UserPopup
+            userHandle={props.handle}
+            pos={(() => {
+              const rect = (
+                wrapperEl as HTMLDivElement
+              ).getBoundingClientRect();
+              return {
+                x: Math.round(rect.left + (rect.right - rect.left) / 2),
+                y: Math.round(rect.top - (rect.bottom - rect.top)),
+              };
+            })()}
+          />
+        </Show>
+      </Suspense>
       <A
         onClick={(e) => {
           e.stopPropagation();
