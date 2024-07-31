@@ -23,7 +23,9 @@ export default function Navbar() {
         </div>
         <nav class="pb-3 flex flex-col items-start my-1">
           <MenuItem href={'/home'} text="Home">
-            <HomeIcon toFill={pathname() == '/home'} />
+            <HomeIcon
+              toFill={pathname() == '/home' || pathname() == '/follows'}
+            />
           </MenuItem>
           <MenuItem href={'/messages'} text="Messages">
             <MessageIcon toFill={pathname() === '/messages'} />
