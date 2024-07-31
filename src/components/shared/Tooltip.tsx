@@ -9,10 +9,13 @@ export default function Tooltip(props: {
   return (
     <Portal mount={document.getElementById('modal-root')!}>
       <div
-        style={`bottom: calc(100dvh - ${props.pos.y - 8}px); left: ${
+        style={`bottom: calc(100dvh - ${props.pos.y + 16}px); left: ${
           props.pos.x
         }px;`}
         class="absolute -translate-x-1/2  "
+        onclick={(e: MouseEvent) => {
+          e.stopPropagation();
+        }}
       >
         <div class="relative left">
           <Suspense>{props.children}</Suspense>
