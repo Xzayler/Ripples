@@ -18,7 +18,7 @@ export default function SearchBar() {
           )}`,
         );
       }, 'search')}
-      class="flex bg-background mb-3 w-full sticky top-0 h-[53px] items-center max-w-xs "
+      class="flex bg-background mb-3 w-full sticky top-0 h-[53px] items-center "
     >
       <div class="flex h-11 w-full bg-highlight rounded-full outline-[3px] outline-accent/60 focus-within:outline ">
         <select

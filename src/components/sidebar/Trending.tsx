@@ -27,8 +27,8 @@ export default function Trending() {
     return getTrending() as Promise<Tag[]>;
   });
   return (
-    <div class="rounded-2xl bg-highlight overflow-hidden">
-      <h2 class=" px-4 py-3 text-foreground text-xl font-extrabold ">
+    <div class="rounded-2xl bg-highlight overflow-hidden text-start ">
+      <h2 class=" px-4 py-3 text-foreground text-xl text-center font-extrabold ">
         Trending
       </h2>
       <For
