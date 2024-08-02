@@ -1,12 +1,15 @@
-import { useLocation } from '@solidjs/router';
+import { action, useLocation } from '@solidjs/router';
 import { createMemo, createSignal } from 'solid-js';
-import MenuItem from './MenuItem';
+import MenuItem, { MenuItemNoA } from './MenuItem';
 import PostButton from '~/components/shared/PostButton';
 import UserProfile from './UserProfile';
 import HomeIcon from '~/components/shared/icons/HomeIcon';
 import MessageIcon from '~/components/shared/icons/MessageIcon';
 import BookmarkIcon from '~/components/shared/icons/BookmarkIcon';
 import WavesIcon from '~/components/shared/icons/WavesIcon';
+import SearchIcon from '../shared/icons/SearchIcon';
+import LogoutIcon from '../shared/icons/LogoutIcon';
+import { logout } from '~/lib/server';
 
 export default function Navbar(props: { isOpen: boolean }) {
   const location = useLocation();
@@ -36,6 +39,24 @@ export default function Navbar(props: { isOpen: boolean }) {
           <MenuItem href={'/bookmarks'} text="Bookmarks">
             <BookmarkIcon toFill={pathname() === '/bookmarks'} />
           </MenuItem>
+          <MenuItem
+            href={'/search'}
+            text="Search"
+            extraClass="block @[62rem]/content:hidden"
+          >
+            <SearchIcon toFill={pathname() === '/search'} />
+          </MenuItem>
+          <form
+            method="post"
+            class="block @[259px]/nav:hidden"
+            action={action(logout)}
+          >
+            <button type="submit">
+              <MenuItemNoA text="Log Out">
+                <LogoutIcon />
+              </MenuItemNoA>
+            </button>
+          </form>
         </nav>
         <div class=" my-1 w-[50px] @[259px]/nav:w-full ">
           <PostButton></PostButton>
