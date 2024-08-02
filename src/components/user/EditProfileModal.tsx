@@ -123,7 +123,7 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
                 />
               </div>
               <div class="mt-2 mb-4 grow flex flex-col items-stretch ">
-                <CharacterLimit text={bio()} limit={20} />
+                <CharacterLimit text={bio()} limit={160} />
                 <textarea
                   placeholder="Your Bio"
                   rows={4}
