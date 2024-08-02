@@ -1,5 +1,6 @@
 import { action, redirect } from '@solidjs/router';
 import { RouterResponseInit } from '@solidjs/router/dist/data/response';
+import SearchIcon from '../shared/icons/SearchIcon';
 
 export default function SearchBar() {
   const resp: RouterResponseInit = { revalidate: 'true' };
@@ -35,9 +36,9 @@ export default function SearchBar() {
         />
         <button
           type="submit"
-          class="hover:bg-highlightextra pl-2 pr-3 rounded-r-full "
+          class="hover:bg-highlightextra p-2 pr-3 rounded-r-full "
         >
-          O
+          <SearchIcon toFill={false} />
         </button>
       </div>
     </form>
