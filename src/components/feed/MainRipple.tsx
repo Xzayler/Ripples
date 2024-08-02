@@ -40,9 +40,9 @@ export default function MainRipple(props: {
             </div>
           </div>
           <div class="flex text-md flex-col w-full">
-            <div>
+            <p class="mt-2">
               {props.post ? <PostContent content={props.post.content} /> : null}
-            </div>
+            </p>
           </div>
         </div>
         <div class="my-4">
@@ -66,11 +66,11 @@ export default function MainRipple(props: {
           </span>
         </div>
       </article>
-      <div class="border-b border-ui"></div>
+      <div class="border-b border-ui" />
       <div class="my-4 w-full">
         <Reactions post={props.post} />
       </div>
-      <div class="border-b border-ui"></div>
+      <div class="border-b border-ui" />
       <WriteComment
         parentid={props.post ? props.post.id : ''}
         replyTo={props.post ? props.post.authorHandle : ''}

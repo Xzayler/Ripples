@@ -26,10 +26,10 @@ export default function UserProfile() {
         </div>
       </Show>
       <div class="cursor-pointer rounded-full w-full p-3 flex items-center hover:bg-highlight">
-        <div class="h-10 w-10 rounded-full">
+        <div class="h-10 w-10 rounded-full shrink-0">
           <UserPfp pfp={user!() ? user!()!.pfp : undefined} />
         </div>
-        <div class="flex flex-col mx-3 text-foreground">
+        <div class="flex-col mx-3 text-foreground hidden @[259px]/nav:flex">
           <span class="text-md font-bold ">
             {user!() ? user!()!.name : 'Loading'}
           </span>
@@ -37,7 +37,7 @@ export default function UserProfile() {
             user!() ? user!()!.handle : 'loading'
           }`}</span>
         </div>
-        <div class="grow flex justify-end">
+        <div class="grow justify-end hidden @[259px]/nav:flex">
           <div
             onclick={(e) => {
               setMenuOpen(!menuOpen());

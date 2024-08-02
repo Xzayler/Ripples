@@ -16,7 +16,7 @@ export default function Ripple(props: { post: Ripple }) {
       onClick={() => {
         navigate(`/post/${id}`);
       }}
-      class="px-4 flex flex-col w-full cursor-pointer border-solid border-b border-ui"
+      class="px-4 flex flex-col bg-background w-full cursor-pointer border-solid border-b border-ui @container/ripple"
     >
       {/* retweeted by.. */}
       <div class="pt-3 pb-2">
@@ -38,7 +38,7 @@ export default function Ripple(props: { post: Ripple }) {
         </div>
         <div class="flex text-md flex-col w-full">
           {/* Post Meta */}
-          <div class="flex flex-row">
+          <div class="flex flex-row flex-wrap">
             <div class="mr-1">
               <UserWrapper handle={authorHandle}>
                 <span class="hover:underline font-bold text-foreground">
@@ -63,11 +63,11 @@ export default function Ripple(props: { post: Ripple }) {
             </div>
           </div>
           {/* Post Content */}
-          <p>
+          <p class="mt-2 ">
             <PostContent content={content} />
           </p>
           {/* Post Reactions */}
-          <div class="mb-3 w-full my-3">
+          <div class="w-full my-3">
             <Reactions post={post} />
           </div>
         </div>

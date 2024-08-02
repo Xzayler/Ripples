@@ -7,7 +7,7 @@ import SearchBar from './SearchBar';
 
 export default function Sidebar() {
   return (
-    <div class="flex flex-col gap-4 sticky top-0 border-l border-ui">
+    <div class="flex flex-col gap-4 ">
       <SearchBar />
       <Suspense fallback={<FollowSuggestionsSkeleton />}>
         <FollowSuggestions />

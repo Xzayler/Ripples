@@ -18,7 +18,7 @@ export default function SearchBar() {
           )}`,
         );
       }, 'search')}
-      class="flex bg-background mb-3 w-full sticky top-0 h-[53px] items-center "
+      class="flex bg-background mb-3 w-full sticky top-0 h-[53px] items-center max-w-xs "
     >
       <div class="flex h-11 w-full bg-highlight rounded-full outline-[3px] outline-accent/60 focus-within:outline ">
         <select
@@ -32,7 +32,7 @@ export default function SearchBar() {
         <input
           type="search"
           name="searchQuery"
-          class="h-11 w-full bg-highlight outline-none"
+          class="h-11 w-full bg-highlight outline-none pl-2"
         />
         <button
           type="submit"

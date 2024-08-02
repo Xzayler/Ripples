@@ -16,7 +16,6 @@ export default function UserWrapper(props: {
   return (
     <div
       ref={wrapperEl}
-      class="relative"
       onMouseEnter={(event: MouseEvent) => {
         let timer: number = setTimeout(() => {
           setActive(true);

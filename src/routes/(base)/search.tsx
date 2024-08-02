@@ -10,7 +10,6 @@ import {
 import { useSearchParams } from '@solidjs/router';
 import BackButton from '~/components/shared/BackButton';
 import Feed from '~/components/feed/Feed';
-import Sidebar from '~/components/sidebar/Sidebar';
 import UserPfp from '~/components/user/UserPfp';
 import UserWrapper from '~/components/user/UserWrapper';
 import FollowButton from '~/components/user/FollowButton';
@@ -18,6 +17,8 @@ import MultiLineText from '~/components/shared/MultiLineText';
 
 import { getHashtags, getUserResults } from '~/lib/server';
 import { Ripple, User } from '~/types';
+import SearchBar from '~/components/sidebar/SearchBar';
+import Sidebar from '~/components/sidebar/Sidebar';
 
 type SearchParams = {
   searchType: 'general' | 'hashtag' | 'user';
@@ -25,7 +26,7 @@ type SearchParams = {
 };
 
 export default function Search() {
-  const [searchParams, setSearchParams] = useSearchParams<SearchParams>();
+  const [searchParams] = useSearchParams<SearchParams>();
   const [fetcher, setFetcher] = createSignal(
     () => new Promise<Ripple[]>((resolve) => resolve([] as Ripple[])),
   );
@@ -49,30 +50,26 @@ export default function Search() {
   });
 
   return (
-    <main class="w-[990px] flex justify-between h-full relative items-end ">
-      <div class="shrink w-[600px] relative flex flex-col self-stretch ">
-        <nav class="flex w-full sticky top-0 border-b border-ui z-50">
-          <div class="px-4 w-1/2 bg-background gap-3 h-[53px] font-semibold grow flex items-center ">
-            <BackButton />
-            <h1 class="flex items-center h-[52px] ">Search Results</h1>
-          </div>
-        </nav>
-        <Suspense>
-          <Switch>
-            <Match when={searchParams.searchType == 'user'}>
-              <UserFeed q={searchParams.q ?? ''} />
-            </Match>
-            <Match when={searchParams.searchType == 'hashtag'}>
-              <Feed fetcher={fetcher()} />
-            </Match>
-          </Switch>
-        </Suspense>
-      </div>
-      {/* Sidebar */}
-      <div class="shrink w-[350px] mr-[10px] border-l border-ui p">
-        <Sidebar />
-      </div>
-    </main>
+    <div class="relative flex flex-col self-stretch ">
+      <nav class="z-10 pl-8 flex w-full sticky top-0 border-b border-ui">
+        <div class="px-4 w-1/2 bg-background gap-3 h-[53px] font-semibold grow flex items-center ">
+          <BackButton />
+          <h1 class="flex items-center h-[52px] ">
+            {searchParams ? 'Search Results' : 'Search'}
+          </h1>
+        </div>
+      </nav>
+      <Suspense>
+        <Switch>
+          <Match when={searchParams.searchType == 'user'}>
+            <UserFeed q={searchParams.q ?? ''} />
+          </Match>
+          <Match when={searchParams.searchType == 'hashtag'}>
+            <Feed fetcher={fetcher()} />
+          </Match>
+        </Switch>
+      </Suspense>
+    </div>
   );
 }
 

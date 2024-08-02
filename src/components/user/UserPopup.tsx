@@ -48,7 +48,7 @@ export default function UserPopup(props: {
           </div>
         </Show>
         <Show when={user()?.bio} fallback={null}>
-          <p>
+          <p class="text-foreground">
             <MultiLineText text={user()!.bio} />
           </p>
         </Show>

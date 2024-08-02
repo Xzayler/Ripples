@@ -24,7 +24,7 @@ function Parent(props: { parent: Ripple }) {
       </div>
       <div class="flex text-md flex-col w-full">
         {/* Post Meta */}
-        <div class="flex flex-row">
+        <div class="flex flex-row flex-wrap">
           <div class="mr-1">
             <UserWrapper handle={props.parent ? props.parent.authorHandle : ''}>
               <span class="font-bold text-foreground">
@@ -47,7 +47,7 @@ function Parent(props: { parent: Ripple }) {
           </div>
         </div>
         {/* Post Content */}
-        <p>
+        <p class="mt-2">
           <PostContent content={props.parent.content} />
         </p>
         <div class="py-4">

@@ -131,21 +131,19 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
           <span class="text-sm">{props.post ? props.post.reposts : 0}</span>
         </div>
       </div>
-      <div class="flex">
-        <div class="flex items-center mr-3 ">
-          <div
-            onclick={(e) => {
-              e.preventDefault();
-              pressBookmark();
-              e.stopPropagation();
-            }}
-            class={
-              'h-6 w-auto hover:text-comment ' +
-              (hasBookmarked() ? 'text-comment' : 'text-faint')
-            }
-          >
-            <BookmarkIcon toFill={hasBookmarked()} />
-          </div>
+      <div class="flex items-center ">
+        <div
+          onclick={(e) => {
+            e.preventDefault();
+            pressBookmark();
+            e.stopPropagation();
+          }}
+          class={
+            'h-6 w-auto hover:text-comment ' +
+            (hasBookmarked() ? 'text-comment' : 'text-faint')
+          }
+        >
+          <BookmarkIcon toFill={hasBookmarked()} />
         </div>
       </div>
     </div>
