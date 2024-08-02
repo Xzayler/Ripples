@@ -9,9 +9,6 @@ const [postBody, setPostBody] = createSignal<string | null>('');
 const updatePlaceholder = (e: Event) => {
   const el: HTMLElement = e.target as HTMLElement;
   setPostBody(el.textContent);
-  if (el.textContent == '') {
-    el.removeChild(el.firstChild!);
-  }
 };
 
 export default function WriteComment(props: {

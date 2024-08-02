@@ -20,9 +20,6 @@ export default function PostModal(props: {
   const updateInput = (e: Event) => {
     const el: HTMLElement = e.target as HTMLElement;
     setPostBody(el.textContent);
-    if (el.textContent == '' && el.firstChild) {
-      el.removeChild(el.firstChild);
-    }
   };
 
   const user = useContext(UserContext);
