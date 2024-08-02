@@ -112,7 +112,7 @@ export const login = async (formData: FormData) => {
   return redirect('/home');
 };
 
-export const logout = async (formData: FormData) => {
+export const logout = async () => {
   const event = getRequestEvent();
   if (!event?.locals.session) {
     return new Error('Unauthorized');
