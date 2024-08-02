@@ -4,6 +4,7 @@ import {
   Switch,
   Match,
   For,
+  Show,
   createEffect,
   createResource,
 } from 'solid-js';
@@ -51,14 +52,30 @@ export default function Search() {
 
   return (
     <div class="relative flex flex-col self-stretch ">
-      <nav class="z-10 pl-8 flex w-full sticky top-0 border-b border-ui">
+      <nav class="z-10 pl-8 @[31.25rem]/content:pl-0 bg-background flex w-full sticky top-0 border-b border-ui">
         <div class="px-4 w-1/2 bg-background gap-3 h-[53px] font-semibold grow flex items-center ">
           <BackButton />
           <h1 class="flex items-center h-[52px] ">
-            {searchParams ? 'Search Results' : 'Search'}
+            {Object.keys(searchParams).length === 0
+              ? 'Search'
+              : 'Search Results'}
           </h1>
         </div>
       </nav>
+      <Show
+        when={Object.keys(searchParams).length === 0}
+        fallback={
+          <div class="w-full bg-background border-b border-ui px-1 py-3 text-lg text-center">{`Searched for: ${
+            searchParams.searchType === 'hashtag' ? '#' : ''
+          }${searchParams.searchType === 'user' ? '@' : ''}${
+            searchParams.q
+          }`}</div>
+        }
+      >
+        <div class="px-4 text-center @[62rem]/content:hidden text-xl ">
+          <Sidebar />
+        </div>
+      </Show>
       <Suspense>
         <Switch>
           <Match when={searchParams.searchType == 'user'}>
