@@ -31,7 +31,7 @@ export default function BaseLayout(props: { children: JSX.Element }) {
             <div class="flex gap-2 shrink grow @[51rem]/content:grow-0">
               <div class="grow w-1 @[51rem]/content:w-[700px] @[62rem]/content:w-[600px] border-x border-ui">
                 <Suspense>
-                  <main class="text-base ">{props.children}</main>
+                  <main class="text-base h-full">{props.children}</main>
                 </Suspense>
               </div>
               <div class="min-w-[290px] @[66rem]/content:min-w-[350px] h-min @container/side @[62rem]/content:block hidden">
