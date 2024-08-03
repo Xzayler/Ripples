@@ -23,11 +23,11 @@ export default function Modal(props: {
       <div class="fixed left-0 top-0 w-full h-full bg-faint/40 z-50 flex justify-center items-start sm:pt-[5vh] ">
         <div
           class={
-            ' bg-background overflow-hidden sm:rounded-2xl w-dvw sm:w-[600px] sm:max-w-[80vw] sm:min-w-[600px] h-dvh sm:max-h-[90vh] ' +
+            ' bg-background overflow-hidden sm:rounded-2xl w-dvw sm:w-[600px] sm:max-w-[80vw] sm:min-w-[600px] sm:h-min h-dvh sm:max-h-[90vh] ' +
             props.class
           }
         >
-          <div class=" h-full flex flex-col mx-auto text-foreground max-w-[500px]">
+          <div class="h-full flex flex-col mx-auto text-foreground max-w-[500px] sm:max-w-none">
             <Suspense>{props.children}</Suspense>
           </div>
         </div>
