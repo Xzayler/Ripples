@@ -1,7 +1,7 @@
 import { createMiddleware } from '@solidjs/start/middleware';
 import { getCookie, setCookie, getHeader } from 'vinxi/http';
 import { Session, User, verifyRequestOrigin } from 'lucia';
-import { lucia } from './lib/auth';
+import { getLucia } from './lib/auth';
 
 export default createMiddleware({
   onRequest: async (event) => {
@@ -17,7 +17,7 @@ export default createMiddleware({
         return;
       }
     }
-
+    const lucia = await getLucia();
     const cookie =
       getCookie(event.nativeEvent, lucia.sessionCookieName) ?? null;
     const sessionId = cookie ? lucia.readSessionCookie(cookie) : null;

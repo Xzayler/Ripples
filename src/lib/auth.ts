@@ -5,15 +5,14 @@ import { createUser, getAdapter, getUserByUsername } from './database';
 import { setCookie } from 'vinxi/http';
 import bcrypt from 'bcryptjs';
 
-export const lucia = await (async () => {
-  // this runs on fucking client for some reason
+export const getLucia = async () => {
   return new Lucia((await getAdapter())!, {
     sessionCookie: {
       expires: true,
       attributes: {
         // set to `true` when using HTTPS
-        // secure: process.env.NODE_ENV === "production",
-        secure: false,
+        // secure: false,
+        secure: process.env.NODE_ENV === 'production',
       },
     },
     getUserAttributes: (attributes) => {
@@ -22,11 +21,16 @@ export const lucia = await (async () => {
       };
     },
   });
-})();
+};
 
 declare module 'lucia' {
   interface Register {
-    Lucia: typeof lucia;
+    Lucia: Lucia<
+      Record<never, never>,
+      {
+        _id: string;
+      }
+    >;
     DatabaseUserAttributes: DatabaseUserAttributes;
   }
 }
@@ -103,6 +107,8 @@ export const login = async (formData: FormData) => {
     return new Error('Incorrect username or password');
   }
 
+  const lucia = await getLucia();
+
   const session = await lucia.createSession(existingUser._id, {});
   const event = getRequestEvent()!;
 
@@ -117,6 +123,7 @@ export const logout = async () => {
   if (!event?.locals.session) {
     return new Error('Unauthorized');
   }
+  const lucia = await getLucia();
   await lucia.invalidateSession(event.locals.session.id);
   event.response.headers.set(
     lucia.sessionCookieName,
