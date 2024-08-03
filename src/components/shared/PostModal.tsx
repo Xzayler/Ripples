@@ -7,6 +7,7 @@ import PostContent from '../feed/PostContent';
 import CharacterLimit from './CharacterLimit';
 import UserPfp from '../user/UserPfp';
 import { UserContext } from '~/lib/UserContext';
+import { calcDate } from '~/lib/date';
 
 export const openModal = om;
 
@@ -38,13 +39,13 @@ export default function PostModal(props: {
             </div>
             <div class="flex text-md flex-col w-full">
               {/* Post Meta */}
-              <div class="flex flex-row">
+              <div class="flex flex-row flex-wrap">
                 <div class="mr-1">
                   <span class="font-bold text-foreground">
                     {props.parent!.authorName}
                   </span>
                 </div>
-                <div class="flex text-faint">
+                <div class="flex text-faint flex-wrap">
                   <div>
                     <span>{`@${props.parent!.authorHandle}`}</span>
                   </div>
@@ -52,7 +53,7 @@ export default function PostModal(props: {
                     <span>⋅</span>
                   </div>
                   <div>
-                    <span>{props.parent!.createdAt.toUTCString()}</span>
+                    <time>{calcDate(props.parent!.createdAt)}</time>
                   </div>
                 </div>
               </div>
