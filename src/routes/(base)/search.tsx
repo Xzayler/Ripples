@@ -65,14 +65,21 @@ export default function Search() {
       <Show
         when={Object.keys(searchParams).length === 0}
         fallback={
-          <div class="w-full bg-background border-b border-ui px-1 py-3 text-lg text-center">{`Searched for: ${
-            searchParams.searchType === 'hashtag' ? '#' : ''
-          }${searchParams.searchType === 'user' ? '@' : ''}${
-            searchParams.q
-          }`}</div>
+          <div class="p-4 border-b border-ui  ">
+            <div class="w-full flex justify-center @[62rem]/content:hidden">
+              <div class="w-full max-w-[350px]">
+                <SearchBar />
+              </div>
+            </div>
+            <div class="w-full bg-background text-lg text-center">{`Searched for: ${
+              searchParams.searchType === 'hashtag' ? '#' : ''
+            }${searchParams.searchType === 'user' ? '@' : ''}${
+              searchParams.q
+            }`}</div>
+          </div>
         }
       >
-        <div class="px-4 text-center @[62rem]/content:hidden text-xl ">
+        <div class="px-4 pt-4 text-center @[62rem]/content:hidden text-xl ">
           <Sidebar />
         </div>
       </Show>
