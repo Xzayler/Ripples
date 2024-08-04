@@ -20,6 +20,7 @@ import { getHashtags, getUserResults } from '~/lib/server';
 import { Ripple, User } from '~/types';
 import SearchBar from '~/components/sidebar/SearchBar';
 import Sidebar from '~/components/sidebar/Sidebar';
+import Loading from '~/components/shared/Loading';
 
 type SearchParams = {
   searchType: 'general' | 'hashtag' | 'user';
@@ -83,16 +84,14 @@ export default function Search() {
           <Sidebar />
         </div>
       </Show>
-      <Suspense>
-        <Switch>
-          <Match when={searchParams.searchType == 'user'}>
-            <UserFeed q={searchParams.q ?? ''} />
-          </Match>
-          <Match when={searchParams.searchType == 'hashtag'}>
-            <Feed fetcher={fetcher()} />
-          </Match>
-        </Switch>
-      </Suspense>
+      <Switch>
+        <Match when={searchParams.searchType == 'user'}>
+          <UserFeed q={searchParams.q ?? ''} />
+        </Match>
+        <Match when={searchParams.searchType == 'hashtag'}>
+          <Feed fetcher={fetcher()} />
+        </Match>
+      </Switch>
     </div>
   );
 }
@@ -105,14 +104,16 @@ function UserFeed(props: { q: string }) {
     },
   );
   return (
-    <For
-      each={users()}
-      fallback={<div class="text-center text-xl mt-6">No users found</div>}
-    >
-      {(item) => {
-        return <UserEntry user={item} />;
-      }}
-    </For>
+    <Suspense fallback={<Loading />}>
+      <For
+        each={users()}
+        fallback={<div class="text-center text-xl mt-6">No users found</div>}
+      >
+        {(item) => {
+          return <UserEntry user={item} />;
+        }}
+      </For>
+    </Suspense>
   );
 }
 

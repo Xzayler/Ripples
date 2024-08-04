@@ -6,6 +6,7 @@ import { Suspense } from 'solid-js';
 import { getCurrentUser } from '~/lib/gcu';
 import WavesIcon from '~/components/shared/icons/WavesIcon';
 import Sidebar from '~/components/sidebar/Sidebar';
+import Loading from '~/components/shared/Loading';
 
 export default function BaseLayout(props: { children: JSX.Element }) {
   const [user] = createResource(async () => {
@@ -18,19 +19,13 @@ export default function BaseLayout(props: { children: JSX.Element }) {
   }
 
   return (
-    <Suspense
-      fallback={
-        <div class="w-full h-dvh bg-background flex items-center justify-center  ">
-          <WavesIcon />
-        </div>
-      }
-    >
+    <Suspense fallback={<Loading />}>
       <Show when={user()}>
         <UserContext.Provider value={user}>
           <div class="relative max-w-[100dvw] flex justify-center bg-background text-foreground @container/content">
             <div class="flex gap-2 shrink grow @[51rem]/content:grow-0">
               <div class="grow w-1 @[51rem]/content:w-[700px] @[62rem]/content:w-[600px] border-x border-ui">
-                <Suspense>
+                <Suspense fallback={<Loading />}>
                   <main class="text-base h-full">{props.children}</main>
                 </Suspense>
               </div>

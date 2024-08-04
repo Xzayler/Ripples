@@ -1,6 +1,5 @@
 import Feed from '~/components/feed/Feed';
 import { getBookmarks } from '~/lib/server';
-import { Suspense } from 'solid-js';
 import BackButton from '~/components/shared/BackButton';
 
 export default function Bookmarks() {
@@ -12,9 +11,7 @@ export default function Bookmarks() {
           <h1 class="flex items-center h-[52px] ">My Bookmarks</h1>
         </div>
       </nav>
-      <Suspense>
-        <Feed fetcher={getBookmarks} />
-      </Suspense>
+      <Feed fetcher={getBookmarks} />
     </div>
   );
 }
