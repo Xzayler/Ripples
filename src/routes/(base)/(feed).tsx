@@ -1,12 +1,10 @@
 import { A } from '@solidjs/router';
 import QuickPost from '~/components/feed/QuickPost';
-import Sidebar from '~/components/sidebar/Sidebar';
-import { Suspense } from 'solid-js';
 import type { JSX } from 'solid-js';
 
 export default function FeedPage(props: { children: JSX.Element }) {
   return (
-    <div class="relative flex flex-col self-stretch w-full">
+    <div class="relative flex flex-col self-stretch w-full h-full">
       <nav class="z-10 pl-14 @[31.25rem]/content:pl-0 bg-background flex w-full sticky top-0 border-b border-ui">
         <A
           activeClass="underline decoration-accent decoration-4 underline-offset-8"
@@ -30,7 +28,7 @@ export default function FeedPage(props: { children: JSX.Element }) {
       <div class="border-solid border-b border-ui">
         <QuickPost />
       </div>
-      <Suspense>{props.children}</Suspense>
+      {props.children}
     </div>
   );
 }

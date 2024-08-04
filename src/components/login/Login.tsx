@@ -22,7 +22,7 @@ export default function Login() {
   return (
     <Switch
       fallback={
-        <div class="text-7xl text-foreground w-screen h-dvh bg-background flex items-center justify-center ">
+        <div class="text-7xl text-foreground w-screen h-full bg-background flex items-center justify-center ">
           <p>LOADING</p>
         </div>
       }
@@ -35,7 +35,7 @@ export default function Login() {
       <Match
         when={!checkLoggedInResp.pending && checkLoggedInResp.result == 'login'}
       >
-        <div class="min-h-screen flex flex-col justify-center items-center">
+        <div class="h-full flex flex-col justify-center items-center">
           <form
             action={action(login)}
             method="post"

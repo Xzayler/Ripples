@@ -75,3 +75,26 @@ export default function Ripple(props: { post: Ripple }) {
     </article>
   );
 }
+
+export function RippleSkeleton() {
+  return (
+    <article class="px-4 flex flex-col bg-background w-full cursor-pointer border-solid border-b border-ui @container/ripple">
+      <div class="pt-3 pb-2"></div>
+      {/* content */}
+      <div class="flex gap-3 w-full">
+        <div class="h-10 aspect-square rounded-full bg-skeleton"></div>
+        <div class="flex text-md flex-col w-full">
+          <div class="flex flex-row items-end gap-1 flex-wrap">
+            <div class="h-5 w-28 bg-skeleton rounded-md"></div>
+            <div class="h-4 w-28 bg-skeleton rounded-md opacity-60 "></div>
+          </div>
+          <div class="mt-2 flex flex-col gap-1 pr-2 max-w-80">
+            <div class="h-5 rounded-md bg-skeleton max-w-full"></div>
+            <div class="h-5 rounded-md bg-skeleton max-w-full"></div>
+            <div class="h-5 rounded-md w-3/5 bg-skeleton max-w-full"></div>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}

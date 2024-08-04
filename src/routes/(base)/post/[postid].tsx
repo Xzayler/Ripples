@@ -8,6 +8,7 @@ import { Suspense } from 'solid-js';
 import BackButton from '~/components/shared/BackButton';
 import type { Ripple as RippleType } from '~/types';
 import { UserContext } from '~/lib/UserContext';
+import Loading from '~/components/shared/Loading';
 
 export default function Post() {
   const params = useParams();
@@ -51,7 +52,7 @@ export default function Post() {
           <div class="flex items-center h-[52px] ">Post</div>
         </div>
       </nav>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<Loading />}>
         <MainRipple post={post()} addComment={addComment} />
         <For each={post() ? post()!.children : []}>
           {(item) => {

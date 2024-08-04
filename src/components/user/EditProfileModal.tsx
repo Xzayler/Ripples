@@ -67,7 +67,7 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
               <p class="font-bold text-foreground text-3xl mt-5 ">
                 Pick a Profile Picture!
               </p>
-              <div class=" flex justify-center grow items-center ">
+              <div class=" flex justify-center grow items-center my-4 ">
                 <div class="w-48 h-48 max-w-48 max-h-48 relative">
                   <Switch fallback={<UserPfp />}>
                     <Match when={pfp() != null}>

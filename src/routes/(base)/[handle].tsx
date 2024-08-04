@@ -40,7 +40,7 @@ export default function UserPage() {
   });
 
   return (
-    <div class="relative flex flex-col self-stretch ">
+    <div class="relative flex flex-col self-stretch h-full">
       <nav class="z-10 bg-background pl-8 @[31.25rem]/content:pl-0 flex w-full sticky top-0 border-b border-ui">
         <div class="px-4 w-1/2 gap-3 h-[53px] font-semibold grow flex items-center ">
           <BackButton />

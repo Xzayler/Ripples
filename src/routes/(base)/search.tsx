@@ -20,6 +20,7 @@ import { getHashtags, getUserResults } from '~/lib/server';
 import { Ripple, User } from '~/types';
 import SearchBar from '~/components/sidebar/SearchBar';
 import Sidebar from '~/components/sidebar/Sidebar';
+import Loading from '~/components/shared/Loading';
 
 type SearchParams = {
   searchType: 'general' | 'hashtag' | 'user';
@@ -51,7 +52,7 @@ export default function Search() {
   });
 
   return (
-    <div class="relative flex flex-col self-stretch ">
+    <div class="relative flex flex-col self-stretch h-full">
       <nav class="z-10 pl-8 @[31.25rem]/content:pl-0 bg-background flex w-full sticky top-0 border-b border-ui">
         <div class="px-4 w-1/2 bg-background gap-3 h-[53px] font-semibold grow flex items-center ">
           <BackButton />
@@ -65,27 +66,32 @@ export default function Search() {
       <Show
         when={Object.keys(searchParams).length === 0}
         fallback={
-          <div class="w-full bg-background border-b border-ui px-1 py-3 text-lg text-center">{`Searched for: ${
-            searchParams.searchType === 'hashtag' ? '#' : ''
-          }${searchParams.searchType === 'user' ? '@' : ''}${
-            searchParams.q
-          }`}</div>
+          <div class="p-4 border-b border-ui  ">
+            <div class="w-full flex justify-center @[62rem]/content:hidden">
+              <div class="w-full max-w-[350px]">
+                <SearchBar />
+              </div>
+            </div>
+            <div class="w-full bg-background text-lg text-center">{`Searched for: ${
+              searchParams.searchType === 'hashtag' ? '#' : ''
+            }${searchParams.searchType === 'user' ? '@' : ''}${
+              searchParams.q
+            }`}</div>
+          </div>
         }
       >
-        <div class="px-4 text-center @[62rem]/content:hidden text-xl ">
+        <div class="px-4 pt-4 text-center @[62rem]/content:hidden text-xl ">
           <Sidebar />
         </div>
       </Show>
-      <Suspense>
-        <Switch>
-          <Match when={searchParams.searchType == 'user'}>
-            <UserFeed q={searchParams.q ?? ''} />
-          </Match>
-          <Match when={searchParams.searchType == 'hashtag'}>
-            <Feed fetcher={fetcher()} />
-          </Match>
-        </Switch>
-      </Suspense>
+      <Switch>
+        <Match when={searchParams.searchType == 'user'}>
+          <UserFeed q={searchParams.q ?? ''} />
+        </Match>
+        <Match when={searchParams.searchType == 'hashtag'}>
+          <Feed fetcher={fetcher()} />
+        </Match>
+      </Switch>
     </div>
   );
 }
@@ -98,14 +104,16 @@ function UserFeed(props: { q: string }) {
     },
   );
   return (
-    <For
-      each={users()}
-      fallback={<div class="text-center text-xl mt-6">No users found</div>}
-    >
-      {(item) => {
-        return <UserEntry user={item} />;
-      }}
-    </For>
+    <Suspense fallback={<Loading />}>
+      <For
+        each={users()}
+        fallback={<div class="text-center text-xl mt-6">No users found</div>}
+      >
+        {(item) => {
+          return <UserEntry user={item} />;
+        }}
+      </For>
+    </Suspense>
   );
 }
 
