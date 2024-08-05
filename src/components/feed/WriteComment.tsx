@@ -3,6 +3,7 @@ import { createSignal, useContext } from 'solid-js';
 import { UserContext } from '~/lib/UserContext';
 import UserPfp from '../user/UserPfp';
 import CharacterLimit from '../shared/CharacterLimit';
+import { submitComment } from '~/lib/server';
 
 const [postBody, setPostBody] = createSignal<string | null>('');
 
@@ -22,8 +23,7 @@ export default function WriteComment(props: {
     <form
       method="post"
       action={action(async (formData: FormData) => {
-        // const { comment, id } = await submitComment(formData, props.parentid);
-        const { comment, id } = { comment: 'asdasdasd', id: '1234567890' };
+        const { comment, id } = await submitComment(formData, props.parentid);
 
         props.addComment(comment ?? '', id);
       }, 'postcomment')}
