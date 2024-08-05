@@ -88,7 +88,7 @@ export function RippleSkeleton() {
             <div class="h-5 w-28 bg-skeleton rounded-md"></div>
             <div class="h-4 w-28 bg-skeleton rounded-md opacity-60 "></div>
           </div>
-          <div class="mt-2 flex flex-col gap-1 pr-2 max-w-80">
+          <div class="mt-2 flex flex-col gap-1 pr-2 max-w-80 mb-4">
             <div class="h-5 rounded-md bg-skeleton max-w-full"></div>
             <div class="h-5 rounded-md bg-skeleton max-w-full"></div>
             <div class="h-5 rounded-md w-3/5 bg-skeleton max-w-full"></div>
