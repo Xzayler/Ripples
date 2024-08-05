@@ -28,8 +28,9 @@ export const submitPost = async (formData: FormData) => {
   const id = (await getCurrentUser()).id;
   const body = formData.get('body')?.toString();
   const postId = new mongoose.Types.ObjectId();
+  if (!body || body.length > 280 || body.length <= 0) return;
   addPost(postId, {
-    content: body ?? '',
+    content: body,
     author: id,
   });
   return postId.toString();

@@ -16,11 +16,11 @@ export default function PostModal(props: {
   closeFn: () => void;
 }) {
   const navigate = useNavigate();
-  const [postBody, setPostBody] = createSignal<string | null>('');
+  const [postBody, setPostBody] = createSignal<string>('');
 
   const updateInput = (e: Event) => {
     const el: HTMLElement = e.target as HTMLElement;
-    setPostBody(el.textContent);
+    setPostBody(el.textContent ?? '');
   };
 
   const user = useContext(UserContext);
@@ -74,12 +74,18 @@ export default function PostModal(props: {
           id="postform"
           method="post"
           action={action(async (formData: FormData) => {
+            const body = formData.get('body')?.toString();
+
             if (props.parent) {
-              navigate(
-                `/post/${(await submitComment(formData, props.parent.id)).id}`,
-              );
+              const res = await submitComment(formData, props.parent.id);
+              if (res) {
+                navigate(`/post/${res.id}`);
+              }
             } else {
-              navigate(`/post/${await submitPost(formData)}`);
+              const id = await submitPost(formData);
+              if (id) {
+                navigate(`/post/${id}`);
+              }
             }
             props.closeFn();
           })}
@@ -94,7 +100,7 @@ export default function PostModal(props: {
               class=" overflow-y-auto mb-4 mt-5 text-pretty [&:empty:not(:focus)]:after:content-['Write_Something'] after:text-faint grow text-xl leading-6 min-h-14 resize-none text-foreground outline-none bg-background focus-within:placeholder-background "
               id=""
             ></p>
-            <textarea name="body" class="hidden">
+            <textarea name="body" class="hidden" maxlength={280}>
               {postBody()}
             </textarea>
           </div>
@@ -106,9 +112,10 @@ export default function PostModal(props: {
             <CharacterLimit text={postBody()} limit={280} color="accent" />
           </div>
           <button
+            disabled={postBody().length > 280 || postBody().length === 0}
             form="postform"
             type="submit"
-            class="px-4 py-2 cursor-pointer bg-accent transition hover:bg-accent/90 rounded-full text-white font-bold"
+            class="px-4 py-2 cursor-pointer bg-accent transition hover:bg-accent/90 rounded-full text-white font-bold disabled:opacity-40"
           >
             <div class="flex items-center justify-center">
               <span class="text-md">Post</span>
