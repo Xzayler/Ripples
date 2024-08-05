@@ -1485,18 +1485,18 @@ export async function updateUserData(
       if (!response) throw new Error('no response');
       toChange.pfp = response.url;
     }
-    if (name) {
+    if (name && name.length > 0) {
       toChange.name = name;
     }
-    if (bio) {
+    if (bio !== null) {
       toChange.bio = bio;
     }
     await UserModel.updateOne({ _id: currUserId }, toChange);
   } catch (error) {
     console.log(error);
-    return 'failed';
+    throw new Error('Something went wrong');
   }
-  return 'ok';
+  return 'User data updated';
 }
 
 export async function getSuggestedUsers(currUserId: string) {

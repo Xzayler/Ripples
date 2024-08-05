@@ -40,21 +40,41 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
   const [bio, setBio] = createSignal<string | null>(null);
   const updateBio = (e: Event) => {
     const el: HTMLTextAreaElement = e.target as HTMLTextAreaElement;
-    setBio(el.value ?? '');
+    if (el.value.length > 160) {
+      el.setCustomValidity('Bio too long');
+    } else {
+      setBio(el.value ?? '');
+    }
   };
 
   const [name, setName] = createSignal<string | null>(null);
   const updateName = (e: Event) => {
     const el: HTMLInputElement = e.target as HTMLInputElement;
+    if (el.value.length == 0) setName(null); // So the name doesn't get changed
+    if (!/^[A-Za-z0-9 _-]+$/.test(el.value)) {
+      el.setCustomValidity(
+        "Use only space or valid characters a-z, A-Z, 0-9, '_' or '-'",
+      );
+    }
     setName(el.value);
   };
 
   const submitAction = action(async () => {
+    console.log(typeof bio());
     return updateUserData(pfp(), name(), bio());
   });
 
   const submitChanges = useAction(submitAction);
   const submitRes = useSubmission(submitAction);
+
+  function isValid() {
+    if (
+      (name() && (!/^[A-Za-z0-9 _-]+$/.test(name()!) || name()!.length > 16)) ||
+      (bio() && bio()!.length > 160)
+    ) {
+      return false;
+    } else return true;
+  }
 
   return (
     <Modal>
@@ -109,7 +129,10 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
                 setStage('pfp');
               }}
             />
-            <div class="justify-between h-full px-20 flex flex-col">
+            <form
+              id="namenbio"
+              class="justify-between h-full px-20 flex flex-col"
+            >
               <p class="font-bold text-foreground text-3xl mt-5 mb-2 ">
                 Describe Yourself
               </p>
@@ -118,26 +141,46 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
                 <input
                   type="text"
                   placeholder="Your Name"
+                  maxlength={16}
                   onInput={updateName}
+                  pattern="^[A-Za-z0-9 _-]+$"
                   class="mt-1 overflow-hidden rounded-lg p-2 outline-offset-0 focus:outline-accent border border-faint text-pretty placeholder:text-faint text-xl leading-6 min-h-10 resize-none text-foreground outline-none bg-background "
                 />
               </div>
               <div class="mt-2 mb-4 grow flex flex-col items-stretch ">
-                <CharacterLimit text={bio()} limit={160} />
+                <div class="flex gap-2 items-center">
+                  <CharacterLimit text={bio()} limit={160} />
+                  <Show when={user()?.bio && user()!.bio!.length > 0}>
+                    <button
+                      type="button"
+                      class="text-md text-foreground hover:underline cursor-pointer"
+                      onClick={() => {
+                        setBio('');
+                      }}
+                    >
+                      Clear currently saved bio
+                    </button>
+                  </Show>
+                </div>
                 <textarea
-                  placeholder="Your Bio"
+                  placeholder="Your New Bio"
                   rows={4}
+                  maxlength={160}
                   onInput={updateBio}
                   class="mt-1 overflow-auto rounded-lg p-2 outline-offset-0 focus:outline-accent border border-faint text-pretty placeholder:text-faint text-xl leading-6 min-h-14 resize-none text-foreground outline-none bg-background "
                 />
               </div>
-            </div>
+            </form>
             <div class="px-3">
               <ModalFoot>
                 <div class="my-4 w-full px-20">
                   <button
-                    type="button"
+                    type="submit"
+                    form="namenbio"
                     onClick={() => {
+                      if (!isValid()) {
+                        return;
+                      }
                       submitChanges();
                       setStage('pending');
                     }}
@@ -155,12 +198,14 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
           {/* Submission */}
           <Match when={stage() == 'pending'}>
             <Show
-              when={submitRes.result}
+              when={submitRes.result || submitRes.error}
               fallback={<p class="text-xl">Saving...</p>}
             >
               <ModalHeadClose closeFn={props.closeFn} />
-              <div class="flex items-center justify-center h-full">
-                <p class="text-xl">{submitRes.result}</p>
+              <div class="flex items-center justify-center h-full min-h-48 ">
+                <p class="text-xl">
+                  {submitRes.result ?? submitRes.error.message}
+                </p>
               </div>
             </Show>
           </Match>

@@ -138,6 +138,16 @@ export const updateUserData = async (
       type: pfp.type,
     });
   }
+  console.log(bio);
+  if (
+    name &&
+    (name.length > 16 || name.length < 1 || !/^[A-Za-z0-9 _-]+$/.test(name))
+  ) {
+    throw new Error('Invalid name');
+  }
+  if (bio && bio.length > 160) {
+    throw new Error('Bio too long');
+  }
   return await uud(currUser.id, newImg, name, bio);
 };
 
