@@ -23,7 +23,7 @@ export default function Signup() {
 
   return (
     <div class="h-full bg-background text-foreground flex flex-col justify-center items-center">
-      <p>{registerResponse.result?.message}</p>
+      <p class="text-foreground h-6">{registerResponse.error?.message}</p>
       <form
         class="mt-5 w-full max-w-lg mx-auto flex flex-col"
         method="post"
@@ -35,6 +35,7 @@ export default function Signup() {
           type="text"
           placeholder="Name"
           required
+          pattern="^[A-Za-z0-9_-]+$"
           minLength={3}
           maxLength={16}
         />
@@ -44,6 +45,7 @@ export default function Signup() {
           type="text"
           placeholder="Username"
           required
+          pattern="^[A-Za-z0-9_-]+$"
           minLength={3}
           maxLength={16}
         />

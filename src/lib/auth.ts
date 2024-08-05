@@ -44,41 +44,38 @@ export const register = async (formData: FormData) => {
   if (
     typeof username !== 'string' ||
     username.length < 3 ||
-    username.length > 31
+    username.length > 16
   ) {
-    return new Error('Invalid username');
+    throw new Error('Invalid username');
   }
-  if (!/^[a-z0-9_-]+$/.test(username))
-    return new Error(
-      "Username must only contain 0-9, a-z, '_' and '-' characters",
-    );
   const name = formData.get('name');
-  if (
-    typeof name !== 'string' ||
-    name.length < 3 ||
-    name.length > 31 ||
-    !/^[a-zA-Z0-9_-\s]+$/.test(name)
-  ) {
-    return new Error('Invalid name');
+  if (typeof name !== 'string' || name.length < 3 || name.length > 16) {
+    throw new Error('Invalid name');
   }
+  if (!/^[A-Za-z0-9_-]+$/.test(username) || !/^[a-zA-Z0-9_-\s]+$/.test(name))
+    throw new Error(
+      "Username must only contain digits, upper and lowercase a-z, '_' and '-' characters",
+    );
+  const dbuser = await getUserByUsername(username);
+  if (dbuser) throw new Error('Username is taken');
   const password = formData.get('password');
   const confirmPassword = formData.get('confirm-password');
   if (
     typeof password !== 'string' ||
     password.length < 6 ||
-    password.length > 255
+    password.length > 32
   ) {
-    return new Error('Invalid password');
+    throw new Error('Invalid password');
   }
   if (password !== confirmPassword) {
-    return new Error('Passwords do not match');
+    throw new Error('Passwords do not match');
   }
   const hashedPass = await bcrypt.hash(password, 10);
 
   try {
     await createUser(name, username, hashedPass);
   } catch (error) {
-    return error as Error;
+    throw new Error((error as Error).message);
   }
   return redirect('/login');
 };
@@ -87,14 +84,14 @@ export const login = async (formData: FormData) => {
   const username = String(formData.get('username'));
   if (
     username.length < 3 ||
-    username.length > 31 ||
-    !/^[a-z0-9_-]+$/.test(username)
+    username.length > 16 ||
+    !/^[A-Za-z0-9_-]+$/.test(username)
   ) {
     throw new Error('Invalid username');
   }
 
   const password = String(formData.get('password'));
-  if (password.length < 6 || password.length > 255) {
+  if (password.length < 6 || password.length > 32) {
     throw new Error('Invalid password');
   }
 
