@@ -38,8 +38,9 @@ export const submitComment = async (formData: FormData, postId: string) => {
   const id = (await getCurrentUser()).id;
   const body = formData.get('body')?.toString();
   const commentId = new mongoose.Types.ObjectId();
+  if (!body || body.length > 280 || body.length <= 0) return;
   addComment(commentId, {
-    content: body ?? '',
+    content: body,
     author: id,
     parent: new mongoose.Types.ObjectId(postId),
   });
