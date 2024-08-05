@@ -52,7 +52,7 @@ export const register = async (formData: FormData) => {
   if (typeof name !== 'string' || name.length < 3 || name.length > 16) {
     throw new Error('Invalid name');
   }
-  if (!/^[A-Za-z0-9_-]+$/.test(username) || !/^[a-zA-Z0-9_-\s]+$/.test(name))
+  if (!/^[A-Za-z0-9_-]+$/.test(username) || !/^[a-zA-Z0-9 _-]+$/.test(name))
     throw new Error(
       "Username must only contain digits, upper and lowercase a-z, '_' and '-' characters",
     );

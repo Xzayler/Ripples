@@ -35,7 +35,7 @@ export default function Signup() {
           type="text"
           placeholder="Name"
           required
-          pattern="^[A-Za-z0-9_-]+$"
+          pattern="^[A-Za-z0-9 _-]+$"
           minLength={3}
           maxLength={16}
         />
