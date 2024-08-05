@@ -1,12 +1,13 @@
-import { createSignal, createEffect } from 'solid-js';
-import { addFollow, removeFollow } from '~/lib/server';
+import { createSignal, createEffect, Show, useContext } from 'solid-js';
+import { addFollow as follow, removeFollow as unfollow } from '~/lib/server';
+import { UserContext } from '~/lib/UserContext';
 
 export default function FollowButton(props: {
   isFollowed: boolean;
   uId: string;
 }) {
-  const follow = addFollow;
-  const unfollow = removeFollow;
+  const user = useContext(UserContext);
+
   const [isFollowed, setIsFollowed] = createSignal<boolean>(
     props.isFollowed ?? false,
   );
@@ -28,15 +29,17 @@ export default function FollowButton(props: {
   return (
     <button
       type="button"
+      disabled={user && user() && user()!.id === props.uId}
       onclick={(e) => {
         e.preventDefault();
         pressFollow();
       }}
       class={
-        'px-4 group cursor-pointer transition rounded-full border text-foreground border-foreground border-solid bg-background ' +
+        'px-4 group cursor-pointer transition rounded-full border text-foreground border-foreground border-solid bg-background' +
         (isFollowed()
           ? ' hover:text-red-500 hover:border-red-500'
-          : ' hover:text-background hover:bg-foreground ')
+          : ' hover:text-background hover:bg-foreground ') +
+        ' disabled:opacity-40 disabled:bg-neutral-800 disabled:text-foreground'
       }
     >
       <div class="flex items-center justify-center py-2">
