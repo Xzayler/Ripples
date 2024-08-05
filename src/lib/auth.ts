@@ -102,7 +102,7 @@ export const login = async (formData: FormData) => {
   if (!existingUser) {
     return new Error("That user doesn't exist");
   }
-  const validPassword = bcrypt.compare(password, existingUser.password);
+  const validPassword = await bcrypt.compare(password, existingUser.password);
   if (!validPassword) {
     return new Error('Incorrect username or password');
   }
