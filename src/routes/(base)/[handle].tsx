@@ -9,7 +9,6 @@ import {
   createEffect,
 } from 'solid-js';
 import { getUserData, getUserLikedPosts, getUserPosts } from '~/lib/server';
-import Sidebar from '~/components/sidebar/Sidebar';
 import BackButton from '~/components/shared/BackButton';
 import FollowButton from '~/components/user/FollowButton';
 import Feed from '~/components/feed/Feed';
@@ -19,6 +18,7 @@ import EditProfileModal, {
 } from '~/components/user/EditProfileModal';
 import UserPfp from '~/components/user/UserPfp';
 import MultiLineText from '~/components/shared/MultiLineText';
+import Loading from '~/components/shared/Loading';
 
 export default function UserPage() {
   const params = useParams();
@@ -52,6 +52,9 @@ export default function UserPage() {
       </nav>
       {/* User Data*/}
       <Switch>
+        <Match when={user.loading}>
+          <Loading />
+        </Match>
         <Match when={user()}>
           <div class="w-full p-4 flex flex-col gap-3">
             <div class="flex gap-4 justify-between w-full">
