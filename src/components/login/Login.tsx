@@ -3,6 +3,7 @@ import { login } from '~/lib/server';
 import { getRequestEvent } from 'solid-js/web';
 import { Switch, Match } from 'solid-js';
 import { Navigate } from '@solidjs/router';
+import Loading from '../shared/Loading';
 
 const isLoggedIn = action(async () => {
   'use server';
@@ -19,14 +20,11 @@ export default function Login() {
   const checkLoggedInResp = useSubmission(isLoggedIn);
   checkLoggedIn();
 
+  const loginAction = action(login);
+  const loginSubmission = useSubmission(loginAction);
+
   return (
-    <Switch
-      fallback={
-        <div class="text-7xl text-foreground w-screen h-full bg-background flex items-center justify-center ">
-          <p>LOADING</p>
-        </div>
-      }
-    >
+    <Switch fallback={<Loading />}>
       <Match
         when={!checkLoggedInResp.pending && checkLoggedInResp.result == 'home'}
       >
@@ -36,8 +34,13 @@ export default function Login() {
         when={!checkLoggedInResp.pending && checkLoggedInResp.result == 'login'}
       >
         <div class="h-full flex flex-col justify-center items-center">
+          <div class="text-foreground h-6">
+            {loginSubmission.pending
+              ? ''
+              : loginSubmission.error?.message ?? ''}
+          </div>
           <form
-            action={action(login)}
+            action={loginAction}
             method="post"
             class="mt-5 w-full max-w-lg mx-auto flex flex-col"
           >

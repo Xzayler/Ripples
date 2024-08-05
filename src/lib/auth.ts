@@ -90,21 +90,21 @@ export const login = async (formData: FormData) => {
     username.length > 31 ||
     !/^[a-z0-9_-]+$/.test(username)
   ) {
-    return new Error('Invalid username');
+    throw new Error('Invalid username');
   }
 
   const password = String(formData.get('password'));
   if (password.length < 6 || password.length > 255) {
-    return new Error('Invalid password');
+    throw new Error('Invalid password');
   }
 
   const existingUser = await getUserByUsername(username);
   if (!existingUser) {
-    return new Error("That user doesn't exist");
+    throw new Error('Incorrect username or password');
   }
   const validPassword = await bcrypt.compare(password, existingUser.password);
   if (!validPassword) {
-    return new Error('Incorrect username or password');
+    throw new Error('Incorrect username or password');
   }
 
   const lucia = await getLucia();
@@ -115,13 +115,13 @@ export const login = async (formData: FormData) => {
   const sessCookieVal = lucia.createSessionCookie(session.id).serialize();
   setCookie(event.nativeEvent, lucia.sessionCookieName, sessCookieVal);
   // event.request.headers.set(lucia.sessionCookieName, sessCookieVal); not working for some reason.
-  return redirect('/home');
+  throw redirect('/home');
 };
 
 export const logout = async () => {
   const event = getRequestEvent();
   if (!event?.locals.session) {
-    return new Error('Unauthorized');
+    throw new Error('Unauthorized');
   }
   const lucia = await getLucia();
   await lucia.invalidateSession(event.locals.session.id);
