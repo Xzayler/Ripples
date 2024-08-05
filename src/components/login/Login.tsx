@@ -1,5 +1,5 @@
 import { A, action, useAction, useSubmission } from '@solidjs/router';
-import { login } from '~/lib/server';
+import { login, guestLogin } from '~/lib/server';
 import { getRequestEvent } from 'solid-js/web';
 import { Switch, Match } from 'solid-js';
 import { Navigate } from '@solidjs/router';
@@ -58,16 +58,28 @@ export default function Login() {
               placeholder="Password"
               required
             />
-            <button class="mt-2.5 py-2.5 text-white font-bold rounded bg-accent hover:opacity-90">
+            <button
+              type="submit"
+              class="mt-2.5 py-2.5 text-white font-bold rounded bg-accent hover:opacity-90"
+            >
               Log in
             </button>
           </form>
           <div class="mt-5 text-foreground">
             Don't have an account?
-            <A class="text-accent ml-1" href="/signup">
+            <A class="text-accent ml-1 inline-block" href="/signup">
               Sign up here
             </A>
           </div>
+          <p class="text-foreground">or</p>
+          <form method="post" action={action(guestLogin)}>
+            <button
+              type="submit"
+              class="mt-2.5 px-2 py-2.5 text-foreground bg-background border-2 border-foreground rounded cursor-pointer"
+            >
+              Log in as a guest
+            </button>
+          </form>
         </div>
       </Match>
     </Switch>

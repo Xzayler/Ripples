@@ -1,5 +1,10 @@
 'use server';
-import { register as rg, login as li, logout as lo } from './auth';
+import {
+  register as rg,
+  login as li,
+  logout as lo,
+  guestLogin as gli,
+} from './auth';
 import {
   submitPost as sp,
   submitComment as sc,
@@ -28,6 +33,7 @@ import {
 export const register = rg;
 export const login = li;
 export const logout = lo;
+export const guestLogin = gli;
 
 // Interactions
 export const submitPost = sp;

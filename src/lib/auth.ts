@@ -129,3 +129,14 @@ export const logout = async () => {
 
   throw redirect('/login');
 };
+
+export const guestLogin = async () => {
+  const lucia = await getLucia();
+
+  const session = await lucia.createSession('66b1042890e68e59d2199cad', {});
+  const event = getRequestEvent()!;
+
+  const sessCookieVal = lucia.createSessionCookie(session.id).serialize();
+  setCookie(event.nativeEvent, lucia.sessionCookieName, sessCookieVal);
+  throw redirect('/home');
+};
