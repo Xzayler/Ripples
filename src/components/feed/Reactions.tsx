@@ -12,6 +12,7 @@ import LikeIcon from '../shared/icons/LikeIcon';
 import CommentIcon from '../shared/icons/CommentIcon';
 import RepostIcon from '../shared/icons/RepostIcon';
 import BookmarkIcon from '../shared/icons/BookmarkIcon';
+import Modal, { ModalHeadClose } from '../shared/Modal';
 
 const defaultPost = {
   id: 'idasd',
@@ -42,6 +43,7 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
   const [hasBookmarked, setHasBookmarked] = createSignal<boolean>(
     props.post ? props.post.hasBookmarked : false,
   );
+  const [repostModal, setRespostModal] = createSignal<boolean>(false);
 
   createEffect(() => {
     setLikesCount((() => (props.post ? props.post.likes : 0))());
@@ -123,7 +125,19 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
           'cursor-pointer flex items-center hover:text-repost ' + 'text-faint'
           // + (hasReposted() ? " text-repost" : "text-faint") For future implementation
         }
+        onClick={(e: Event) => {
+          setRespostModal(true);
+          e.stopPropagation();
+        }}
       >
+        <Show when={repostModal()}>
+          <Modal>
+            <ModalHeadClose closeFn={() => setRespostModal(false)} />
+            <div class="w-full pt-16 pb-20 flex items-center justify-center text-xl text-foreground">
+              Feature not implemented yet
+            </div>
+          </Modal>
+        </Show>
         <div class="h-4 w-auto">
           <RepostIcon />
         </div>
