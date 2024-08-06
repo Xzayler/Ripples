@@ -9,6 +9,7 @@ import BackButton from '~/components/shared/BackButton';
 import type { Ripple as RippleType } from '~/types';
 import { UserContext } from '~/lib/UserContext';
 import Loading from '~/components/shared/Loading';
+import { Title } from '@solidjs/meta';
 
 export default function Post() {
   const params = useParams();
@@ -53,6 +54,7 @@ export default function Post() {
         </div>
       </nav>
       <Suspense fallback={<Loading />}>
+        <Title>{`${post()?.authorName} on Waves: "${post()?.content}"`}</Title>
         <MainRipple post={post()} addComment={addComment} />
         <For each={post() ? post()!.children : []}>
           {(item) => {

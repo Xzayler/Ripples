@@ -8,6 +8,7 @@ import {
   createSignal,
   createEffect,
 } from 'solid-js';
+import { Title } from '@solidjs/meta';
 import { getUserData, getUserLikedPosts, getUserPosts } from '~/lib/server';
 import BackButton from '~/components/shared/BackButton';
 import FollowButton from '~/components/user/FollowButton';
@@ -56,6 +57,7 @@ export default function UserPage() {
           <Loading />
         </Match>
         <Match when={user()}>
+          <Title>{`${user()!.name} (@${user()!.handle}) | Waves`}</Title>
           <div class="w-full p-4 flex flex-col gap-3">
             <div class="flex gap-4 justify-between w-full">
               <div class="flex flex-col gap-2 items-start">

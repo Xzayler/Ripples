@@ -22,6 +22,8 @@ import SearchBar from '~/components/sidebar/SearchBar';
 import Sidebar from '~/components/sidebar/Sidebar';
 import Loading from '~/components/shared/Loading';
 
+import { Title } from '@solidjs/meta';
+
 type SearchParams = {
   searchType: 'general' | 'hashtag' | 'user';
   q: string;
@@ -52,47 +54,50 @@ export default function Search() {
   });
 
   return (
-    <div class="relative flex flex-col self-stretch h-full">
-      <nav class="z-10 pl-8 @[31.25rem]/content:pl-0 bg-background flex w-full sticky top-0 border-b border-ui">
-        <div class="px-4 w-1/2 bg-background gap-3 h-[53px] font-semibold grow flex items-center ">
-          <BackButton />
-          <h1 class="flex items-center h-[52px] ">
-            {Object.keys(searchParams).length === 0
-              ? 'Search'
-              : 'Search Results'}
-          </h1>
-        </div>
-      </nav>
-      <Show
-        when={Object.keys(searchParams).length === 0}
-        fallback={
-          <div class="p-4 border-b border-ui  ">
-            <div class="w-full flex justify-center @[62rem]/content:hidden">
-              <div class="w-full max-w-[350px]">
-                <SearchBar />
-              </div>
-            </div>
-            <div class="w-full bg-background text-lg text-center">{`Searched for: ${
-              searchParams.searchType === 'hashtag' ? '#' : ''
-            }${searchParams.searchType === 'user' ? '@' : ''}${
-              searchParams.q
-            }`}</div>
+    <>
+      <Title>{`${searchParams.q ?? 'Search'} | Waves`}</Title>
+      <div class="relative flex flex-col self-stretch h-full">
+        <nav class="z-10 pl-8 @[31.25rem]/content:pl-0 bg-background flex w-full sticky top-0 border-b border-ui">
+          <div class="px-4 w-1/2 bg-background gap-3 h-[53px] font-semibold grow flex items-center ">
+            <BackButton />
+            <h1 class="flex items-center h-[52px] ">
+              {Object.keys(searchParams).length === 0
+                ? 'Search'
+                : 'Search Results'}
+            </h1>
           </div>
-        }
-      >
-        <div class="px-4 pt-4 text-center @[62rem]/content:hidden text-xl ">
-          <Sidebar />
-        </div>
-      </Show>
-      <Switch>
-        <Match when={searchParams.searchType == 'user'}>
-          <UserFeed q={searchParams.q ?? ''} />
-        </Match>
-        <Match when={searchParams.searchType == 'hashtag'}>
-          <Feed fetcher={fetcher()} />
-        </Match>
-      </Switch>
-    </div>
+        </nav>
+        <Show
+          when={Object.keys(searchParams).length === 0}
+          fallback={
+            <div class="p-4 border-b border-ui  ">
+              <div class="w-full flex justify-center @[62rem]/content:hidden">
+                <div class="w-full max-w-[350px]">
+                  <SearchBar />
+                </div>
+              </div>
+              <div class="w-full bg-background text-lg text-center">{`Searched for: ${
+                searchParams.searchType === 'hashtag' ? '#' : ''
+              }${searchParams.searchType === 'user' ? '@' : ''}${
+                searchParams.q
+              }`}</div>
+            </div>
+          }
+        >
+          <div class="px-4 pt-4 text-center @[62rem]/content:hidden text-xl ">
+            <Sidebar />
+          </div>
+        </Show>
+        <Switch>
+          <Match when={searchParams.searchType == 'user'}>
+            <UserFeed q={searchParams.q ?? ''} />
+          </Match>
+          <Match when={searchParams.searchType == 'hashtag'}>
+            <Feed fetcher={fetcher()} />
+          </Match>
+        </Switch>
+      </div>
+    </>
   );
 }
 
