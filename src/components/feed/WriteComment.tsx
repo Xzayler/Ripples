@@ -23,9 +23,8 @@ export default function WriteComment(props: {
     <form
       method="post"
       action={action(async (formData: FormData) => {
-        'use server';
         const body = formData.get('body')?.toString();
-        if (!(body === undefined || body.length > 280 || body.length < 1)) {
+        if (body === undefined || body.length > 280 || body.length < 1) {
           return;
         }
         const res = await submitComment(formData, props.parentid);
