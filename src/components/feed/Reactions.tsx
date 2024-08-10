@@ -80,7 +80,6 @@ export default function Reactions(props: { post: Ripple | null | undefined }) {
       <div
         class="cursor-pointer flex items-center text-faint hover:text-comment"
         onClick={(e) => {
-          e.preventDefault();
           openModal(() => setActive(true));
           e.stopPropagation();
         }}
