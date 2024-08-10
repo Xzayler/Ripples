@@ -60,7 +60,6 @@ export default function EditProfileModal(props: { closeFn: () => void }) {
   };
 
   const submitAction = action(async () => {
-    console.log(typeof bio());
     return updateUserData(pfp(), name(), bio());
   });
 
