@@ -28,6 +28,7 @@ import {
   getHashtags as gh,
   getUserResults as gur,
 } from './interactions';
+import { dbReset as dbr } from './database';
 
 // session / auth
 export const register = rg;
@@ -59,3 +60,5 @@ export const getSuggestedUsers = gsu;
 export const getTrending = gt;
 export const getHashtags = gh;
 export const getUserResults = gur;
+
+export const dbReset = dbr;

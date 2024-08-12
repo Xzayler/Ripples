@@ -1870,3 +1870,169 @@ export const getAdapter = async () => {
     mongoose.connection.collection('users'),
   );
 };
+
+// clear database and populate with sample data
+export const dbReset = async () => {
+  try {
+    await Promise.all([
+      UserModel.deleteMany({}),
+      HashtagsModel.deleteMany({}),
+      PostModel.deleteMany({}),
+      BookmarksModel.deleteMany({}),
+      HashtagsModel.deleteMany({}),
+      LikeModel.deleteMany({}),
+      LikerModel.deleteMany({}),
+      FollowerModel.deleteMany({}),
+      FollowingModel.deleteMany({}),
+    ]);
+
+    // Create ObjIds
+    const jimObjId = new mongoose.Types.ObjectId();
+    const michaelObjId = new mongoose.Types.ObjectId();
+    const dwightObjId = new mongoose.Types.ObjectId();
+    const andrewObjId = new mongoose.Types.ObjectId();
+    const guestObjId = new mongoose.Types.ObjectId('66b1042890e68e59d2199cad');
+
+    // Create & add Guest with id 66b1042890e68e59d2199cad,
+    const guest: InferredUser = {
+      _id: '66b1042890e68e59d2199cad',
+      name: 'Guest',
+      handle: 'guest',
+      password: '$2a$10$l9375VWZO/Oc.Gwri0g23eOHMT8x.gZQxZ1Xs5miJ0QP97yyHb8qO',
+      followers: 0,
+      following: 0,
+    };
+    // Create & add Michael, Dwight, Andy and Jim
+    const michael: InferredUser = {
+      _id: michaelObjId.toString(),
+      name: 'Michael Scott',
+      handle: 'itsbritneybitch',
+      password: '$2a$10$ktfIrm1BcSsTEXox/U43BOLTzVPewIhTcTPl0fCTuJVvSZVRId./u',
+      pfp: 'http://res.cloudinary.com/djdafssz0/image/upload/v1717780686/itsbritneybitch.webp',
+      bio: "World's best boss\nStar of Threat Level: Midnight",
+      followers: 0,
+      following: 0,
+    };
+    const dwight: InferredUser = {
+      _id: dwightObjId.toString(),
+      name: 'Dwight Schrute',
+      handle: 'captainkirk',
+      password: '$2a$10$xzO4LpsCpipPfUJ0JLNW8.KDPKEtMtL2ykOxpAYIlqPHc2koknsb2',
+      pfp: 'http://res.cloudinary.com/djdafssz0/image/upload/v1722095058/captainkirk.webp',
+      bio: 'Assistant Regional Manager at Dunder Mifflin.\nOwner of Schrute Farms.\nVolunteer sheriff deputy.',
+      followers: 0,
+      following: 0,
+    };
+    const andrew: InferredUser = {
+      _id: andrewObjId.toString(),
+      name: 'Andy Bernard',
+      handle: 'TheNardDog',
+      password: '$2a$10$6o0.bsWtlCgrswbG101ka.RBG8MjyAGZt3o0ANvlyrT/CQDWcqR5G',
+      pfp: 'http://res.cloudinary.com/djdafssz0/image/upload/v1723302373/TheNardDog.webp',
+      bio: 'Cornell Admissions Director\n🎶 #HereComesTreble',
+      followers: 0,
+      following: 0,
+    };
+    const jim: InferredUser = {
+      _id: jimObjId.toString(),
+      name: 'Dwight Schrute',
+      handle: 'jimhalpert',
+      password: '$2a$10$NfyD3/3ffIuxcjYlseguiO6HR8dW6G8Q4rHnYKTi7dG4PLbM2CpTe',
+      pfp: 'http://res.cloudinary.com/djdafssz0/image/upload/v1723304141/jimhalpert.webp',
+      bio: 'Assistant TO THE Regional Manager\nBears. Beets. Battlestar Galactica.',
+      followers: 0,
+      following: 0,
+    };
+    await UserModel.insertMany([guest, michael, dwight, andrew, jim]);
+    await Promise.all([
+      BookmarksModel.insertMany([
+        { _id: guestObjId, posts: [] },
+        { _id: michaelObjId, posts: [] },
+        { _id: dwightObjId, posts: [] },
+        { _id: andrewObjId, posts: [] },
+        { _id: jimObjId, posts: [] },
+      ] as InferredBookmark[]),
+      FollowerModel.insertMany([
+        { _id: guestObjId, users: [] },
+        { _id: michaelObjId, users: [] },
+        { _id: dwightObjId, users: [] },
+        { _id: andrewObjId, users: [] },
+        { _id: jimObjId, users: [] },
+      ] as InferredFollower[]),
+      FollowingModel.insertMany([
+        { _id: guestObjId, users: [] },
+        { _id: michaelObjId, users: [] },
+        { _id: dwightObjId, users: [] },
+        { _id: andrewObjId, users: [] },
+        { _id: jimObjId, users: [] },
+      ] as InferredFollowing[]),
+      LikeModel.insertMany([
+        { _id: guestObjId, posts: [] },
+        { _id: michaelObjId, posts: [] },
+        { _id: dwightObjId, posts: [] },
+        { _id: andrewObjId, posts: [] },
+        { _id: jimObjId, posts: [] },
+      ] as InferredLike[]),
+    ]);
+
+    // Have Michael and Jim post
+    const michaelPostId = new mongoose.Types.ObjectId();
+    const jimPostId = new mongoose.Types.ObjectId();
+    await Promise.all([
+      addPost(michaelPostId, { content: '#PARKOUR!', author: michael._id }),
+      addPost(jimPostId, {
+        content: 'Question: What kind of bear is best?',
+        author: jim._id,
+      }),
+    ]);
+
+    // Andy and Dwight comment
+    const parkourCommentIds = [
+      new mongoose.Types.ObjectId(),
+      new mongoose.Types.ObjectId(),
+    ];
+    const dwightCommentId = new mongoose.Types.ObjectId();
+    await Promise.all([
+      addComment(parkourCommentIds[0], {
+        content: 'PARKOUR!',
+        author: dwight._id,
+        parent: michaelPostId,
+      }),
+      addComment(parkourCommentIds[1], {
+        content: 'PARKOUR!',
+        author: andrew._id,
+        parent: michaelPostId,
+      }),
+      addComment(dwightCommentId, {
+        content: 'IDENTITY THEFT IS NOT A JOKE, JIM!',
+        author: dwight._id,
+        parent: jimPostId,
+      }),
+    ]);
+
+    // Michael likes each of the comments
+    await Promise.all([
+      likePost(michaelPostId, michael._id),
+      likePost(michaelPostId, andrew._id),
+      likePost(michaelPostId, dwight._id),
+
+      likePost(parkourCommentIds[0], michael._id),
+      likePost(parkourCommentIds[0], andrew._id),
+      likePost(parkourCommentIds[1], michael._id),
+      likePost(parkourCommentIds[1], dwight._id),
+    ]);
+
+    // Michael follows Jim, Dwight and Adrew follow Michael, Jim follows Dwight, Dwight follows Andy
+    await Promise.all([
+      addFollow(michaelObjId, jimObjId),
+      addFollow(dwightObjId, michaelObjId),
+      addFollow(andrewObjId, michaelObjId),
+      addFollow(jimObjId, dwightObjId),
+      addFollow(dwightObjId, andrewObjId),
+    ]);
+
+    await addBookmark(jimObjId, dwightCommentId);
+  } catch (e) {
+    console.log(e);
+  }
+};
